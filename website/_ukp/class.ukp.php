@@ -1,0 +1,3681 @@
+<?php
+
+/**
+ * Ukp 라이브러리  
+ *   
+ * $option        옵션설정  
+ * [api_bool]     true - json, false - html(기본값: false)  
+ * [session_bool] 세션사용여부(기본값: true)  
+ * [cors_bool]    cors 허용여부(기본값: false)  
+ *   
+ * require  2025.06.13 config.php
+ * @version 2025.11.25
+ * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
+ * @author  ukp
+ */
+class Ukp {
+
+    /**
+     * 서버 케릭터셋  
+     *   
+     * @version 2020.02.13
+     * @var     string
+     */
+    private $character_set;
+
+    /**
+     * 서버 타임존  
+     *   
+     * @version 2020.07.29
+     * @var     string
+     */
+    private $time_zone;
+
+    /**
+     * mysqli 접속정보  
+     *   
+     * @version 2020.07.10
+     * @var     array
+     */
+    private $db_info;
+
+    /**
+     * mysqli insert_id  
+     *   
+     * @version 2020.07.10
+     * @var     int
+     */
+    private $db_insert_id;
+
+    /**
+     * mysqli affected_rows  
+     *   
+     * @version 2020.07.10
+     * @var     int
+     */
+    private $db_affected_rows;
+
+    /**
+     * mysqli last_query  
+     *   
+     * @version 2022.12.19
+     * @var     string
+     */
+    private $db_last_query;
+
+    /**
+     * 파일 업로드 상태값  
+     *   
+     * [code]: 업로드 결과코드  
+     *         0 - 업로드한적 없음  
+     *         1 - 업로드 성공  
+     *         2 - 업로드파일 없음  
+     *         3 - 업로드할 폴더 없음  
+     *         4 - 허용확장자 없음  
+     * [name]: 업로드 파일명  
+     * [ext]: 업로드 파일 확장자  
+     * [full_name]: 확장자 포함 파일명  
+     * [src]: 업로드 경로  
+     *   
+     * @version 2020.02.13
+     * @var     array
+     */
+    private $input_upload_info;
+
+    /**
+     * api url  
+     *   
+     * @version 2025.03.06
+     * @var     string
+     */
+    private $common_api_url;
+
+    /**
+     * api 토큰  
+     *   
+     * @version 2025.03.06
+     * @var     string
+     */
+    private $common_api_token;
+
+    /**
+     * User-Agent(크롤링용)  
+     *   
+     * @version 2020.05.26
+     * @var     string
+     */
+    private $common_user_agent;
+
+    /**
+     * 페이누리 암호화키  
+     *   
+     * @version 2020.02.13
+     * @var     string
+     */
+    private $common_keyin_paynuri_crypto;
+
+    /**
+     * 웰컴페이 API키  
+     *   
+     * @version 2020.02.13
+     * @var     string
+     */
+    private $common_keyin_welcome_api_key;
+
+    /**
+     * 웰컴페이 IV값  
+     *   
+     * @version 2020.02.13
+     * @var     string
+     */
+    private $common_keyin_welcome_iv;
+
+    /**
+     * 원시그널 앱아이디  
+     *   
+     * @version 2020.02.13
+     * @var     string
+     */
+    private $common_onesignal_app_id;
+
+    /**
+     * 원시그널 rest api 키  
+     *   
+     * @version 2024.10.29
+     * @var     string
+     */
+    private $common_onesignal_rest_api_key;
+
+    /**
+     * 공공데이터포털 날씨 서비스키  
+     *   
+     * @version 2020.02.13
+     * @var     string
+     */
+    private $common_godata_weather;
+
+    /**
+     * 공공데이터포털 휴일 서비스키  
+     *   
+     * @version 2020.09.11
+     * @var     string
+     */
+    private $common_godata_holiday;
+
+    /**
+     * 카카오맵 REST API 키  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_kakao_rest_api;
+
+    /**
+     * 카카오 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_kakao_redirect_url;
+
+    /**
+     * 카카오 로그인 REST API 키  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_kakao_rest_api;
+
+    /**
+     * 카카오 로그인 client secret  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_kakao_client_secret;
+
+    /**
+     * 네이버 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_naver_redirect_url;
+
+    /**
+     * 네이버 로그인 client id  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_naver_client_id;
+
+    /**
+     * 네이버 로그인 client secret  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_naver_client_secret;
+
+    /**
+     * 페이스북 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_facebook_redirect_url;
+
+    /**
+     * 페이스북 로그인 client id  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_facebook_client_id;
+
+    /**
+     * 페이스북 로그인 client secret  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_facebook_client_secret;
+
+    /**
+     * 구글 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_google_redirect_url;
+
+    /**
+     * 구글 로그인 client id  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_google_client_id;
+
+    /**
+     * 구글 로그인 client secret  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_google_client_secret;
+
+    /**
+     * PASS 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_pass_redirect_url;
+
+    /**
+     * PASS 로그인 client id  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_pass_client_id;
+
+    /**
+     * PASS 로그인 client secret  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_pass_client_secret;
+
+    /**
+     * 애플 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_apple_redirect_url;
+
+    /**
+     * 애플 로그인 identifier(service id)  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_apple_identifier;
+
+    /**
+     * 애플 로그인 key id(key)  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_apple_key_id;
+
+    /**
+     * 애플 로그인 team id  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_apple_team_id;
+
+    /**
+     * 애플 로그인 private key file  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_apple_private_key_file;
+
+    /**
+     * 카페24 로그인 redirect url  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_cafe24_redirect_url;
+
+    /**
+     * 카페24 로그인 client id  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_cafe24_client_id;
+
+    /**
+     * 카페24 로그인 client secret  
+     *   
+     * @version 2025.01.17
+     * @var     string
+     */
+    private $common_social_cafe24_client_secret;
+
+    /**
+     * 톡스토어 api 인증키  
+     *   
+     * @version 2021.05.24
+     * @var     string
+     */
+    private $common_shop_kakao_admin_app_key;
+
+    /**
+     * esm 비밀키  
+     *   
+     * @version 2022.01.11
+     * @var     string
+     */
+    private $common_shop_esm_secret_key;
+
+    /**
+     * 커머스 client id  
+     *   
+     * @version 2023.05.18
+     * @var     string
+     */
+    private $common_shop_commerce_client_id;
+
+    /**
+     * 커머스 client secret  
+     *   
+     * @version 2023.05.18
+     * @var     string
+     */
+    private $common_shop_commerce_client_secret;
+
+    /**
+     * 티몬 client id  
+     *   
+     * @version 2023.05.18
+     * @var     string
+     */
+    private $common_shop_tmon_client_id;
+
+    /**
+     * 티몬 client secret  
+     *   
+     * @version 2023.05.18
+     * @var     string
+     */
+    private $common_shop_tmon_client_secret;
+
+    /**
+     * 티몬 복호화 키  
+     *   
+     * @version 2023.05.18
+     * @var     string
+     */
+    private $common_shop_tmon_secret_key;
+
+    /**
+     * asn1 integer  
+     *   
+     * @version 2021.03.10
+     * @var     int
+     */
+    private $custom_asn1_integer;
+
+    /**
+     * asn1 sequence  
+     *   
+     * @version 2021.03.10
+     * @var     int
+     */
+    private $custom_asn1_sequence;
+
+    /**
+     * asn1 bit string  
+     *   
+     * @version 2021.03.10
+     * @var     int
+     */
+    private $custom_asn1_bit_string;
+
+    /**
+     * unique id 중복방지  
+     *   
+     * @version 2022.06.28
+     * @var     int
+     */
+    private $custom_unique_index;
+
+    /**
+     * 사용자 정보  
+     *   
+     * @version 2025.10.24
+     * @var     string
+     */
+    private $custom_user_info;
+
+    /**
+     * request  
+     *   
+     * @version 2025.08.05
+     * @var     array
+     */
+    private $custom_request;
+
+    /**
+     * 스마트스토어 api url  
+     *   
+     * @version 2023.06.14
+     * @var     string
+     */
+    private $custom_shop_smartstore_api_url;
+
+    /**
+     * 티몬 api url  
+     *   
+     * @version 2023.06.14
+     * @var     string
+     */
+    private $custom_shop_tmon_api_url;
+
+    /**
+     * 위메프 api url  
+     *   
+     * @version 2023.06.14
+     * @var     string
+     */
+    private $custom_shop_wemakeprice_api_url;
+
+    /**
+     * 스마트스토어 api 수집딜레이(마이크로초)  
+     *   
+     * @version 2023.06.14
+     * @var     int
+     */
+    private $custom_shop_smartstore_api_delay;
+
+    /**
+     * 톡스토어 api 수집딜레이(마이크로초)  
+     *   
+     * @version 2023.07.10
+     * @var     int
+     */
+    private $custom_shop_kakao_api_delay;
+
+    /**
+     * 주문/클레임정보  
+     * 주문리스트에 결제일이 누락된 부분이 있는경우 구매일자 주문일, 아닌경우 결제일  
+     * 선물하기 주문은 주문일과 결제일이 같음  
+     *   
+     * 상점별 기준(order_no / product_price / buy_dt / 선물주문여부)  
+     * 스마트스토어: 상품주문번호 / 상품별 총 주문금액 / 결제일 / y  
+     * 티몬: 주문번호-옵션번호 / 총 주문금액 / 결제일 / n  
+     * ESM: 주문번호 / 정산예정금액 / 결제일 / y  
+     * 쿠팡:주문번호-(vendorItemId 또는 targetItemId) / 주문금액 - 할인금액 + 쿠팡지원할인 / 결제일 / n  
+     * 위메프: 옵션주문번호 / 판매단가 * 수량 / 결제일 / n  
+     * 11번가: 주문번호-주문순번 / 판매단가 * 수량 + 옵션가 / 주문일 / y  
+     * 톡스토어: 주문번호 / 총 주문금액 - 총 할인금액 / 결제일 / n  
+     * 인터파크: 주문번호-주문순번 / 판매단가 * 수량 / 결제일 / n  
+     * 롯데ON: 주문번호-주문순번 / 판매금액 / 결제일 / n  
+     * 카페24: ord-item-code / 상품구매금액(계정방식 배송중,배송완료는 총 상품구매금액) / 주문일 / n  
+     * 고도몰5: 상품주문번호 / 총 상품금액 / 결제일 / n  
+     * 샵바이: 주문상품옵션번호 / 즉시할인가 * 수량 / 주문일 / n  
+     * SSG: 주문번호-주문순번 / 판매단가 * 수량 / 결제일 / n  
+     * 셀러허브: 주문아이템번호(sno) / 결제가격(sprice) / 주문일 / n  
+     * 멸치쇼핑: 주문번호-상품번호(ordercd-productcd) / 정산예정금액(calamount + chargedshippingfee) / 주문일 / n  
+     * 아임웹: 품목주문번호 / 옵션가격 / 주문일 / n  
+     * 블로그페이: 주문상품번호 / 상품주문가격 / 주문일 / n  
+     * GS SHOP: 주문번호 / 협력사지급금액 / 주문일 / n  
+     *   
+     * [status](주문,클레임)(필수): 선물수락전-gift, 신규-new, 확인-confirm, 배송대기,배송중-progress 배송완료,구매확정-end  
+     *                              취소요청-cancel, 반품요청-refund, 교환요청-exchange  
+     *                              취소처리-cancel_end, 반품처리-refund_end, 교환처리-exchange_end  
+     * [code](주문): 주문처리코드(^구분자)  
+     * [order_no](주문,클레임)(필수): 주문고유번호  
+     * [shop_order_no](주문,클레임): 상점주문번호  
+     * [buy_code](주문): 개인통관고유부호  
+     * [buy_dt](주문)(필수): 구매일자  
+     * [buy_name](주문,클레임): 주문자명  
+     * [buy_tel](주문): 주문자 전화번호  
+     * [buy_phone](주문): 주문자 핸드폰번호  
+     * [product_code](주문): 판매자코드  
+     * [product_url](주문,클레임): 상품URL  
+     * [product_name](주문,클레임): 상품명  
+     * [product_option](주문,클레임): 옵션  
+     * [product_option_code](주문): 옵션코드  
+     * [product_cnt](주문,클레임)(필수): 수량  
+     * [product_price](주문,클레임)(필수): 총금액  
+     * [to_dt](주문): 발송예정일  
+     * [to_name](주문,클레임): 수취인명  
+     * [to_tel](주문): 수취인 전화번호  
+     * [to_phone](주문): 수취인 핸드폰번호  
+     * [to_postcode](주문): 우편번호  
+     * [to_address](주문): 수취인 주소  
+     * [to_message](주문): 배송메세지  
+     * [to_type](주문): 배송비지불방법  
+     * [to_price](주문): 배송비  
+     * [delivery](주문): 배송코드  
+     * [invoicing_no](주문): 송장번호  
+     * [claim_dt](클레임)(필수): 클레임요청일자  
+     * [claim_reason](클레임): 클레임사유  
+     * [search_date](주문,클레임)(필수): 검색기준일  
+     *   
+     * @version 2023.07.10
+     * @var     array
+     */
+    private $custom_shop_order_row;
+
+    /**
+     * 문의정보  
+     * [question_code]: 문의처리번호  
+     * [question_no](필수): 문의고유번호  
+     * [question_title]: 문의제목  
+     * [question_content]: 문의내용  
+     * [question_dt](필수): 문의일자  
+     * [product_url]: 상품URL  
+     * [product_name]: 상품명  
+     *   
+     * @version 2023.07.10
+     * @var     array
+     */
+    private $custom_shop_question_row;
+
+    /**
+     * 상품url  
+     * [smartstore]: 스마트스토어  
+     * [tmon]: 티몬  
+     * [esm_g]: 지마켓  
+     * [esm_a]: 옥션  
+     * [coupang]: 쿠팡  
+     * [wemakeprice2]: 위메프  
+     * [11st]: 11번가  
+     * [kakao]: 톡스토어  
+     * [interpark]: 인터파크  
+     * [lotte_on]: 롯데ON  
+     * [cafe24]: 카페24  
+     * [godo5_pro]: 고도몰5  
+     * [godo_shopby]: 샵바이  
+     * [ssg]: SSG  
+     * [sellerhub]: 셀러허브  
+     * [smelchi]: 멸치쇼핑  
+     * [imweb]: 아임웹  
+     * [blogpay]: 블로그페이  
+     * [gsshop]: GS SHOP  
+     *   
+     * @version 2023.07.10
+     * @var     array
+     */
+    private $custom_shop_product_url;
+
+    /**
+     * 생성자  
+     *   
+     * require  2025.10.24 custom_error_handler custom_error_handler_fatal custom_parking session_start_check
+     * @version 2025.10.24
+     * 
+     * @param array $option        옵션설정  
+     *              [api_bool]     true - json, false - html(기본값: false)  
+     *              [session_bool] 세션사용여부(기본값: true)  
+     *              [cors_bool]    cors 허용여부(기본값: false)
+     */
+    function __construct($option = array()) {
+        //에러핸들러 설정 전에 발생하는 에러 무시
+        error_reporting(0);
+        //$option 설정
+        if (!is_array($option)) {
+            $option = array();
+        }
+        $api_bool = isset($option["api_bool"]) ? $option["api_bool"] : false;
+        $session_bool = isset($option["session_bool"]) ? $option["session_bool"] : true;
+        $cors_bool = isset($option["cors_bool"]) ? $option["cors_bool"] : false;
+        //umask 설정
+        umask(0);
+        //config 호출
+        $config = array();
+        require dirname(__FILE__) . "/config.php";
+        //일반변수 초기화(접두어 common)
+        foreach ($config as $k => $v) {
+            if (substr($k, 0, 6) != "common") {
+                continue;
+            }
+            $this->{$k} = $v;
+        }
+        //타임존 설정
+        $this->time_zone = $config["time_zone"];
+        date_default_timezone_set($this->time_zone);
+        //점검중
+        $this->custom_parking($config["parking_start_dt"], $config["parking_end_dt"]);
+        //케릭터셋 설정
+        $this->character_set = $config["character_set"];
+        if ($api_bool) {
+            header("Content-Type: application/json; charset={$this->character_set}");
+        } else {
+            header("Content-Type: text/html; charset={$this->character_set}");
+        }
+        //cors 설정
+        if ($cors_bool) {
+            header("Access-Control-Allow-Origin: *");
+        }
+        //기간지난 파일 삭제
+        $date = date("Y_m_d");
+        $arr = array(
+            array(dirname(__FILE__) . "/log", intval($config["log_limit_day"])),
+            array(dirname(__FILE__) . "/temp", intval($config["temp_limit_day"]))
+        );
+        if (mkdir(dirname(__FILE__) . "/temp/{$date}")) {
+            foreach ($arr as $temp) {
+                $dh = opendir($temp[0]);
+                while (($file = readdir($dh)) !== false) {
+                    //삭제 안할 파일
+                    if (in_array($file, array(".", "..", "index.html", "index.php"))) {
+                        continue;
+                    }
+                    $dest_path = "{$temp[0]}/{$file}";
+                    if (is_dir($dest_path) && $file != $date) {
+                        rmdir($dest_path);
+                        continue;
+                    }
+                    $fat = filemtime($dest_path);
+                    $time = strtotime("-{$temp[1]} day");
+                    if ($fat < $time) {
+                        unlink($dest_path);
+                    }
+                }
+                closedir($dh);
+            }
+        }
+        //에러핸들러 설정
+        error_reporting(E_ALL);
+        $this->custom_user_info = "";
+        set_error_handler(array($this, "custom_error_handler"));
+        register_shutdown_function(array($this, "custom_error_handler_fatal"));
+        ini_set("display_errors", 0);
+        //db 접속정보
+        $this->db_info = $config["db"];
+        $this->db_insert_id = 0;
+        $this->db_affected_rows = 0;
+        //mysql report
+        mysqli_report(MYSQLI_REPORT_OFF);
+        //session_start
+        if ($session_bool && !$this->session_start_check()) {
+            //세션시간 설정한경우
+            if ($config["session_limit_time"] > 0) {
+                ini_set("session.save_path", dirname(__FILE__) . "/temp");
+                ini_set("session.gc_maxlifetime", $config["session_limit_time"]);
+            }
+            session_start();
+        }
+        //파일업로드 코드 설정
+        $this->input_upload_info = array(
+            "code" => "0",
+            "name" => "",
+            "ext" => "",
+            "full_name" => "",
+            "src" => ""
+        );
+        //asn1 세팅
+        $this->custom_asn1_integer = 0x02;
+        $this->custom_asn1_sequence = 0x10;
+        $this->custom_asn1_bit_string = 0x03;
+        //preg 제한
+        ini_set("pcre.backtrack_limit", -1);
+        //unique id 중복방지
+        $this->custom_unique_index = 0;
+        //setting cookie
+        $this->custom_set_cookie();
+        //setting request
+        $this->custom_set_request();
+        //api url 세팅
+        //$this->custom_shop_smartstore_api_url = "https://sandbox-api.commerce.naver.com/partner"; //스마트스토어 개발
+        $this->custom_shop_smartstore_api_url = "https://api.commerce.naver.com/partner"; //스마트스토어 운영
+        //$this->custom_shop_tmon_api_url = "http://interworkapi-test.tmon.co.kr"; //티몬 개발
+        $this->custom_shop_tmon_api_url = "https://interworkapi.tmon.co.kr"; //티몬 운영
+        //$this->custom_shop_wemakeprice_api_url = "https://wapi-stg.wemakeprice.com"; //위메프 개발
+        $this->custom_shop_wemakeprice_api_url = "https://w-api.wemakeprice.com"; //위메프 운영
+        //api 딜레이(마이크로초)
+        $this->custom_shop_smartstore_api_delay = 100000;
+        $this->custom_shop_kakao_api_delay = 100000;
+        //주문, 클레임, 문의정보 초기화
+        $this->custom_shop_order_row = array(
+            "status" => "",
+            "code" => "",
+            "order_no" => "",
+            "shop_order_no" => "",
+            "buy_code" => "",
+            "buy_dt" => "",
+            "buy_name" => "",
+            "buy_tel" => "",
+            "buy_phone" => "",
+            "product_code" => "",
+            "product_url" => "",
+            "product_name" => "",
+            "product_option" => "",
+            "product_option_code" => "",
+            "product_cnt" => "",
+            "product_price" => "",
+            "to_dt" => "",
+            "to_name" => "",
+            "to_tel" => "",
+            "to_phone" => "",
+            "to_postcode" => "",
+            "to_address" => "",
+            "to_message" => "",
+            "to_type" => "",
+            "to_price" => "",
+            "delivery" => "",
+            "invoicing_no" => "",
+            "claim_dt" => "",
+            "claim_reason" => "",
+            "search_date" => ""
+        );
+        $this->custom_shop_question_row = array(
+            "question_code" => "",
+            "question_no" => "",
+            "question_title" => "",
+            "question_content" => "",
+            "question_dt" => "",
+            "product_url" => "",
+            "product_name" => ""
+        );
+        //상품url
+        $this->custom_shop_product_url = array(
+            "smartstore" => "https://smartstore.naver.com/main/products/",
+            "tmon" => "https://www.tmon.co.kr/deal/",
+            "esm_g" => "https://item.gmarket.co.kr/Item?goodscode=",
+            "esm_a" => "https://itempage3.auction.co.kr/DetailView.aspx?itemno=",
+            "coupang" => "https://www.coupang.com/vp/products/777?vendorItemId=",
+            "wemakeprice2" => "https://front.wemakeprice.com/product/",
+            "11st" => "https://www.11st.co.kr/products/",
+            "kakao" => "https://store.kakao.com/__php__id__/products/",
+            "interpark" => "https://shopping.interpark.com/product/productInfo.do?prdNo=",
+            "lotte_on" => "https://www.lotteon.com/p/product/",
+            "cafe24" => "https://__php__id__.cafe24.com/shop__php__shop_no__/front/php/product.php?product_no=",
+            "godo5_pro" => "__php__extra__/goods/goods_view.php?goodsNo=",
+            "godo_shopby" => "__php__url__/product-detail?productNo=",
+            "ssg" => "https://www.ssg.com/item/itemView.ssg?itemId=",
+            "sellerhub" => "https://admin.sellerhub.co.kr/shop/goods/goods_view.php?goodsno=",
+            "smelchi" => "http://www.smelchi.com/product/detail?productCd=",
+            "imweb" => "__php__url__/shop/?idx=",
+            "blogpay" => "https://__php__id__.shop.blogpay.co.kr/good/product_view?goodNum=",
+            "gsshop" => "https://www.gsshop.com/prd/prd.gs?prdid="
+        );
+    }
+
+    /**
+     * 소멸자  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     */
+    function __destruct() {
+    }
+
+    /**
+     * 커스텀 xml요소 추가(encode_xml에서 사용)  
+     *   
+     * require  2025.01.17 custom_add_xml_element
+     * @version 2025.01.17
+     *
+     * @param SimpleXMLElement $xml SimpleXMLElement 객체
+     * @param array            $arr 추가할 배열
+     */
+    function custom_add_xml_element(&$xml, $arr) {
+        foreach ($arr as $k => $v) {
+            //요소가 숫자인경우(예외처리)
+            if (is_numeric($k)) {
+                $k = "item{$k}";
+            }
+            //자식이 배열인경우
+            if (is_array($v)) {
+                //리스트형 배열인경우
+                if (isset($v[0])) {
+                    foreach ($v as $temp) {
+                        $this->custom_add_xml_element($xml, array($k => $temp));
+                    }
+                }
+                //객체형 배열인경우
+                else {
+                    $sub_xml = $xml->addChild($k);
+                    $this->custom_add_xml_element($sub_xml, $v);
+                }
+            }
+            //자식이 값인경우
+            else {
+                $xml->addChild("{$k}", htmlspecialchars("{$v}"));
+            }
+        }
+    }
+
+    /**
+     * api로 함수 실행  
+     * 이진데이터는 base64 인코딩해서 전송  
+     * 변수참조반환 함수인경우 반환값이 bool, 변수참조값이 return
+     *   
+     * require  2025.05.30 array_value decode_json encode_json
+     * @version 2025.05.30
+     *
+     * @param  string $func    실행할 함수
+     * @param  array  $param   함수에 전달할 파라미터 리스트
+     * @return array  [bool]   접속성공여부  
+     *                [return] 함수결과값
+     */
+    function custom_api_func($func, $param) {
+        //실행 전 처리
+        if ($func == "openssl_verify") {
+            $param[1] = base64_encode($param[1]);
+        }
+        $curl_url = $this->common_api_url;
+        $curl_header = array(
+            "Content-Type: application/x-www-form-urlencoded"
+        );
+        $curl_query = http_build_query(array(
+            "token" => $this->common_api_token,
+            "func" => $func,
+            "param" => $this->encode_json($param)
+        ));
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $curl_url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $curl_query);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $curl_header);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        $content = curl_exec($ch);
+        $curl_info = curl_getinfo($ch);
+        if ($this->array_value($curl_info, "http_code") != 200) {
+            return array(
+                "bool" => false,
+                "return" => null
+            );
+        }
+        $arr = $this->decode_json($content);
+        //실행 후 처리
+        //openssl_sign 함수는 이진데이터를 반환하면서 변수참조반환 함수임
+        if ($func == "openssl_sign") {
+            $arr["return"] = base64_decode($arr["return"]);
+        }
+        return $arr;
+    }
+
+    /**
+     * 커스텀 에러 핸들러  
+     *   
+     * require  2025.10.24 log_message
+     * @version 2025.10.24
+     *
+     * @param  int    $errno   에러번호
+     * @param  string $errstr  에러메시지
+     * @param  string $errfile 에러파일
+     * @param  int    $errline 에러줄
+     * @return bool
+     */
+    function custom_error_handler($errno, $errstr, $errfile, $errline) {
+        error_reporting(0);
+        $backtrace_arr = debug_backtrace();
+        $backtrace = "";
+        foreach ($backtrace_arr as $k => $v) {
+            if (isset($v["file"]) && isset($v["line"])) {
+                $backtrace .= "\n{$v["file"]} Line {$v["line"]}";
+            }
+        }
+        $message = "Error: [{$errno}] {$errstr} In {$errfile} Line {$errline}\nBacktrace: {$backtrace}";
+        $this->log_message($message, "error");
+        error_reporting(E_ALL);
+        return true;
+    }
+
+    /**
+     * 커스텀 에러 핸들러  
+     *   
+     * require  2025.10.24 array_value log_message
+     * @version 2025.10.24
+     *
+     * @return bool
+     */
+    function custom_error_handler_fatal() {
+        $error = error_get_last();
+        if ($this->array_value($error, "type") != E_ERROR) {
+            return true;
+        }
+        $message = "Fatal error: {$error["message"]} In {$error["file"]} Line {$error["line"]}";
+        $this->log_message($message, "error");
+        return true;
+    }
+
+    /**
+     * 점검중인경우 생성자에서 함수실행  
+     * 점검일시는 값이 있는경우에만 노출  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param string $start_dt 점검시작일시(YYYY-mm-dd HH:ii:ss)
+     * @param string $end_dt   점검종료일시(YYYY-mm-dd HH:ii:ss)
+     */
+    function custom_parking($start_dt = "", $end_dt = "") {
+        $now_dt = date("Y-m-d H:i:s");
+        if (($start_dt != "" && $now_dt < $start_dt) || $end_dt == "" || $end_dt < $now_dt) {
+            return;
+        }
+        $dt_html = "";
+        if ($start_dt != "" && $end_dt != "" && $start_dt < $end_dt) {
+            if (substr($start_dt, 0, 10) == substr($end_dt, 0, 10)) {
+                $dt_text = date("Y년 m월 d일", strtotime($start_dt)) . "<br>";
+                $dt_text .= date("H시 i분", strtotime($start_dt)) . " ~ " . date("H시 i분", strtotime($end_dt)) . "<br>";
+            } else {
+                $dt_text = date("Y년 m월 d일 H시 i분", strtotime($start_dt)) . "<br>~<br>";
+                $dt_text .= date("Y년 m월 d일 H시 i분", strtotime($end_dt)) . "<br>";
+            }
+            $diff = strtotime($end_dt) - strtotime($start_dt);
+            if ($diff < 3600) {
+                $dt_text .= "(약 " . round($diff / 60) . "분)";
+            } else if ($diff < 86400) {
+                $dt_text .= "(약 " . intval($diff / 3600) . "시간" . ($diff % 3600 == 0 ? "" : (" " . round(($diff % 3600) / 60)) . "분") . ")";
+            } else {
+                $dt_text .= "(약 " . round($diff / 86400) . "일)";
+            }
+            $dt_html = "<div class='d_title'>예상 서버 점검시간</div><div class='d_content'>{$dt_text}</div>";
+        } else {
+            $dt_text = date("Y년 m월 d일 H시 i분", strtotime($end_dt));
+            $dt_html = "<div class='d_title'>예상 점검 종료일시</div><div class='d_content'>{$dt_text}</div>";
+        }
+        $meta = "<meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>";
+        $style = "*{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;text-align:center;}body{min-height:100vh;display:flex;}";
+        $style .= ".box{margin:auto;}.icon{border:3px solid black;width:40px;height:40px;line-height:34px;margin:0 auto;font-size:24px;font-weight:900;border-radius:20px;margin-bottom:6px;}";
+        $style .= ".title{font-size:24px;font-weight:900;padding:4px 20px;border-bottom:2px solid black;display:inline-block;}.red{color:#cd0000;}.content{font-size:12px;padding-top:10px;}";
+        $style .= ".d_title{padding-top:20px;font-size:18px;color:#cd0000;font-weight:900;}.d_content{padding-top:4px;font-size:12px;font-weight:bold;}";
+        $css = "<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap'><style>{$style}</style>";
+        $body = "<div class='box'><div class='icon'>!</div><div class='title'>시스템 <span class='red'>점검중</span>입니다</div><div class='content'>서비스 이용에 불편을 드려서 대단히 죄송합니다<br>조속한 시간 내에 서비스를 정상화 시키도록 하겠습니다</div>";
+        echo "<!DOCTYPE html><html><head>{$meta}{$css}</head><body>{$body}{$dt_html}</body></html>";
+        exit;
+    }
+
+    /**
+     * cookie 변수 세팅  
+     * magic_quotes_gpc on 인경우 stripslashes 처리  
+     * $_COOKIE 변수 직접 수정  
+     *   
+     * require  2025.08.05 is_magic_quotes_gpc
+     * @version 2025.08.05
+     */
+    function custom_set_cookie() {
+        if (!$this->is_magic_quotes_gpc()) {
+            return;
+        }
+        foreach ($_COOKIE as $k => $v) {
+            $_COOKIE[$k] = stripslashes($v);
+        }
+    }
+
+    /**
+     * request 변수 세팅  
+     * magic_quotes_gpc on 인경우 stripslashes 처리  
+     * post > get  
+     *   
+     * require  2025.08.05 is_magic_quotes_gpc
+     * @version 2025.08.05
+     */
+    function custom_set_request() {
+        $request = $_REQUEST;
+        foreach ($_COOKIE as $k => $v) {
+            unset($request[$k]);
+            if (isset($_POST[$k])) {
+                $request[$k] = $_POST[$k];
+            } else if (isset($_GET[$k])) {
+                $request[$k] = $_GET[$k];
+            }
+        }
+        if ($this->is_magic_quotes_gpc()) {
+            $stack = array(&$request);
+            while (isset($stack[0])) {
+                $current = &$stack[0];
+                foreach ($current as $k => $v) {
+                    if (is_array($v)) {
+                        $stack[] = &$current[$k];
+                        continue;
+                    }
+                    $current[$k] = stripslashes($v);
+                }
+                unset($current);
+                array_shift($stack);
+            }
+        }
+        $this->custom_request = $request;
+    }
+
+    /**
+     * 배열 추가  
+     *   
+     * require  2025.01.17 array_change
+     * @version 2025.01.17
+     *
+     * @param  array  $arr         배열
+     * @param  array  $add_arr     추가배열
+     * @param  string $arr_key     배열 키
+     * @param  string $add_arr_key 추가배열 키
+     * @return array               추가된 배열
+     */
+    function array_add($arr, $add_arr, $arr_key, $add_arr_key) {
+        $return_arr = array();
+        $add_arr = $this->array_change($add_arr, $arr_key, false);
+        foreach ($arr as $temp) {
+            $temp[$add_arr_key] = isset($add_arr[$temp[$arr_key]]) ? $add_arr[$temp[$arr_key]] : array();
+            $return_arr[] = $temp;
+        }
+        return $return_arr;
+    }
+
+    /**
+     * 연관배열정렬(같은 인덱스는 임의로 정렬, 문자열 기준으로 정렬, 숫자정렬은 10.2자리수까지)  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  array  $arr      정렬할 배열
+     * @param  string $key      정렬기준 배열 인덱스
+     * @param  bool   $asc_bool true-오름차순, false-내림차순
+     * @return array            정렬된 배열, 인덱스 존재하지 않는경우 빈 배열
+     */
+    function array_asort($arr, $key, $asc_bool = true) {
+        //임시배열 채우기
+        $temp_arr = array();
+        $i = 0;
+        foreach ($arr as $k => $v) {
+            //인덱스 없는경우 예외처리
+            if (!isset($v[$key])) {
+                return array();
+            }
+            //숫자인경우 앞에 0 붙이기
+            $temp_key = $v[$key];
+            if (floatval($v[$key]) . "" == $v[$key]) {
+                $temp_key = sprintf("%013.2lf", $v[$key]);
+            }
+            $temp_arr[$k] = "{$temp_key}__{$i}";
+            $i++;
+        }
+        if ($asc_bool) {
+            asort($temp_arr);
+        } else {
+            arsort($temp_arr);
+        }
+        //반환배열 채우기
+        $return_arr = array();
+        foreach ($temp_arr as $k => $v) {
+            $return_arr[$k] = $arr[$k];
+        }
+        return $return_arr;
+    }
+
+    /**
+     * 배열 치환  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  array  $arr         배열
+     * @param  string $arr_key     배열 키
+     * @param  bool   $unique_bool true - 값으로, false - 배열로
+     * @return array               치환된 배열
+     */
+    function array_change($arr, $arr_key, $unique_bool = true) {
+        $return_arr = array();
+        if ($unique_bool) {
+            foreach ($arr as $temp) {
+                $return_arr[$temp[$arr_key]] = $temp;
+            }
+        } else {
+            foreach ($arr as $temp) {
+                if (!isset($return_arr[$temp[$arr_key]])) {
+                    $return_arr[$temp[$arr_key]] = array();
+                }
+                $return_arr[$temp[$arr_key]][] = $temp;
+            }
+        }
+        return $return_arr;
+    }
+
+    /**
+     * 배열 값 찾아서 삭제  
+     * 값이 중복인경우 처음 나오는 값만 삭제  
+     * 연관배열에서 사용 불가능  
+     *   
+     * require  2025.03.06
+     * @version 2025.03.06
+     *
+     * @param  array  $arr    원본배열
+     * @param  string $search 찾을 값
+     * @return array          값 삭제된 배열, 값이 없는경우 원본배열
+     */
+    function array_search_delete($arr, $search) {
+        if (!in_array($search, $arr)) {
+            return $arr;
+        }
+        $key = array_search($search, $arr);
+        array_splice($arr, $key, 1);
+        return $arr;
+    }
+
+    /**
+     * 배열정렬(같은 인덱스는 임의로 정렬, 문자열 기준으로 정렬, 숫자정렬은 10.2자리수까지)  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  array  $arr      정렬할 배열
+     * @param  string $key      정렬기준 배열 인덱스
+     * @param  bool   $asc_bool true-오름차순, false-내림차순
+     * @return array            정렬된 배열, 인덱스 존재하지 않는경우 빈 배열
+     */
+    function array_sort($arr, $key, $asc_bool = true) {
+        //임시배열 채우기
+        $temp_arr = array();
+        foreach ($arr as $k => $v) {
+            //인덱스 없는경우 예외처리
+            if (!isset($v[$key])) {
+                return array();
+            }
+            //숫자인경우 앞에 0 붙이기
+            $temp_key = $v[$key];
+            if (floatval($v[$key]) . "" == $v[$key]) {
+                $temp_key = sprintf("%013.2lf", $v[$key]);
+            }
+            $temp_arr["{$temp_key}__{$k}"] = $v;
+        }
+        if ($asc_bool) {
+            ksort($temp_arr);
+        } else {
+            krsort($temp_arr);
+        }
+        //반환배열 채우기
+        $arr = array();
+        foreach ($temp_arr as $temp) {
+            $arr[] = $temp;
+        }
+        return $arr;
+    }
+
+    /**
+     * 배열값 반환, stdClass인경우 배열로 변환해서 확인  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  array|object $var        배열 또는 stdClass
+     * @param  string       $key        인덱스
+     * @param  bool         $array_bool 반환값형태, true - 배열, false - 문자열
+     * @return array|string
+     */
+    function array_value($var, $key, $array_bool = false) {
+        if (is_object($var)) {
+            //객체 배열 변환
+            $var = get_object_vars($var);
+        }
+        if (is_array($var) && isset($var[$key])) {
+            if ($array_bool) {
+                //배열인경우 문자열이면 0번째 배열에 들어간다.
+                return is_array($var[$key]) ? $var[$key] : array($var[$key]);
+            } else {
+                //문자열인경우 배열이면 빈 문자열이 된다.
+                return is_array($var[$key]) ? "" : $var[$key];
+            }
+        } else if ($array_bool) {
+            return array();
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * base32 to hex  
+     *   
+     * require  2025.10.24
+     * @version 2025.10.24
+     * 
+     * @param  string $base32 base32 문자열
+     * @return string         hex 문자열
+     */
+    function convert_base32_hex($base32) {
+        $map = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567");
+        $flipped_map = array_flip($map);
+        $base32_arr = str_split(strtoupper($base32));
+        $bits = "";
+        $hex = "";
+        foreach ($base32_arr as $temp) {
+            $bits .= str_pad(decbin(isset($flipped_map[$temp]) ? $flipped_map[$temp] : "0"), 5, '0', STR_PAD_LEFT);
+        }
+        $bits_arr = str_split($bits, 4);
+        foreach ($bits_arr as $temp) {
+            if (strlen($temp) < 4) {
+                break;
+            }
+            $hex .= dechex(bindec($temp));
+        }
+        return $hex;
+    }
+
+    /**
+     * - 로컬시간 다른 타임존 시간으로 변환
+     * 
+     * require  2025.11.10
+     * @version 2025.11.10
+     * 
+     * @param  string $local_dt  로컬시간(YYYY-mm-dd HH:ii:ss)
+     * @param  string $to        변경할 타임존 (+09:00 -05:00 등)
+     * @param  string $from      변환전 타임존 (+09:00 -05:00 등), null인경우 서버 타임존
+     * @return string            변경된 로컬시간(YYYY-mm-dd HH:ii:ss)
+     */
+    function convert_localtime($local_dt, $to, $from = null) {
+        if ($from === null) {
+            $tz = new DateTimeZone($this->time_zone);
+            $date = new DateTime("now", $tz);
+            $from = $date->format("P");
+        }
+        $from_calc = intval(substr($from, 0, 1) . 1);
+        $to_calc = intval(substr($to, 0, 1) . 1);
+        $diff_hour = intval($to_calc * substr($to, 1, 2)) - intval($from_calc * substr($from, 1, 2));
+        $diff_minute = intval($to_calc * substr($to, 4, 2)) - intval($from_calc * substr($from, 4, 2));
+        return date("Y-m-d H:i:s", strtotime("{$local_dt} {$diff_hour} hour {$diff_minute} minute"));
+    }
+
+    /**
+     * rsa ne to public key  
+     *   
+     * require  2025.10.24
+     * @version 2025.10.24
+     * 
+     * @param  string $n n(base64 or url safe)
+     * @param  string $e e(base64 or url safe)
+     * @return string    public key
+     */
+    function convert_ne_pk($n, $e) {
+        $n = str_replace(array("-", "_"), array("+", "/"), $n);
+        $e = str_replace(array("-", "_"), array("+", "/"), $e);
+        $pk = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA{$n}ID{$e}";
+        //=문자 추가
+        for ($i = (strlen($pk) - 1) % 4; $i < 3; $i++) {
+            $pk = "{$pk}=";
+        }
+        //개행추가
+        $pk = implode("\n", str_split($pk, 64));
+        $public_key = "-----BEGIN PUBLIC KEY-----\n{$pk}\n-----END PUBLIC KEY-----";
+        return $public_key;
+    }
+
+    /**
+     * public key to rsa ne  
+     *   
+     * require  2025.10.24 encode_base64
+     * @version 2025.10.24
+     * 
+     * @param  string $public_key    public key
+     * @param  bool   $url_safe_bool true: url safe, false: base64
+     * @return array                 [n] - n(base64 or url safe)<br>
+     *                               [e] - e(base64 or url safe)
+     */
+    function convert_pk_ne($public_key, $url_safe_bool = true) {
+        $return_arr = array(
+            "n" => "",
+            "e" => ""
+        );
+        $key = openssl_pkey_get_public($public_key);
+        if ($key === false) {
+            return $return_arr;
+        }
+        $detail = openssl_pkey_get_details($key);
+        if (!isset($detail["rsa"])) {
+            return $return_arr;
+        }
+        $return_arr["n"] = $this->encode_base64($detail["rsa"]["n"], $url_safe_bool);
+        $return_arr["e"] = $this->encode_base64($detail["rsa"]["e"], $url_safe_bool);
+        return $return_arr;
+    }
+
+    /**
+     * 개행문자, &nbsp; 공백변환  
+     *   
+     * require  2025.10.24
+     * @version 2025.10.24
+     *
+     * @param  string $text 변환할 문자열
+     * @return string       변환된 문자열
+     */
+    function convert_nl_space($text) {
+        return str_replace(array("&nbsp;", "\r\n", "\r", "\n"), " ", $text);
+    }
+
+    /**
+     * 쿠키 값 불러오기  
+     *   
+     * require  2025.08.05
+     * @version 2025.08.05
+     *
+     * @param  string       $key 키
+     * @return string|array      값
+     */
+    function cookie_get($key = "") {
+        if ($key == "") {
+            return $_COOKIE;
+        }
+        return isset($_COOKIE[$key]) ? $_COOKIE[$key] : "";
+    }
+
+    /**
+     * 쿠키 저장  
+     *   
+     * require  2025.08.05
+     * @version 2025.08.05
+     *
+     * @param string $key   키
+     * @param string $value 값
+     */
+    function cookie_set($key, $value) {
+        setcookie($key, $value, 0, "/");
+        $_COOKIE[$key] = $value;
+    }
+
+    /**
+     * 쿠키 제거  
+     *   
+     * require  2025.01.17 cookie_get
+     * @version 2025.01.17
+     *
+     * @param string $key
+     */
+    function cookie_unset($key = "") {
+        if ($key == "") {
+            $cookie = $this->cookie_get();
+        } else if (isset($_COOKIE[$key])) {
+            $cookie = array(
+                $key => $this->cookie_get("key")
+            );
+        } else {
+            $cookie = array();
+        }
+        foreach ($cookie as $k => $v) {
+            setcookie($k, "", 1, "/");
+            unset($_COOKIE[$k]);
+        }
+    }
+
+    /**
+     * 쿼리문에 테이블 접두어 추가  
+     * select, insert, update, delete 쿼리문만 가능  
+     *   
+     * require  2025.11.21 db_add_table_info
+     * @version 2025.11.21
+     *
+     * @param  string $sql      쿼리문
+     * @param  string $database 데이터베이스
+     * @param  string $table    테이블
+     * @return string           접두어 추가된 쿼리문
+     */
+    function db_add_prefix($sql, $database = "default", $table = "") {
+        //테이블설정 불러오기
+        $table_info = $this->db_add_table_info($database, $table);
+        $prefix = $table_info["prefix"];
+        if ($prefix == "") {
+            return $sql;
+        }
+        //문자열 치환
+        preg_match_all("/(?<!\\\\)'([\S\s]*?)(?:[^\\\\]*\\\\\\\\)*(?<!\\\\)'/", $sql, $text_arr);
+        foreach ($text_arr[0] as $k => $v) {
+            //한개씩 변환하기 위에 preg_replace 사용
+            $sql = preg_replace('/' . preg_quote($v, "/") . '/', '\\$' . $k . '\\$', $sql, 1);
+        }
+        //접두어 추가
+        $pattern = "/(from(?!\s+dual)|join|insert\s+into|update)(\s+`?)([^\(])/i";
+        $replacement = '${1}${2}' . $prefix . '${3}';
+        $sql = preg_replace($pattern, $replacement, $sql);
+        //문자열복구(역순)
+        $reverse_arr = array_reverse($text_arr[0]);
+        $cnt = count($reverse_arr) - 1;
+        foreach ($reverse_arr as $k => $v) {
+            //한개씩 변환하기 위에 preg_replace 사용
+            $sql = preg_replace('/' . preg_quote('$' . ($cnt - $k) . '$', "/") . '/', $v, $sql, 1);
+        }
+        return $sql;
+    }
+
+    /**
+     * row 배열에 테이블 날짜설정 추가  
+     *   
+     * require  2025.03.06 db_add_table_info
+     * @version 2025.03.06
+     *
+     * @param  array  $row         row 배열
+     * @param  array  $update_bool true: update 날짜만 설정, false(기본값): insert, update 날짜 설정
+     * @param  string $database    데이터베이스
+     * @param  string $table       테이블
+     * @return array               날짜설정 추가된 row 배열
+     */
+    function db_add_row($row, $update_bool = false, $database = "default", $table = "") {
+        //현재일시(now()를 사용하지 않는 이유는 날짜형식이 YmdHis인 경우가 있어서)
+        $db_dt = date("YmdHis");
+        $db_d = substr($db_dt, 0, 8);
+        $db_t = substr($db_dt, 8, 6);
+        //테이블설정 불러오기
+        $table_info = $this->db_add_table_info($database, $table);
+        //컬럼 찾기용 배열 생성
+        $find_row = array();
+        foreach ($row as $k => $v) {
+            $temp = explode(" ", trim($k));
+            $find_row[] = trim(str_replace("`", "", strtolower($temp[0])));
+        }
+        $arr = array(
+            "insert_date" => $db_d,
+            "insert_time" => $db_t,
+            "insert_dt" => $db_dt,
+            "update_date" => $db_d,
+            "update_time" => $db_t,
+            "update_dt" => $db_dt
+        );
+        foreach ($arr as $k => $v) {
+            if (substr($k, 0, 6) == "insert" && $update_bool) {
+                continue;
+            }
+            foreach ($table_info[$k] as $temp) {
+                if (in_array($temp, $find_row)) {
+                    continue;
+                }
+                $row[$temp] = $v;
+            }
+        }
+        return $row;
+    }
+
+    /**
+     * 테이블 추가정보 반환  
+     * 컬럼명, 접두어 trim 처리 및 컬럼명 소문자 변환  
+     *   
+     * require  2025.05.29 array_value
+     * @version 2025.05.29
+     *
+     * @param  string $database     데이터베이스, default가 기본 db
+     * @param  string $table        테이블, 공백인경우 기본 table
+     * @return array                테이블 추가정보 배열
+     */
+    function db_add_table_info($database = "default", $table = "") {
+        $return_arr = array(
+            "prefix" => "",
+            "delete_flag" => "",
+            "insert_date" => array(),
+            "insert_time" => array(),
+            "insert_dt" => array(),
+            "update_date" => array(),
+            "update_time" => array(),
+            "update_dt" => array()
+        );
+        $db_info = $this->array_value($this->db_info, $database, true);
+        if (count($db_info) == 0) {
+            return $return_arr;
+        }
+        foreach ($return_arr as $k => $v) {
+            if (!isset($db_info[$k])) {
+                continue;
+            } else if ($k == "prefix") {
+                $return_arr[$k] = trim($db_info[$k]);
+                continue;
+            } else if ($k == "delete_flag") {
+                $return_arr[$k] = trim(strtolower($db_info[$k]));
+                continue;
+            }
+            foreach ($db_info[$k] as $temp) {
+                $return_arr[$k][] = trim(strtolower($temp));
+            }
+        }
+        //테이블설정 확인
+        if ($table == "" || !isset($db_info["table"]) || !isset($db_info["table"][$table])) {
+            return $return_arr;
+        }
+        $return_arr = array(
+            "prefix" => "",
+            "delete_flag" => "",
+            "insert_date" => array(),
+            "insert_time" => array(),
+            "insert_dt" => array(),
+            "update_date" => array(),
+            "update_time" => array(),
+            "update_dt" => array()
+        );
+        $table_info = $db_info["table"][$table];
+        foreach ($return_arr as $k => $v) {
+            if (!isset($table_info[$k])) {
+                continue;
+            } else if ($k == "prefix") {
+                $return_arr[$k] = trim($table_info[$k]);
+                continue;
+            } else if ($k == "delete_flag") {
+                $return_arr[$k] = trim(strtolower($table_info[$k]));
+                continue;
+            }
+            foreach ($table_info[$k] as $temp) {
+                $return_arr[$k][] = trim(strtolower($temp));
+            }
+        }
+        return $return_arr;
+    }
+
+    /**
+     * 쿼리 변경된 레코드 갯수  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @return int
+     */
+    function db_affected_rows() {
+        return $this->db_affected_rows;
+    }
+
+    /**
+     * charset에 맞는 db정보 반환  
+     *   
+     * require  2025.05.29 array_value
+     * @version 2025.05.29
+     *
+     * @param  string $database 데이터베이스
+     * @return array  [engine]  
+     *                [charset]  
+     *                [collate]
+     */
+    function db_charset_info($database = "default") {
+        $return_arr = array(
+            "engine" => "",
+            "charset" => "",
+            "collate" => ""
+        );
+        //캐릭터셋별 설정
+        $db_info = $this->array_value($this->db_info, $database, true);
+        if (count($db_info) == 0) {
+            return $return_arr;
+        } else if ($db_info["character_set"] == "utf8mb4") {
+            $return_arr["engine"] = "InnoDB";
+            $return_arr["charset"] = "utf8mb4";
+            $return_arr["collate"] = "utf8mb4_unicode_ci";
+        } else if ($db_info["character_set"] == "utf8") {
+            $return_arr["engine"] = "MyISAM";
+            $return_arr["charset"] = "utf8";
+            $return_arr["collate"] = "utf8_general_ci";
+        } else if ($db_info["character_set"] == "euckr") {
+            $return_arr["engine"] = "MyISAM";
+            $return_arr["charset"] = "euckr";
+            $return_arr["collate"] = "euckr_korean_ci";
+        }
+        return $return_arr;
+    }
+
+    /**
+     * mysqli connect  
+     *   
+     * require  2025.05.29 array_value db_charset_info decode_base64
+     * @version 2025.05.29
+     *
+     * @param  string $database 데이터베이스
+     * @return array  [code]    1 - 성공, 2 - 실패  
+     *                [msg]     설명  
+     *                [link]    mysqil 객체(실패시 false)
+     */
+    function db_connect($database = "default") {
+        $return_arr = array(
+            "code" => "2",
+            "msg" => "성공",
+            "link" => false
+        );
+        //db설정값 존재여부
+        $db_info = $this->array_value($this->db_info, $database, true);
+        if (count($db_info) == 0) {
+            $return_arr["msg"] = "Unknown database '{$database}'";
+            return $return_arr;
+        }
+        //캐릭터셋확인
+        $info = $this->db_charset_info($database);
+        if ($info["charset"] == "") {
+            $return_arr["msg"] = "Unknown character set '{$db_info["character_set"]}'";
+            return $return_arr;
+        }
+        //base64 디코딩
+        if ($db_info["base64_password_bool"]) {
+            $db_info["password"] = $this->decode_base64($db_info["password"]);
+        }
+        //db접속(접속 실패시 에러메시지)
+        $return_arr["link"] = mysqli_connect($db_info["host"], $db_info["username"], $db_info["password"], $db_info["database"], $db_info["port"]);
+        //db접속확인
+        if ($return_arr["link"] === false) {
+            $return_arr["msg"] = "'{$database}' database connect failed";
+            return $return_arr;
+        }
+        //캐릭터셋, 타임존, 메모리제한 설정
+        mysqli_query($return_arr["link"], "set names '{$info["charset"]}' collate '{$info["collate"]}'");
+        mysqli_query($return_arr["link"], "set time_zone = '{$db_info["time_zone"]}'");
+        $return_arr["code"] = "1";
+        return $return_arr;
+    }
+
+    /**
+     * - set, into, values 컬럼 생성
+     * - escape인경우 키가 is
+     * 
+     * require  2025.11.21
+     * @version 2025.11.21
+     * 
+     * @param  array  $row_arr  row 배열(escape인경우 키가 is)
+     * @return array            row 정보  
+     * - [set]:string    추가 set문
+     * - [into]:string   추가 into문
+     * - [values]:string 추가 values문
+     * - [binding]:array 추가 binding문
+     */
+    function db_create_row($row_arr = array()) {
+        $return_arr = array(
+            "set" => "",
+            "into" => "",
+            "values" => "",
+            "binding" => array()
+        );
+        //row 정보 설정
+        $arr = array(
+            "set" => array(),
+            "info" => array(),
+            "values" => array()
+        );
+        foreach ($row_arr as $k => $v) {
+            $k = trim(preg_replace("/\s+/", " ", str_replace("`", "", $k)));
+            $temp = explode(" ", $k);
+            $field = "`{$temp[0]}`";
+            $operator = strtolower(substr($k, strlen($temp[0]) + 1));
+            $arr["set"][] = $operator == "is" ? "{$field} = {$v}" : "{$field} = ?";
+            $arr["into"][] = $field;
+            $arr["values"][] = $operator == "is" ? $v : "?";
+            if ($operator != "is") {
+                $return_arr["binding"][] = $v;
+            }
+        }
+        $list = array("set", "into", "values");
+        foreach ($list as $temp) {
+            $return_arr[$temp] = implode(", ", $arr[$temp]);
+        }
+        return $return_arr;
+    }
+
+    /**
+     * where문 생성  
+     * 테이블명, 필드명, 연산자 소문자로 강제 변경  
+     * 연산자 없는경우 값이 배열인경우 in 쿼리, 아닌경우 일반 쿼리  
+     * 연산자 is인경우  
+     * 값이 null 또는 not null인경우 연산자 is  
+     * 값이 null 또는 not null이 아닌경우 is 뒤에 연산자 입력(입력 안하면 =) ex) is >, is <, is >=, is <=, is <>, is =  
+     * 연산자 in, not in인경우 값이 배열, 빈배열인경우 null 포함  
+     * 연산자 like, not like, is like, is not like 사용 가능  
+     * 연산자 between, is between은 연산자 필수, 0번째 배열이 시작, 1번째 배열이 끝  
+     * 백틱(\`) 생략해도 자동으로 입력  
+     * 배열 키가 숫자인경우 값배열은 서브쿼리, 키가 같은 조건문 여러개 사용시 값배열 길이가 1인 배열로 처리  
+     *   
+     * require  2025.03.06 db_create_where
+     * @version 2025.03.06
+     * 
+     * @param  array  $where_arr         where 배열
+     * @param  bool   $or_bool           true: or(서브쿼리 and), false: and(서브쿼리 or)
+     * @return array  [where]            where 쿼리  
+     *                [binding]          binding 배열  
+     *                [dot_bool]         true 인경우 모든 키에 점 포함
+     */
+    function db_create_where($where_arr = array(), $or_bool = false) {
+        $return_arr = array(
+            "where" => "",
+            "binding" => array(),
+            "dot_bool" => true
+        );
+        foreach ($where_arr as $k => $v) {
+            if ($return_arr["where"] != "") {
+                $return_arr["where"] .= $or_bool ? " or " : " and ";
+            }
+            //키가 숫자인경우
+            if ($k == strval(intval($k))) {
+                $return_arr["where"] .= count($v) > 1 ? "(" : "";
+                $temp = $this->db_create_where($v, !$or_bool);
+                $return_arr["where"] .= $temp["where"];
+                $return_arr["binding"] = array_merge($return_arr["binding"], $temp["binding"]);
+                $return_arr["dot_bool"] = $temp["dot_bool"] == false ? false : $return_arr["dot_bool"];
+                $return_arr["where"] .= count($v) > 1 ? ")" : "";
+                continue;
+            }
+            $k = trim(preg_replace("/\s+/", " ", str_replace("`", "", strtolower($k))));
+            $key_arr = explode(" ", $k);
+            $key = explode(".", $key_arr[0]);
+            if (!isset($key[1])) {
+                $return_arr["dot_bool"] = false;
+            }
+            $field = isset($key[1]) ? "`{$key[0]}`.`{$key[1]}`" : "`{$key[0]}`";
+            $operator = substr($k, strlen($key_arr[0]) + 1);
+            //between 쿼리
+            if (in_array($operator, array("between", "is between"))) {
+                if ($operator == "between") {
+                    $return_arr["where"] .= "{$field} between ? and ?";
+                    $return_arr["binding"][] = $v[0];
+                    $return_arr["binding"][] = $v[1];
+                } else {
+                    $return_arr["where"] .= "{$field} between {$v[0]} and {$v[1]}";
+                }
+            }
+            //in쿼리
+            else if (is_array($v)) {
+                if (!in_array($operator, array("in", "not in"))) {
+                    $operator = "in";
+                }
+                $return_arr["where"] .= "{$field} {$operator}(null";
+                foreach ($v as $temp) {
+                    $return_arr["where"] .= ", ?";
+                    $return_arr["binding"][] = $temp;
+                }
+                $return_arr["where"] .= ")";
+            }
+            //is 쿼리
+            else if (substr($operator, 0, 2) == "is") {
+                //null 또는 not null인경우
+                if (in_array(trim(strtolower($v)), array("null", "not null"))) {
+                    $v = trim(strtolower($v));
+                }
+                //연산자 없는경우
+                else if (strlen($operator) == 2) {
+                    $operator = "=";
+                }
+                //연산자 있는경우
+                else {
+                    $operator = substr($operator, 3);
+                }
+                $return_arr["where"] .= "{$field} {$operator} {$v}";
+            }
+            //일반쿼리
+            else {
+                if ($operator == "") {
+                    $operator = "=";
+                }
+                $return_arr["where"] .= "{$field} {$operator} ?";
+                $return_arr["binding"][] = $v;
+            }
+        }
+        return $return_arr;
+    }
+
+    /**
+     * 테이블 삭제(1개)  
+     * delete_flag 변경시 update_dt도 갱신  
+     * where 설정 안한경우 아무것도 삭제 안됨  
+     *   
+     * require  2025.08.13 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2025.08.13
+     * 
+     * @param  string $table       테이블명
+     * @param  array  $option      옵션  
+     *                [where]      삭제 조건문, db_create_where 사용  
+     *                [or_bool]    true: where or문, false(기본): where and문  
+     *                [force_bool] true: 삭제, false(기본값): delete_flag 변경, delete_flag 없는경우 force_bool true로 변경
+     * @param  string $database    사용할 db명
+     * @return int                 affected_rows(수정 안된경우 0)
+     */
+    function db_delete($table, $option = array(), $database = "default") {
+        $main_where = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $force_bool = isset($option["force_bool"]) ? $option["force_bool"] : false;
+        $table_info = $this->db_add_table_info($database, $table);
+        $delete_flag = $table_info["delete_flag"];
+        $prefix = $table_info["prefix"];
+        if ($delete_flag == "") {
+            $force_bool = true;
+        }
+        $where_info = $this->db_create_where($main_where, $or_bool);
+        if ($where_info["where"] == "") {
+            $where_info["where"] = "1 = 0";
+        }
+        if ($force_bool) {
+            $sql = "
+                delete from
+                    `{$prefix}{$table}`
+                where
+                    {$where_info["where"]}
+            ";
+            $binding = $where_info["binding"];
+        } else {
+            $main_row = array($delete_flag => "y");
+            $row_arr = $this->db_add_row($main_row, true, $database, $table);
+            $row_info = $this->db_create_row($row_arr);
+            $sql = "
+                update
+                    `{$prefix}{$table}`
+                set
+                    {$row_info["set"]}
+                where
+                    `{$delete_flag}` = 'n' and
+                    {$where_info["where"]}
+            ";
+            $binding = array_merge($row_info["binding"], $where_info["binding"]);
+        }
+        $this->db_query($sql, $binding, $database);
+        return $this->db_affected_rows;
+    }
+
+    /**
+     * 쿼리 문자열 이스케이프  
+     * db 연결 이슈로 배열로 한번에 받아서 처리  
+     *   
+     * require  2025.01.17 db_connect
+     * @version 2025.01.17
+     *
+     * @param  array  $data     이스케이프할 데이터(키는 유지된 상태에서 값만 바뀜)
+     * @param  string $database 사용할 db
+     * @return array            이스케이프된 데이터 배열(에러인경우 빈배열)
+     */
+    function db_escape($data, $database = "default") {
+        $content = $this->db_connect($database);
+        if ($content["code"] == "2") {
+            trigger_error($content["msg"]);
+            exit;
+        }
+        $link = $content["link"];
+        $return_arr = array();
+        foreach ($data as $k => $v) {
+            $result = mysqli_escape_string($link, $v);
+            $return_arr[$k] = $result;
+        }
+        //db접속종료
+        mysqli_close($link);
+        return $return_arr;
+    }
+
+    /**
+     * - from 절 테이블명 추출
+     * - 테이블 별칭을 우선적으로 추출
+     * 
+     * require  2025.11.10
+     * @version 2025.11.10
+     * 
+     * @param  string $sql 쿼리문
+     * @return string      테이블명 또는 테이블별칭, 에러인경우 빈문자열
+     */
+    function db_from_table_name($sql) {
+        //테이블별명 또는 테이블명 추출
+        preg_match_all("/\s+from\s+(`?[^`\s]+`?)(?:\s+as)?(?:\s|$)+(`?[^`\s]*`?)/i", $sql, $matches);
+        //테이블명 없는경우
+        if (!isset($matches[1][0])) {
+            return "";
+        }
+        //별칭 있으면서 별칭이 키워드가 아닌경우
+        if ($matches[2][0] != "") {
+            $lower_name = strtolower($matches[2][0]);
+            $keyword = array(
+                "inner",
+                "outer",
+                "left",
+                "right",
+                "join",
+                "cross",
+                "natural",
+                "where",
+                "group",
+                "having",
+                "order",
+                "limit",
+                "union",
+                "intersect",
+                "minus"
+            );
+            if (!in_array($lower_name, $keyword)) {
+                return str_replace("`", "", $matches[2][0]);
+            }
+        }
+        //별칭 없는경우
+        return str_replace("`", "", $matches[1][0]);
+    }
+
+    /**
+     * 테이블 인서트(1개)  
+     *   
+     * require  2025.03.06 db_add_row db_add_table_info db_create_row db_create_where db_query 
+     * @version 2025.03.06
+     * 
+     * @param  string $table    테이블명
+     * @param  array  $option   옵션  
+     *                [row]     입력할 row, db_create_row 사용  
+     *                [where]   중복 조건문, db_create_where 사용  
+     *                [or_bool] true: 중복체크 where or문, false(기본값): 중복체크 where and문
+     * @param  string $database 사용할 db명
+     * @return int              insert_id(입력 안된경우 0)
+     */
+    function db_insert($table, $option = array(), $database = "default") {
+        $main_row = isset($option["row"]) ? $option["row"] : array();
+        $main_where = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $table_info = $this->db_add_table_info($database, $table);
+        $prefix = $table_info["prefix"];
+        $row_arr = $this->db_add_row($main_row, false, $database, $table);
+        $row_info = $this->db_create_row($row_arr, $database);
+        //중복체크인경우
+        if (count($main_where) > 0) {
+            $where_info = $this->db_create_where($main_where, $or_bool);
+            $sql = "
+                insert into `{$prefix}{$table}` (
+                    {$row_info["into"]}
+                )
+                select
+                    {$row_info["values"]}
+                from
+                    dual
+                where not exists (
+                    select
+                        1
+                    from
+                        `{$prefix}{$table}`
+                    where
+                        {$where_info["where"]}
+                )
+            ";
+            $binding = array_merge($row_info["binding"], $where_info["binding"]);
+        }
+        //아닌경우
+        else {
+            $sql = "
+                insert into `{$prefix}{$table}` (
+                    {$row_info["into"]}
+                ) values (
+                    {$row_info["values"]}
+                )
+            ";
+            $binding = $row_info["binding"];
+        }
+        $this->db_query($sql, $binding, $database);
+        return $this->db_affected_rows > 0 ? $this->db_insert_id : 0;
+    }
+
+    /**
+     * - 마지막으로 인서트된 primary key
+     * 
+     * require  2025.11.18
+     * @version 2025.11.18
+     *
+     * @return int
+     */
+    function db_insert_id() {
+        return $this->db_insert_id;
+    }
+
+    /**
+     * 마지막 쿼리문  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @return int
+     */
+    function db_last_query() {
+        return $this->db_last_query;
+    }
+
+    /**
+     * 쿼리 보내기  
+     * 쿼리 실패시 프로그램 종료  
+     *   
+     * require  2025.11.25 db_connect db_escape
+     * @version 2025.11.25
+     *
+     * @param  string $sql
+     * @param  array  $binding  prepared statement 인경우 사용
+     * @param  string $database 사용할 db
+     * @return array            쿼리결과리스트, 리스트가 없는경우 키가 필드명, 값이 null인 배열
+     */
+    function db_query($sql, $binding = array(), $database = "default") {
+        $content = $this->db_connect($database);
+        if ($content["code"] == "2") {
+            trigger_error($content["msg"]);
+            exit;
+        }
+        $link = $content["link"];
+        //문자열 치환
+        preg_match_all("/(?<!\\\\)'([\S\s]*?)(?:[^\\\\]*\\\\\\\\)*(?<!\\\\)'/", $sql, $text_arr);
+        foreach ($text_arr[0] as $k => $v) {
+            //한개씩 변환하기 위에 preg_replace 사용
+            $sql = preg_replace('/' . preg_quote($v, "/") . '/', '\\$' . $k . '\\$', $sql, 1);
+        }
+        //바인딩 갯수
+        $binding_cnt = count($binding);
+        //마지막 실행 쿼리문에 바인딩 추가
+        if ($binding_cnt > 0 && substr_count($sql, "?") == count($binding)) {
+            $error_sql = str_replace(array("%", "?"), array("%%", "'%s'"), $sql);
+            $error_binding = $this->db_escape($binding, $database);
+            $error_sql = call_user_func_array("sprintf", array_merge(array($error_sql), $error_binding));
+        } else {
+            $error_sql = $sql;
+        }
+        //문자열복구(역순)
+        $reverse_arr = array_reverse($text_arr[0]);
+        $cnt = count($reverse_arr) - 1;
+        foreach ($reverse_arr as $k => $v) {
+            //한개씩 변환하기 위에 preg_replace 사용
+            $sql = preg_replace('/' . preg_quote('$' . ($cnt - $k) . '$', "/") . '/', $v, $sql, 1);
+            $error_sql = preg_replace('/' . preg_quote('$' . ($cnt - $k) . '$', "/") . '/', $v, $error_sql, 1);
+        }
+        //마지막 쿼리문 저장
+        $this->db_last_query = $error_sql;
+        //반환값
+        $result = array();
+        //바인딩 없는경우
+        if ($binding_cnt == 0) {
+            $query = mysqli_query($link, $sql);
+            //쿼리에러인경우 종료
+            if ($query === false) {
+                $db_error = mysqli_error($link);
+                mysqli_close($link);
+                trigger_error("{$db_error}\n{$this->db_last_query}\n");
+                exit;
+            }
+            //빈쿼리인경우 빈값 반환
+            else if ($query === true) {
+                mysqli_close($link);
+                return $result;
+            }
+            //insert_id, affected_rows 저장
+            $this->db_insert_id = mysqli_insert_id($link);
+            $this->db_affected_rows = mysqli_affected_rows($link);
+            while ($row = mysqli_fetch_assoc($query)) {
+                $result[] = $row;
+            }
+            if (count($result) == 0) {
+                $field = mysqli_fetch_fields($query);
+                foreach ($field as $temp) {
+                    $result[$temp->name] = null;
+                }
+            }
+            mysqli_close($link);
+            return $result;
+        }
+        //바인딩 있는경우
+        do {
+            $db_error = "";
+            $stmt = mysqli_prepare($link, $sql);
+            //쿼리에러인경우 종료
+            if ($stmt === false) {
+                break;
+            }
+            //기본 파라미터
+            $param_arr = array(
+                $stmt,
+                str_repeat("s", $binding_cnt)
+            );
+            foreach ($binding as $k => $v) {
+                $param_arr[] = &$binding[$k];
+            }
+            //바인딩함수 실행
+            $stmt_bool = call_user_func_array("mysqli_stmt_bind_param", $param_arr) ? true : false;
+            //바인딩 실패한경우 종료
+            if (!$stmt_bool) {
+                $db_error = mysqli_stmt_error($stmt);
+                mysqli_stmt_close($stmt);
+                break;
+            }
+            //쿼리실행
+            $stmt_bool = mysqli_stmt_execute($stmt);
+            //실행 실패한경우 종료
+            if (!$stmt_bool) {
+                $db_error = mysqli_stmt_error($stmt);
+                mysqli_stmt_close($stmt);
+                break;
+            }
+            //insert_id, affected_rows 저장
+            $this->db_insert_id = mysqli_stmt_insert_id($stmt);
+            $this->db_affected_rows = mysqli_stmt_affected_rows($stmt);
+            //필드정보 쿼리 실행
+            $query = mysqli_stmt_result_metadata($stmt);
+            if ($query === false) {
+                mysqli_stmt_close($stmt);
+                mysqli_close($link);
+                return $result;
+            }
+            //필드배열
+            $row = array();
+            //bind_result 파라미터
+            $binding_arr = array(
+                $stmt
+            );
+            //필드배열 및 bind_result 파라미터 생성
+            while ($field = mysqli_fetch_field($query)) {
+                $row[$field->name] = null;
+                $binding_arr[] = &$row[$field->name];
+                $field_arr[] = $field->name;
+            }
+            //필드값 바인딩
+            call_user_func_array("mysqli_stmt_bind_result", $binding_arr);
+            //result 생성(참조값으로 인해 일일히 값 넣어줌)
+            for ($i = 0; mysqli_stmt_fetch($stmt); $i++) {
+                foreach ($row as $k => $v) {
+                    $result[$i][$k] = $v;
+                }
+            }
+            if (count($result) == 0) {
+                foreach ($row as $k => $v) {
+                    $result[$k] = null;
+                }
+            }
+            mysqli_stmt_close($stmt);
+            mysqli_close($link);
+            return $result;
+        } while (false);
+        if ($db_error == "") {
+            $db_error = mysqli_error($link);
+        }
+        mysqli_close($link);
+        trigger_error("{$db_error}\n{$this->db_last_query}\n");
+        exit;
+    }
+
+    /**
+     * 쿼리결과 여러줄  
+     *   
+     * require  2025.03.06 db_query
+     * @version 2025.03.06
+     *
+     * @param  string $sql
+     * @param  array  $binding  prepared statement 인경우 사용
+     * @param  string $database 사용할 db
+     * @return array
+     */
+    function db_result_array($sql, $binding = array(), $database = "default") {
+        $result = $this->db_query($sql, $binding, $database);
+        return isset($result[0]) ? $result : array();
+    }
+
+    /**
+     * 쿼리결과 1줄  
+     *   
+     * require  2025.03.06 db_query
+     * @version 2025.03.06
+     *
+     * @param  string $sql
+     * @param  array  $binding  prepared statement 인경우 사용
+     * @param  string $database 사용할 db
+     * @return array
+     */
+    function db_row_array($sql, $binding = array(), $database = "default") {
+        $result = $this->db_query($sql, $binding, $database);
+        return isset($result[0]) ? $result[0] : $result;
+    }
+
+    /**
+     * 테이블 백업  
+     * mysql 서버 버전과 호환되는 mysql 클라이언트 설치 필수  
+     *   
+     * require  2025.05.29 array_value db_add_table_info
+     * @version 2025.05.29
+     *
+     * @param  string $table    테이블
+     * @param  array  $dir      저장경로, null인경우 temp 폴더
+     * @param  string $database 사용할 db
+     */
+    function db_table_dump($table, $dir = null, $database = "default") {
+        if ($dir === null) {
+            $dir = dirname(__FILE__) . "/temp";
+        }
+        $dt = date("Y_m_d_H_i_s");
+        $db_info = $this->array_value($this->db_info, $database, true);
+        if (count($db_info) == 0) {
+            return;
+        }
+        $table_info = $this->db_add_table_info($database, $table);
+        $prefix = $table_info["prefix"];
+        shell_exec("mysqldump -h {$db_info["host"]} -u{$db_info["username"]} -p{$db_info["password"]} {$db_info["database"]} {$prefix}{$table} > {$dir}/{$prefix}{$table}_{$dt}.sql");
+    }
+
+    /**
+     * 테이블 복구  
+     * mysql 서버 버전과 호환되는 mysql 클라이언트 설치 필수  
+     *   
+     * require  2025.05.29 array_value
+     * @version 2025.05.29
+     *
+     * @param  string $src      sql 파일경로
+     * @param  string $database 사용할 db
+     */
+    function db_table_restore($src, $database = "default") {
+        $db_info = $this->array_value($this->db_info, $database, true);
+        if (count($db_info) == 0) {
+            return;
+        }
+        shell_exec("mysql -h {$db_info["host"]} -u {$db_info["username"]} -p{$db_info["password"]} < {$src}");
+    }
+
+    /**
+     * - 데이터베이스 타임존
+     * 
+     * require  2025.11.10 array_value
+     * @version 2025.11.10
+     * 
+     * @param  string $database 사용할 db
+     * @return string           타임존 문자열
+     */
+    function db_time_zone($database = "default") {
+        $db_info = $this->array_value($this->db_info, $database, true);
+        if (count($db_info) == 0) {
+            return "+00:00";
+        }
+        return $db_info["time_zone"];
+    }
+
+    /**
+     * 테이블 업데이트(1개)  
+     * add_where 설정 안한경우 중복체크 안함  
+     *   
+     * require  2025.03.06 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2025.03.06
+     * 
+     * @param  string $table        테이블명
+     * @param  array  $option       옵션  
+     *                [row]         수정할 row, db_create_row 사용  
+     *                [where]       수정 조건문(중복체크 하는경우 기본키 필수), db_create_where 사용  
+     *                [or_bool]     true: where or문, false(기본): where and문  
+     *                [primary]     기본키 컬럼명(공백인경우 중복체크 안함)  
+     *                [add_where]   중복체크 조건문(없는경우 중복체크 안함), db_create_where 사용  
+     *                [add_or_bool] true: 중복체크 where or문, false(기본): 중복체크 where and문
+     * @param  string $database     사용할 db명
+     * @return int                  affected_rows(수정 안된경우 0)
+     */
+    function db_update($table, $option = array(), $database = "default") {
+        $main_row = isset($option["row"]) ? $option["row"] : array();
+        $main_where = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $main_primary = isset($option["primary"]) ? trim(strtolower($option["primary"])) : "";
+        $main_add_where = isset($option["add_where"]) ? $option["add_where"] : array();
+        $add_or_bool = isset($option["add_or_bool"]) ? $option["add_or_bool"] : false;
+        $table_info = $this->db_add_table_info($database, $table);
+        $prefix = $table_info["prefix"];
+        $where_info = $this->db_create_where($main_where, $or_bool);
+        $row_arr = $this->db_add_row($main_row, true, $database, $table);
+        $row_info = $this->db_create_row($row_arr, $database);
+        if ($main_primary != "" && count($main_add_where) > 0) {
+            $primary_key = "";
+            foreach ($main_where as $k => $v) {
+                $temp = explode(" ", trim($k));
+                if ($main_primary == trim(str_replace("`", "", strtolower($temp[0])))) {
+                    $primary_key = $v;
+                    break;
+                }
+            }
+            $add_where_info = $this->db_create_where($main_add_where, $add_or_bool);
+            $where_info["where"] .= " and (
+                    select
+                        `cnt`
+                    from (
+                        select
+                            count(*) as `cnt`
+                        from
+                            `{$prefix}{$table}`
+                        where
+                            `{$main_primary}` <> ? and
+                            ({$add_where_info["where"]})
+                    ) as `t1`
+                ) = 0
+            ";
+            $where_info["binding"] = array_merge($where_info["binding"], array($primary_key), $add_where_info["binding"]);
+        }
+        $sql = "
+            update
+                `{$prefix}{$table}`
+            set
+                {$row_info["set"]}
+            where
+                {$where_info["where"]}
+        ";
+        $binding = array_merge($row_info["binding"], $where_info["binding"]);
+        $this->db_query($sql, $binding, $database);
+        return $this->db_affected_rows;
+    }
+
+    /**
+     * 테이블 다중행 업데이트(모자라는경우 인서트, 남는경우 삭제처리)  
+     * 리스트 한건당 한번의 쿼리이므로 속도 느릴 수 있음  
+     * 조건문 없는경우 다중행 인서트로 사용 가능  
+     * 리스트 배열이 잘못된경우 select문 쿼리에러 발생함  
+     * 연산자가 없거나 =, 값이 배열이 아닌 where문은 insert 쿼리시 자동추가  
+     *   
+     * require  2025.03.06 db_add_table_info db_create_where db_delete db_insert db_result_array db_update
+     * @version 2025.03.06
+     * 
+     * @param string $table       테이블명
+     * @param array  $option      옵션
+     *               [primary]    기본키 컬럼명  
+     *               [list]       리스트  
+     *               [where]      조건문, db_create_where 사용
+     *               [or_bool]    true: where or문, false(기본): where and문  
+     *               [force_bool] true: 삭제, false(기본값): delete_flag 변경, delete_flag 없는경우 force_bool true로 변경  
+     * @param string $database 사용할 db명
+     */
+    function db_update_multiple($table, $option = array(), $database = "default") {
+        $main_primary = isset($option["primary"]) ? trim(strtolower($option["primary"])) : "";
+        $list = isset($option["list"]) ? $option["list"] : array();
+        $main_where = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $force_bool = isset($option["force_bool"]) ? $option["force_bool"] : false;
+        $table_info = $this->db_add_table_info($database, $table);
+        $delete_flag = $table_info["delete_flag"];
+        $prefix = $table_info["prefix"];
+        if ($delete_flag == "") {
+            $force_bool = true;
+        }
+        //리스트 검사
+        $main_list = array();
+        $column = "";
+        $arr = array();
+        foreach ($list as $temp) {
+            if (!is_array($temp)) {
+                trigger_error("list 값이 잘못되었습니다. 확인해주세요.");
+                exit;
+            }
+            $temp_arr = array();
+            foreach ($temp as $k => $v) {
+                $temp_column = explode(" ", trim($k));
+                $temp_column = trim(str_replace("`", "", strtolower($temp_column[0])));
+                $temp_arr[$temp_column] = $v;
+                if (isset($arr[$temp_column])) {
+                    continue;
+                }
+                $arr[$temp_column] = 1;
+                $column .= ", `{$temp_column}`";
+            }
+            $main_list[] = $temp_arr;
+        }
+        //기존 리스트
+        $where_info = $this->db_create_where($main_where, $or_bool);
+        if ($where_info["where"] == "") {
+            $where_info["where"] .= "1 = 0";
+        }
+        $sql = "
+            select
+                `{$main_primary}`
+                {$column}
+            from
+                `{$prefix}{$table}`
+            where
+                {$where_info["where"]}
+        ";
+        $binding = $where_info["binding"];
+        $result = $this->db_result_array($sql, $binding, $database);
+        //삭제리스트
+        $delete_arr = array();
+        foreach ($result as $k => $v) {
+            if (isset($main_list[$k])) {
+                continue;
+            }
+            $delete_arr[] = $v[$main_primary];
+        }
+        //삭제
+        $option = array(
+            "where" => array(
+                $main_primary => $delete_arr
+            ),
+            "force_bool" => $force_bool
+        );
+        $this->db_delete($table, $option, $database);
+        //업데이트 리스트(기본키가 키값)
+        $update_arr = array();
+        //인서트 리스트
+        $insert_arr = array();
+        //처리
+        foreach ($main_list as $k => $v) {
+            //기존리스트 있는경우
+            if (isset($result[$k][$main_primary])) {
+                $primary_key = $result[$k][$main_primary];
+                $update_arr[$primary_key] = $v;
+            }
+            //없는경우
+            else {
+                $insert_arr[] = $v;
+            }
+        }
+        //업데이트
+        foreach ($update_arr as $k => $v) {
+            if ($delete_flag != "") {
+                $v[$delete_flag] = "n";
+            }
+            $option = array(
+                "row" => $v,
+                "where" => array(
+                    $main_primary => $k
+                )
+            );
+            $this->db_update($table, $option, $database);
+        }
+        //인서트
+        foreach ($insert_arr as $temp) {
+            //where배열에서 insert에 추가 가능항목은 insert 배열에 추가
+            foreach ($main_where as $k => $v) {
+                $k = trim(preg_replace("/\s+/", " ", str_replace("`", "", strtolower($k))));
+                $key_arr = explode(" ", $k);
+                $key = explode(".", $key_arr[0]);
+                $field = isset($key[1]) ? "{$key[0]}.{$key[1]}" : $key[0];
+                $operator = substr($k, strlen($key_arr[0]) + 1);
+                //추가가능항목 확인
+                if (!isset($temp[$field]) && !is_array($v) && in_array($operator, array("", "="))) {
+                    $temp[$k] = $v;
+                }
+            }
+            $option = array(
+                "row" => $temp
+            );
+            $this->db_insert($table, $option, $database);
+        }
+    }
+
+    /**
+     * 11st xml decode  
+     *   
+     * require  2025.01.17 decode_xml
+     * @version 2025.01.17
+     *
+     * @param  string $xml xml
+     * @return array       배열
+     */
+    function decode_11st_xml($xml) {
+        $content = str_ireplace(array("<ns2:", "</ns2:", " xmlns:ns2=", ' encoding="euc-kr"'), array("<", "</", " xmlns=", ' encoding="utf-8"'), preg_replace('/[^[:graph:]\s]/u', "", mb_convert_encoding($xml, "UTF-8", "EUC-KR")));
+        $arr = $this->decode_xml($content);
+        return $arr;
+    }
+
+    /**
+     * base32 decode by Bryan Ruiz  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $input base32
+     * @return string        문자열
+     */
+    function decode_base32($input) {
+        if (empty($input)) {
+            return "";
+        }
+        $map = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567");
+        $flipped_map = array_flip($map);
+        $padding_char_count = substr_count($input, "=");
+        $allowed_value = array(6, 4, 3, 1, 0);
+        if (!in_array($padding_char_count, $allowed_value)) {
+            return "";
+        }
+        for ($i = 0; $i < 4; $i++) {
+            if ($padding_char_count == $allowed_value[$i] && substr($input, - ($allowed_value[$i])) != str_repeat("=", $allowed_value[$i])) {
+                return "";
+            }
+        }
+        $input = str_split(str_replace('=', '', $input));
+        $binary_string = "";
+        $input_cnt = count($input);
+        for ($i = 0; $i < $input_cnt; $i += 8) {
+            $x = "";
+            if (!in_array($input[$i], $map)) {
+                return "";
+            }
+            for ($j = 0; $j < 8; $j++) {
+                $temp = isset($input[$i + $j]) ? $flipped_map[$input[$i + $j]] : "";
+                $x .= str_pad(base_convert($temp, 10, 2), 5, '0', STR_PAD_LEFT);
+            }
+            $eight_bits = str_split($x, 8);
+            foreach ($eight_bits as $temp) {
+                $y = chr(base_convert($temp, 2, 10));
+                $binary_string .= ($y || ord($y) == 48) ? $y : "";
+            }
+        }
+        return $binary_string;
+    }
+
+    /**
+     * base64 decode  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $text base64 텍스트
+     * @return string       텍스트
+     */
+    function decode_base64($text) {
+        return base64_decode(str_replace(array("-", "_"), array("+", "/"), $text));
+    }
+
+    /**
+     * DER decode  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $der    the binary data in DER format
+     * @param  int    $offset the offset of the data stream containing the object
+     * @return array          [$offset, $data] the new offset and the decoded object
+     */
+    function decode_der($der, $offset = 0) {
+        $pos = $offset;
+        $size = strlen($der);
+        $constructed = (ord($der[$pos]) >> 5) & 0x01;
+        $type = ord($der[$pos++]) & 0x1f;
+
+        // Length
+        $len = ord($der[$pos++]);
+        if ($len & 0x80) {
+            $n = $len & 0x1f;
+            $len = 0;
+            while ($n-- && $pos < $size) {
+                $len = ($len << 8) | ord($der[$pos++]);
+            }
+        }
+
+        // Value
+        if ($type == $this->custom_asn1_bit_string) {
+            $pos++; // Skip the first contents octet (padding indicator)
+            $data = substr($der, $pos, $len - 1);
+            $pos += $len - 1;
+        } else if (!$constructed) {
+            $data = substr($der, $pos, $len);
+            $pos += $len;
+        } else {
+            $data = null;
+        }
+
+        return array($pos, $data);
+    }
+
+    /**
+     * html decode(&amp; &lt; &gt; &quot;)  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $text 인코딩 텍스트
+     * @return string       html코드
+     */
+    function decode_html($text) {
+        return htmlspecialchars_decode($text, ENT_COMPAT);
+    }
+
+    /**
+     * JSON 디코딩  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string $json JSON형태의 문자열
+     * @return array        배열
+     */
+    function decode_json($json) {
+        $content = json_decode($json, true);
+        return is_array($content) ? $content : array();
+    }
+
+    /**
+     * nhn xml decode  
+     *   
+     * require  2025.01.17 array_value, decode_xml
+     * @version 2025.01.17
+     *
+     * @param  string $xml xml
+     * @return array       배열
+     */
+    function decode_nhn_xml($xml) {
+        $content = explode("<soapenv:Body>", $xml);
+        $content = explode("</soapenv:Body>", $this->array_value($content, 1));
+        $content = str_replace(array("<n:", "</n:"), array("<", "</"), $content[0]);
+        $arr = array();
+        if ($content != "") {
+            $arr = $this->decode_xml($content);
+        }
+        return $arr;
+    }
+
+    /**
+     * UCS2 변환  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string $text 변환할 문자열
+     * @return string       변환된 문자열
+     */
+    function decode_ucs2($text) {
+        return html_entity_decode($text);
+    }
+
+    /**
+     * xml 디코딩 (root 포함된 배열 반환, 네임스페이스 안됨)  
+     *   
+     * require  2025.01.17 decode_json encode_json
+     * @version 2025.01.17
+     *
+     * @param  string $xml xml
+     * @return array       배열
+     */
+    function decode_xml($xml) {
+        $simple_xml = simplexml_load_string($xml);
+        $arr = array(
+            $simple_xml->getName() => $this->decode_json($this->encode_json(simplexml_load_string($xml)))
+        );
+        return $arr;
+    }
+
+    /**
+     * AES-128/CBC,ECB 복호화  
+     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+     *   
+     * require  2025.06.17 str_pkcs7_unpadding
+     * @version 2025.06.17
+     *
+     * @param  string $text     암호화문자열
+     * @param  string $key      복호화 키
+     * @param  string $iv       복호화 iv(ecb인경우 공백으로 두면 됨)
+     * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+     * @return string           평문자열, 실패시 빈문자열
+     */
+    function decrypt_aes128($text, $key, $iv = "", $cbc_bool = false) {
+        $return_str = "";
+        if (strlen($key) != 16) {
+            return $return_str;
+        }
+        if ($cbc_bool && strlen($iv) != 16) {
+            return $return_str;
+        }
+        if (version_compare(phpversion(), '5.3.0', '>=')) {
+            $return_str = openssl_decrypt($text, $cbc_bool ? "AES-128-CBC" : "AES-128-ECB", $key, 0, $iv);
+        } else {
+            eval('$return_str = $this->str_pkcs7_unpadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, base64_decode($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
+        }
+        return $return_str;
+    }
+
+    /**
+     * AES-256/CBC,ECB 복호화  
+     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+     *   
+     * require  2025.06.17 str_pkcs7_unpadding
+     * @version 2025.06.17
+     *
+     * @param  string $text     암호화문자열
+     * @param  string $key      복호화 키
+     * @param  string $iv       복호화 iv(ecb인경우 공백으로 두면 됨)
+     * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+     * @return string           평문자열, 실패시 빈문자열
+     */
+    function decrypt_aes256($text, $key, $iv = "", $cbc_bool = false) {
+        $return_str = "";
+        if (strlen($key) != 32) {
+            return $return_str;
+        }
+        if ($cbc_bool && strlen($iv) != 16) {
+            return $return_str;
+        }
+        if (version_compare(phpversion(), '5.3.0', '>=')) {
+            $return_str = openssl_decrypt($text, $cbc_bool ? "AES-256-CBC" : "AES-256-ECB", $key, 0, $iv);
+        } else {
+            eval('$return_str = $this->str_pkcs7_unpadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, base64_decode($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
+        }
+        return $return_str;
+    }
+
+    /**
+     * nhn decrypt  
+     *   
+     * require  2025.01.17 decrypt_aes128
+     * @version 2025.01.17
+     *
+     * @param  string $text       암호화문자열
+     * @param  string $secret_key 비밀키
+     * @param  string $iv         iv
+     * @param  string $timestamp  nhn timestamp
+     * @return string             평문
+     */
+    function decrypt_nhn($text, $secret_key, $iv, $timestamp) {
+        $iv = pack("H*", $iv);
+        $temp = "";
+        $signature = hash_hmac("sha256", $timestamp, $secret_key, true);
+        for ($i = 0; $i < 16; $i++) {
+            $temp .= substr($signature, $i, 1) ^ substr($signature, $i + 16, 1);
+        }
+        $secret = pack("H*", bin2hex($temp));
+        return $this->decrypt_aes128($text, $secret, $iv, true);
+    }
+
+    /**
+     * 티몬 복호화  
+     *   
+     * require  2025.01.17 decrypt_aes128
+     * @version 2025.01.17
+     *
+     * @param  string $text       암호문
+     * @param  string $secret_key 시크릿키
+     * @return string             평문
+     */
+    function decrypt_tmon($text, $secret_key) {
+        return $this->decrypt_aes128($text, $secret_key);
+    }
+
+    /**
+     * base32 encode by Bryan Ruiz  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $input        문자열
+     * @param  bool   $padding_bool padding 여부
+     * @return string               base32
+     */
+    function encode_base32($input, $padding_bool = true) {
+        if (empty($input)) {
+            return "";
+        }
+        $map = str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567");
+        $input = str_split($input);
+        $binary_string = "";
+        foreach ($input as $temp) {
+            $binary_string .= str_pad(base_convert(ord($temp), 10, 2), 8, '0', STR_PAD_LEFT);
+        }
+        $five_bit_binary_array = str_split($binary_string, 5);
+        $base32 = "";
+        foreach ($five_bit_binary_array as $temp) {
+            $base32 .= $map[base_convert(str_pad($temp, 5, '0'), 2, 10)];
+        }
+        if ($padding_bool && ($x = strlen($binary_string) % 40) != 0) {
+            if ($x == 8) {
+                $base32 .= str_repeat("=", 6);
+            } else if ($x == 16) {
+                $base32 .= str_repeat("=", 4);
+            } else if ($x == 24) {
+                $base32 .= str_repeat("=", 3);
+            } else if ($x == 32) {
+                $base32 .= "=";
+            }
+        }
+        return $base32;
+    }
+
+    /**
+     * base64 encode  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $text          텍스트
+     * @param  bool   $url_safe_bool url safe 여부
+     * @return string                base64 텍스트
+     */
+    function encode_base64($text, $url_safe_bool = false) {
+        $enc_text = base64_encode($text);
+        if ($url_safe_bool) {
+            $enc_text = str_replace(array("+", "/", "="), array("-", "_", ""), $enc_text);
+        }
+        return $enc_text;
+    }
+
+    /**
+     * DER encode  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  int    $type  DER tag
+     * @param  bool   $value the value to encode
+     * @return string        the encoded object
+     */
+    function encode_der($type, $value) {
+        $tag_header = 0;
+        if ($type === $this->custom_asn1_sequence) {
+            $tag_header |= 0x20;
+        }
+        // Type
+        $der = chr($tag_header | $type);
+        // Length
+        $der .= chr(strlen($value));
+        return $der . $value;
+    }
+
+    /**
+     * html encode(&amp; &lt; &gt; &quot;)  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     * 
+     * @param  string $html               html코드
+     * @param  bool   $double_encode_bool 이중변환여부
+     * @return string                     인코딩 텍스트
+     */
+    function encode_html($html, $double_encode_bool = true) {
+        return htmlspecialchars($html, ENT_COMPAT, null, $double_encode_bool);
+    }
+
+    /**
+     * JSON 인코딩  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  array  $arr 배열
+     * @return string      JSON형태의 문자열
+     */
+    function encode_json($arr) {
+        //php 5.4버전 이상인경우
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            return json_encode($arr, JSON_UNESCAPED_UNICODE);
+            //php 5.2, 5.3버전인경우
+        } else {
+            $param1 = '/(\\\u[a-f0-9]+)+/';
+            $param2 = '$s';
+            $param3 = '$json = json_decode(\'{"s":"\'.$s[0].\'"}\'); return reset($json);';
+            $return_str = "";
+            eval('$return_str = preg_replace_callback($param1, create_function($param2, $param3), json_encode($arr));');
+            return $return_str;
+        }
+    }
+
+    /**
+     * jsonp 문자열 반환  
+     * callback은 request로 받아옴  
+     * 배열은 json문자열로 변환  
+     *   
+     * require  2025.01.17 encode_json input_request
+     * @version 2025.01.17
+     * 
+     * @param  string|array $data 데이터
+     * @param  string       $name request name
+     * @return array
+     */
+    function encode_jsonp($data, $name = "callback") {
+        $callback = $this->input_request($name);
+        if (is_array($data)) {
+            $data = $this->encode_json($data);
+        }
+        $text = str_replace("'", "\\'", $data);
+        return "{$callback}('{$text}')";
+    }
+
+    /**
+     * xml 인코딩 (root가 배열에 포함, 네임스페이스 안됨)  
+     *   
+     * require  2025.01.17 custom_add_xml_element
+     * @version 2025.01.17
+     *
+     * @param  array  $arr 배열
+     * @return string      xml
+     */
+    function encode_xml($arr) {
+        $root = key($arr);
+        $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"{$this->character_set}\"?><{$root}></{$root}>");
+        $this->custom_add_xml_element($xml, $arr[$root]);
+        return $xml->asXML();
+    }
+
+    /**
+     * AES-128/CBC,ECB 암호화  
+     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+     *   
+     * require  2025.06.17 str_pkcs7_padding
+     * @version 2025.06.17
+     *
+     * @param  string $text     평문자열
+     * @param  string $key      암호화 키
+     * @param  string $iv       암호화 iv(ecb인경우 공백으로 두면 됨)
+     * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+     * @return string           암호화문자열, 실패시 빈문자열
+     */
+    function encrypt_aes128($text, $key, $iv = "", $cbc_bool = false) {
+        $return_str = "";
+        if (strlen($key) != 16) {
+            return $return_str;
+        }
+        if ($cbc_bool && strlen($iv) != 16) {
+            return $return_str;
+        }
+        if (version_compare(phpversion(), '5.3.0', '>=')) {
+            return openssl_encrypt($text, $cbc_bool ? "AES-128-CBC" : "AES-128-ECB", $key, 0, $iv);
+        } else {
+            eval('$return_str = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $this->str_pkcs7_padding($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
+        }
+        return $return_str;
+    }
+
+    /**
+     * AES-256/CBC,ECB 암호화  
+     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+     *   
+     * require  2025.06.17 str_pkcs7_padding
+     * @version 2025.06.17
+     *
+     * @param  string $text     평문자열
+     * @param  string $key      암호화 키
+     * @param  string $iv       암호화 iv(ecb인경우 공백으로 두면 됨)
+     * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+     * @return string           암호화문자열, 실패시 빈문자열
+     */
+    function encrypt_aes256($text, $key, $iv = "", $cbc_bool = false) {
+        $return_str = "";
+        if (strlen($key) != 32) {
+            return $return_str;
+        }
+        if ($cbc_bool && strlen($iv) != 16) {
+            return $return_str;
+        }
+        if (version_compare(phpversion(), '5.3.0', '>=')) {
+            return openssl_encrypt($text, $cbc_bool ? "AES-256-CBC" : "AES-256-ECB", $key, 0, $iv);
+        } else {
+            eval('$return_str = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $this->str_pkcs7_padding($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
+        }
+        return $return_str;
+    }
+
+    /**
+     * nhn encrypt  
+     *   
+     * require  2025.01.17 encrypt_aes128
+     * @version 2025.01.17
+     *
+     * @param  string $text       평문
+     * @param  string $secret_key 비밀키
+     * @param  string $iv         iv
+     * @return array  [text]      암호문  
+     *                [timestamp] 타임스템프
+     */
+    function encrypt_nhn($text, $secret_key, $iv) {
+        $microtime = explode(" ", microtime());
+        $datetime = str_replace(" ", "T", gmdate("Y-m-d H:i:s", $microtime[1]));
+        $rand = sprintf("%04d", mt_rand(0, 9999));
+        $timestamp = $datetime . substr($microtime[0], 1, 4) . "Z" . $rand;
+        $iv = pack("H*", $iv);
+        $temp = "";
+        $signature = hash_hmac("sha256", $timestamp, $secret_key, true);
+        for ($i = 0; $i < 16; $i++) {
+            $temp .= substr($signature, $i, 1) ^ substr($signature, $i + 16, 1);
+        }
+        $secret = pack("H*", bin2hex($temp));
+        return array(
+            "text" => $this->encrypt_aes128($text, $secret, $iv, true),
+            "timestamp" => $timestamp
+        );
+    }
+
+    /**
+     * 티몬 암호화  
+     *   
+     * require  2025.01.17 encrypt_aes128
+     * @version 2025.01.17
+     *
+     * @param  string $text       평문
+     * @param  string $secret_key 시크릿키
+     * @return string             암호문
+     */
+    function encrypt_tmon($text, $secret_key) {
+        return $this->encrypt_aes128($text, $secret_key);
+    }
+
+    /**
+     * 현재 실행중인 php파일  
+     *   
+     * require  2025.10.30 input_server str_simplify_path
+     * @version 2025.10.30
+     * 
+     * @return array         배열  
+     *         string [dir]  절대경로  
+     *         string [base] 파일명
+     */
+    function input_current_php() {
+        $file_name = $this->input_server("script_filename");
+        $pwd = substr($file_name, 0, 1) == "/" ? "" : ($this->input_server("pwd") . "/");
+        $file = $this->str_simplify_path($pwd . $file_name);
+        return array(
+            "dir" => dirname($file),
+            "base" => basename($file)
+        );
+    }
+
+    /**
+     * 파일정보  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string $name       파일 태그 name속성
+     * @param  bool   $array_bool true - 배열이름, false - 단일이름
+     * @return array  [name]  
+     *                [type]  
+     *                [tmp_name]  
+     *                [error]  
+     *                [size]
+     */
+    function input_file($name, $array_bool = false) {
+        if ($array_bool) {
+            if (!isset($_FILES[$name])) {
+                return array();
+            }
+            $arr = array();
+            foreach ($_FILES[$name]["name"] as $k => $v) {
+                $arr[] = array(
+                    "name" => $_FILES[$name]["name"][$k],
+                    "type" => $_FILES[$name]["type"][$k],
+                    "tmp_name" => $_FILES[$name]["tmp_name"][$k],
+                    "error" => $_FILES[$name]["error"][$k],
+                    "size" => $_FILES[$name]["size"][$k]
+                );
+            }
+            return $arr;
+        } else {
+            $arr = array(
+                "name" => "",
+                "type" => "",
+                "tmp_name" => "",
+                "error" => 0,
+                "size" => 0
+            );
+            return isset($_FILES[$name]) ? $_FILES[$name] : $arr;
+        }
+    }
+
+    /**
+     * 파일업로드  
+     *   
+     * require  2025.01.17 unique_id
+     * @version 2025.01.17
+     *
+     * @param  string $name             파일 태그 name속성
+     * @param  string $src              저장폴더
+     * @param  array  $allow_ext        업로드 허용 확장자(.제외)
+     * @param  bool   $unique_name_bool true인경우 고유파일명 false인경우 업로드한 파일명
+     * @return bool
+     */
+    function input_file_upload($name = "file", $src = ".", $allow_ext = array(), $unique_name_bool = false) {
+        //파일존재확인
+        if (!isset($_FILES[$name])) {
+            $this->input_upload_info["code"] = "2";
+            return false;
+        }
+        //폴더존재확인
+        if (!is_dir($src)) {
+            $this->input_upload_info["code"] = "3";
+            return false;
+        }
+        //윈도우 아닌경우 쓰기권한 확인
+        if (strncasecmp(PHP_OS, "win", 3) != 0 && !is_writable($src)) {
+            $this->input_upload_info["code"] = "3";
+            return false;
+        }
+        //업로드파일 확장자
+        $temp_name = explode(".", $_FILES[$name]["name"]);
+        $ext = count($temp_name) == "0" ? "" : strtolower($temp_name[count($temp_name) - 1]);
+        //true인경우 고유파일명 false인경우 업로드한 파일명
+        if ($unique_name_bool) {
+            $file_name = $this->unique_id();
+        } else {
+            $file_name = str_replace("." . $ext, "", $_FILES[$name]["name"]);
+        }
+        $temp_num = "";
+        foreach ($allow_ext as $temp) {
+            if ($temp == $ext) {
+                for ($i = 1; file_exists("{$src}/{$file_name}{$temp_num}.{$ext}"); $i++) {
+                    $temp_num = "_{$i}";
+                }
+                move_uploaded_file($_FILES[$name]["tmp_name"], "{$src}/{$file_name}{$temp_num}.{$ext}");
+
+                $this->input_upload_info["code"] = "1";
+                $this->input_upload_info["name"] = "{$file_name}{$temp_num}";
+                $this->input_upload_info["ext"] = "{$ext}";
+                $this->input_upload_info["full_name"] = "{$file_name}{$temp_num}.{$ext}";
+                $this->input_upload_info["src"] = "{$src}";
+                return true;
+            }
+        }
+        //확장자 없음
+        $this->input_upload_info["code"] = "4";
+        return false;
+    }
+
+    /**
+     * 배열파일 일괄업로드  
+     *   
+     * require  2025.01.17 input_file unique_id
+     * @version 2025.01.17
+     *
+     * @param  string $name                  파일 태그 name속성
+     * @param  string $src                   저장폴더
+     * @param  array  $allow_ext             업로드 허용 확장자(.제외)
+     * @param  bool   $unique_name_bool      true인경우 고유파일명 false인경우 업로드한 파일명
+     * @return array  [success_bool]         true: 성공, false: 업로드할 폴더 없음  
+     *                [list][][success_bool] true: 성공, false: 허용확장자 아님  
+     *                [list][][name]         업로드 파일명  
+     *                [list][][ext]          업로드 파일 확장자  
+     *                [list][][full_name]    확장자 포함 파일명
+     */
+    function input_file_upload_arr($name = "file", $src = ".", $allow_ext = array(), $unique_name_bool = false) {
+        $return_arr = array(
+            "success_bool" => false,
+            "list" => array()
+        );
+        //폴더존재확인
+        if (!is_dir($src)) {
+            return $return_arr;
+        }
+        //윈도우 아닌경우 쓰기권한 확인
+        if (strncasecmp(PHP_OS, "win", 3) != 0 && !is_writable($src)) {
+            return $return_arr;
+        }
+        $return_arr["success_bool"] = true;
+        $file_list = $this->input_file($name, true);
+        if (count($file_list) == 0) {
+            return $return_arr;
+        }
+        foreach ($file_list as $temp) {
+            $temp_arr = array(
+                "success_bool" => false,
+                "name" => "",
+                "ext" => "",
+                "full_name" => ""
+            );
+            //업로드파일 확장자
+            $temp_name = explode(".", $temp["name"]);
+            $ext = count($temp_name) == 0 ? "" : strtolower($temp_name[count($temp_name) - 1]);
+            //true인경우 고유파일명 false인경우 업로드한 파일명
+            if ($unique_name_bool) {
+                $file_name = $this->unique_id();
+            } else {
+                $file_name = $ext == "" ? $temp["name"] : substr($temp["name"], 0, (-strlen($ext) - 1));
+            }
+            foreach ($allow_ext as $temp2) {
+                if ($temp2 != $ext) {
+                    continue;
+                }
+                $temp_num = "";
+                for ($i = 1; file_exists("{$src}/{$file_name}{$temp_num}.{$ext}"); $i++) {
+                    $temp_num = "_{$i}";
+                }
+                move_uploaded_file($temp["tmp_name"], "{$src}/{$file_name}{$temp_num}.{$ext}");
+                $temp_arr["success_bool"] = true;
+                $temp_arr["name"] = "{$file_name}{$temp_num}";
+                $temp_arr["ext"] = $ext;
+                $temp_arr["full_name"] = "{$file_name}{$temp_num}.{$ext}";
+                break;
+            }
+            $return_arr["list"][] = $temp_arr;
+        }
+        return $return_arr;
+    }
+
+    /**
+     * 파일업로드 base64(이미지만)  
+     *   
+     * require  2025.01.17 array_value unique_id
+     * @version 2025.01.17
+     *
+     * @param  string $file 파일데이터
+     * @param  string $src  저장폴더
+     * @return bool
+     */
+    function input_file_upload_base64($file, $src = ".") {
+        //폴더존재확인
+        if (!is_dir($src)) {
+            $this->input_upload_info["code"] = "3";
+            return false;
+        }
+        //윈도우 아닌경우 쓰기권한 확인
+        if (strncasecmp(PHP_OS, "win", 3) != 0 && !is_writable($src)) {
+            $this->input_upload_info["code"] = "3";
+            return false;
+        }
+        //파일처리
+        $file_info = explode(";base64,", $file);
+        $ext = explode("/", $file_info[0]);
+        $ext = strtolower($this->array_value($ext, 1));
+        //허용 확장자 아닌경우
+        if (!in_array($ext, array("jpg", "jpeg", "gif", "png"))) {
+            $this->input_upload_info["code"] = "4";
+            return false;
+        }
+        $file = $this->array_value($file_info, 1);
+        //파일존재확인
+        if ($file == "") {
+            $this->input_upload_info["code"] = "2";
+            return false;
+        }
+        $file_name = $this->unique_id();
+        $temp_num = "";
+        for ($i = 0; file_exists("{$src}/{$file_name}{$temp_num}.{$ext}"); $i++) {
+            $temp_num = "_{$i}";
+        }
+        file_put_contents("{$src}/{$file_name}{$temp_num}.{$ext}", $file);
+        $this->input_upload_info["code"] = "1";
+        $this->input_upload_info["name"] = "{$file_name}{$temp_num}";
+        $this->input_upload_info["ext"] = "{$ext}";
+        $this->input_upload_info["full_name"] = "{$file_name}{$temp_num}.{$ext}";
+        $this->input_upload_info["src"] = "{$src}";
+        return true;
+    }
+
+    /**
+     * 파일업로드 결과  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @return array [code]      업로드 결과코드  
+     *                           0 - 업로드한적 없음  
+     *                           1 - 업로드 성공  
+     *                           2 - 업로드파일 없음  
+     *                           3 - 업로드할 폴더 없음  
+     *                           4 - 허용확장자 없음  
+     *               [name]      업로드 파일명  
+     *               [ext]       업로드 파일 확장자  
+     *               [full_name] 확장자 포함 파일명  
+     *               [src]       업로드 경로
+     */
+    function input_file_upload_info() {
+        return $this->input_upload_info;
+    }
+
+    /**
+     * Set http status header  
+     * The SERVER_PROTOCOL value is fixed to "HTTP/1.1"  
+     *   
+     * require  2025.09.23
+     * @version 2025.09.23
+     * 
+     * @param  int  $code HTTP status code
+     * @return bool true - 성공, false - 실패
+     */
+    function input_http_status_header($code = 200) {
+        $status = array(
+            100 => "Continue",
+            101 => "Switching Protocols",
+            102 => "Processing",
+            103 => "Early Hints",
+            200 => "OK",
+            201 => "Created",
+            202 => "Accepted",
+            203 => "Non-Authoritative Information",
+            204 => "No Content",
+            205 => "Reset Content",
+            206 => "Partial Content",
+            207 => "Multi-Status",
+            208 => "Already Reported",
+            226 => "IM Used",
+            300 => "Multiple Choices",
+            301 => "Moved Permanently",
+            302 => "Found",
+            303 => "See Other",
+            304 => "Not Modified",
+            307 => "Temporary Redirect",
+            308 => "Permanent Redirect",
+            400 => "Bad Request",
+            401 => "Unauthorized",
+            402 => "Payment Required",
+            403 => "Forbidden",
+            404 => "Not Found",
+            405 => "Method Not Allowed",
+            406 => "Not Acceptable",
+            407 => "Proxy Authentication Required",
+            408 => "Request Timeout",
+            409 => "Conflict",
+            410 => "Gone",
+            411 => "Length Required",
+            412 => "Precondition Failed",
+            413 => "Content Too Large",
+            414 => "URI Too Long",
+            415 => "Unsupported Media Type",
+            416 => "Range Not Satisfiable",
+            417 => "Expectation Failed",
+            418 => "I'm a teapot",
+            421 => "Misdirected Request",
+            422 => "Unprocessable Content",
+            423 => "Locked",
+            424 => "Failed Dependency",
+            425 => "Too Early",
+            426 => "Upgrade Required",
+            428 => "Precondition Required",
+            429 => "Too Many Requests",
+            431 => "Request Header Fields Too Large",
+            451 => "Unavailable For Legal Reasons",
+            500 => "Internal Server Error",
+            501 => "Not Implemented",
+            502 => "Bad Gateway",
+            503 => "Service Unavailable",
+            504 => "Gateway Timeout",
+            505 => "HTTP Version Not Supported",
+            506 => "Variant Also Negotiates",
+            507 => "Insufficient Storage",
+            508 => "Loop Detected",
+            510 => "Not Extended",
+            511 => "Network Authentication Required"
+        );
+        if (!isset($status[$code])) {
+            return false;
+        }
+        header("HTTP/1.1 {$code} {$status[$code]}");
+        return true;
+    }
+
+    /**
+     * request  
+     *   
+     * require  2025.08.05 array_value
+     * @version 2025.08.05
+     *
+     * @param  string       $key        키, 공백인경우 배열전체
+     * @param  bool         $array_bool 반환값형태, true - 배열, false - 문자열
+     * @return string|array
+     */
+    function input_request($key = "", $array_bool = false) {
+        $request = $this->custom_request;
+        if ($key == "") {
+            return $request;
+        }
+        return $this->array_value($request, $key, $array_bool);
+    }
+
+    /**
+     * server  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string       $key        키, 공백인경우 배열전체
+     * @param  bool         $upper_bool 대문자 변환여부
+     * @return string|array
+     */
+    function input_server($key = "", $upper_bool = true) {
+        if ($upper_bool) {
+            $key = strtoupper($key);
+        }
+        if ($key == "") {
+            return isset($_SERVER) ? $_SERVER : array();
+        }
+        return isset($_SERVER[$key]) ? $_SERVER[$key] : "";
+    }
+
+    /**
+     * 봇 여부  
+     *   
+     * require  2025.07.15 input_server
+     * @version 2025.07.15
+     *
+     * @return bool
+     */
+    function is_bot() {
+        $useragent = $this->input_server("http_user_agent");
+        //bot문자열 있는경우 bot
+        if (stristr($useragent, "bot")) {
+            return true;
+        }
+        //운영체제 문자열 있는경우 봇 아님
+        if (stristr($useragent, "Mozilla/5.0 (Macintosh") || stristr($useragent, "Mozilla/5.0 (Windows") || stristr($useragent, "Mozilla/5.0 (Linux") || stristr($useragent, "Mozilla/5.0 (iPhone")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * magic_quotes_gpc 설정여부
+     *   
+     * require  2025.08.13
+     * @version 2025.08.13
+     *
+     * @return bool
+     */
+    function is_magic_quotes_gpc() {
+        $result = false;
+        if (version_compare(phpversion(), "5.4.0", ">=")) {
+            return $result;
+        }
+        eval('$result = get_magic_quotes_gpc();');
+        return $result;
+    }
+
+    /**
+     * 모바일 여부 (http://detectmobilebrowsers.com/)  
+     *   
+     * require  2025.07.15 input_server
+     * @version 2025.07.15
+     *
+     * @return bool
+     */
+    function is_mobile() {
+        $useragent = $this->input_server("http_user_agent");
+        //|android|ipad|playbook|silk 추가됨(태블릿 대응)
+        if (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i', $useragent) || preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', substr($useragent, 0, 4))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 로그저장  
+     * require 없어야함  
+     *   
+     * require  2025.10.24
+     * @version 2025.10.24
+     *
+     * @param string $str    로그남길 문자열
+     * @param string $prefix 로그파일 접두어
+     */
+    function log_message($str, $prefix = "") {
+        $dt = date("Y-m-d H:i:s");
+        $date = date("Y_m_d", strtotime($dt));
+        if ($prefix != "") {
+            $prefix .= "_";
+        }
+        //문자열 예외처리
+        $message = (is_numeric($str) || is_string($str)) ? $str : var_export($str, true);
+        //회원정보 있는경우 표시
+        if ($this->custom_user_info != "") {
+            $message .= "\n" . $this->custom_user_info;
+        }
+        $file = fopen(dirname(__FILE__) . "/log/{$prefix}{$date}.log", "a");
+        fwrite($file, "{$dt} --> {$message}\n");
+        fclose($file);
+    }
+
+    /**
+     * 세션 값 불러오기  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string       $key 키
+     * @return string|array      값
+     */
+    function session_get($key = "") {
+        if ($key == "") {
+            return isset($_SESSION) ? $_SESSION : array();
+        }
+        return isset($_SESSION[$key]) ? $_SESSION[$key] : "";
+    }
+
+    /**
+     * 세션 저장  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param string $key   키
+     * @param string $value 값
+     */
+    function session_set($key, $value) {
+        $_SESSION[$key] = $value;
+    }
+
+    /**
+     * 세션 시작여부 확인  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @return bool
+     */
+    function session_start_check() {
+        if (php_sapi_name() !== 'cli') {
+            if (version_compare(phpversion(), '5.4.0', '>=')) {
+                return session_status() === PHP_SESSION_ACTIVE ? true : false;
+            } else {
+                return session_id() === '' ? false : true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 세션 제거  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param string $key
+     */
+    function session_unset($key = "") {
+        if ($key == "") {
+            session_destroy();
+        } else if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
+        }
+    }
+
+    /**
+     * 문자열 공백추가후 반환  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string $text       문자열
+     * @param  int    $length     euckr_bool 값이 true인경우 바이트길이, false인경우 문자열길이
+     * @param  string $blank      공백문자열
+     * @param  bool   $front_bool true: 앞에 공백, false(기본값): 뒤에 공백
+     * @param  bool   $euckr_bool true: euc-kr, false(기본값): utf-8
+     * @return string             공백추가 문자열($euckr_bool에 맞게 인코딩됨)
+     */
+    function str_pad($text, $length, $blank = " ", $front_bool = false, $euckr_bool = false) {
+        if ($this->character_set == "euc-kr") {
+            $text = mb_convert_encoding($text, "UTF-8", "EUC-KR");
+            $blank = mb_convert_encoding($blank, "UTF-8", "EUC-KR");
+        }
+        $add = 0;
+        if ($euckr_bool) {
+            $add = (strlen($text) - mb_strlen($text, "utf-8")) / 2;
+        }
+        $count = $length - mb_strlen($text, "utf-8") - $add;
+        $blanks = $count > 0 ? str_repeat($blank, $count) : "";
+        $text = $front_bool ? "{$blanks}{$text}" : "{$text}{$blanks}";
+        return $euckr_bool ? mb_convert_encoding($text, "EUC-KR", "UTF-8") : $text;
+    }
+
+    /**
+     * pkcs7 padding  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string $text 문자열
+     * @return string       padding 추가 문자열
+     */
+    function str_pkcs7_padding($text) {
+        $padding = 16 - strlen($text) % 16;
+        $padding_text = str_repeat(chr($padding), $padding);
+        return $text . $padding_text;
+    }
+
+    /**
+     * pkcs7 unpadding  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @param  string $text 문자열
+     * @return string       padding 제거 문자열
+     */
+    function str_pkcs7_unpadding($text) {
+        $length = strlen($text);
+        $unpadding = ord(substr($text, -1));
+        return substr($text, 0, $length - $unpadding);
+    }
+
+    /**
+     * 폴더경로 심플하게 바꾸기  
+     *   
+     * require  2025.10.30
+     * @version 2025.10.30
+     * 
+     * @param  string $path 폴더경로
+     * @return string       심플한 폴더경로
+     */
+    function str_simplify_path($path) {
+        $absolute_bool = substr($path, 0, 1) === "/";
+        $end_slash = substr($path, -1) === "/" ? "/" : "";
+        $parts = explode('/', $path);
+        $stack = array();
+        foreach ($parts as $part) {
+            if ($part === '' || $part === '.') {
+                continue;
+            }
+            if ($part === '..') {
+                if (!empty($stack) && end($stack) !== '..') {
+                    array_pop($stack);
+                } else if (!$absolute_bool) {
+                    // For relative paths, keep leading ".."
+                    $stack[] = '..';
+                }
+            } else {
+                $stack[] = $part;
+            }
+        }
+        // Reconstruct the simplified path is empty
+        if (count($stack) === 0) {
+            return $absolute_bool ? '/' : ('.' . $end_slash);
+        }
+        $simplified = implode('/', $stack);
+        return ($absolute_bool ? '/' : '') . $simplified . $end_slash;
+    }
+
+    /**
+     * 고유번호 생성(년월일시분마이크로초PID순서값)  
+     *   
+     * require  2025.01.17
+     * @version 2025.01.17
+     *
+     * @return string 문자열 형태이지만 10진수 정수를 반환
+     */
+    function unique_id() {
+        $time = explode(" ", str_replace("0.", "", microtime()));
+        return date("YmdHis", $time[1]) . substr($time[0], 0, -2) . sprintf("%07d", getmypid()) . $this->custom_unique_index++;
+    }
+
+    /**
+     * 세션에 사용될 임시값 생성  
+     *   
+     * require  2025.01.17 encode_base64 unique_id
+     * @version 2025.01.17
+     *
+     * @param  string $id        사용자 아이디
+     * @param  string $pw        사용자 비밀번호
+     * @param  bool   $temp_bool true 인경우 항상 다른 session
+     * @return string
+     */
+    function unique_session_id($id, $pw, $temp_bool = false) {
+        $str = $this->encode_base64($id, true) . "_";
+        $str .= $temp_bool ? md5("{$id}_{$pw}_{$this->unique_id()}") : md5("{$id}_{$pw}");
+        return $str;
+    }
+
+    /**
+     * 사용자 정보 문자열 설정 및 반환  
+     * 로그에도 사용자 정보 문자열 출력됨  
+     *   
+     * require  2025.10.24
+     * @version 2025.10.24
+     * 
+     * @param  string $str 사용자 정보 문자열, null인경우 반환만, 빈문자열인경우 초기화
+     * @return string      사용자 정보 문자열
+     */
+    function user_info($str = null) {
+        if ($str !== null) {
+            $this->custom_user_info = strval($str);
+        }
+        return $this->custom_user_info;
+    }
+}

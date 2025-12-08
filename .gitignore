@@ -1,0 +1,21 @@
+# ukp 사용하는 프로젝트용 .gitignore
+# netbeans 프로젝트 폴더
+/nbproject
+# vscode 프로젝트 폴더
+/.vscode
+# 잠금파일
+.LCK*
+# Mac OS에서 생성하는 파일
+.DS_Store
+# 프로젝트에서 테스트용으로 사용되는 임시파일
+*__*
+# _ukp 폴더 내 민감정보, 프로젝트에 맞게 경로 변경
+/website/_ukp/env/*
+!/website/_ukp/env/index.php
+/website/_ukp/log/*
+!/website/_ukp/log/index.php
+/website/_ukp/temp/*
+!/website/_ukp/temp/index.php
+# 업로드 폴더, 100MiB 초과 파일있는 폴더, 프로젝트에 맞게 경로 변경
+/www/website/upload/*
+!/www/website/upload/index.php
