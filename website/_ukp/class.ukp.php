@@ -9,7 +9,7 @@
  * [cors_bool]    cors 허용여부(기본값: false)  
  *   
  * require  2025.06.13 config.php
- * @version 2025.11.25
+ * @version 2025.12.04
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
