@@ -9,7 +9,7 @@
  * [cors_bool]    cors 허용여부(기본값: false)  
  *   
  * require  2025.06.13 config.php
- * @version 2025.12.04
+ * @version 2025.12.16
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -2199,46 +2199,842 @@ class Ukp {
     }
 
     /**
-     * 테이블 백업  
-     * mysql 서버 버전과 호환되는 mysql 클라이언트 설치 필수  
-     *   
-     * require  2025.05.29 array_value db_add_table_info
-     * @version 2025.05.29
-     *
-     * @param  string $table    테이블
-     * @param  array  $dir      저장경로, null인경우 temp 폴더
-     * @param  string $database 사용할 db
+     * - cnt 쿼리 결과
+     * - db/cnt 폴더 내 {$database}/{$table}.sql 파일 sql 사용
+     * - delete_flag 설정 안한경우 delete_flag_bool 무시함
+     * 
+     * require  2025.12.16 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
+     * @version 2025.12.16
+     * 
+     * @param  string $table    테이블명
+     * @param  array  $option   옵션  
+     * - [where=array()]:array        where문, 키는 컬럼명, 값은 컬럼값
+     * - [or_bool=false]:bool         true: where or문, false: where and문
+     * - [delete_flag_bool=true]:bool true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+     * - [where_table_bool=true]:bool true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * @param  string $database 사용 데이터베이스
+     * @return array            쿼리결과 배열, 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열
      */
-    function db_table_dump($table, $dir = null, $database = "default") {
-        if ($dir === null) {
-            $dir = dirname(__FILE__) . "/temp";
-        }
-        $dt = date("Y_m_d_H_i_s");
-        $db_info = $this->array_value($this->db_info, $database, true);
-        if (count($db_info) == 0) {
-            return;
-        }
+    function db_select_cnt($table, $option = array(), $database = "default") {
+        $where_arr = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
+        $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
         $table_info = $this->db_add_table_info($database, $table);
-        $prefix = $table_info["prefix"];
-        shell_exec("mysqldump -h {$db_info["host"]} -u{$db_info["username"]} -p{$db_info["password"]} {$db_info["database"]} {$prefix}{$table} > {$dir}/{$prefix}{$table}_{$dt}.sql");
+        $where_info = $this->db_create_where($where_arr, $or_bool);
+        if ($where_table_bool && !$where_info["dot_bool"]) {
+            trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
+            exit;
+        }
+        //쿼리문 가져오기
+        $result = $this->db_select_sql($table, array(
+            "prefix_bool" => true,
+            "cnt_bool" => true
+        ), $database);
+        if ($result == "") {
+            trigger_error("{$database} 데이터베이스의 {$table} 테이블 cnt 쿼리가 없습니다.");
+            exit;
+        }
+        //쿼리문 order by 기준으로 나누기
+        $arr = explode("order by", str_ireplace("order by", "order by", $result));
+        $sql = trim($arr[0]);
+        //where문 생성
+        $where = "";
+        //삭제여부 사용 하는경우
+        if ($delete_flag_bool && $table_info["delete_flag"] != "") {
+            //테이블별명 또는 테이블명 추출
+            $short = $this->db_from_table_name($sql);
+            if ($short != "") {
+                $short = "`{$short}`.";
+            }
+            //삭제여부 쿼리 추가
+            $where .= "{$short}`{$table_info["delete_flag"]}` = 'n'";
+        }
+        //where문 있는경우
+        if ($where_info["where"] != "") {
+            //삭제여부 쿼리 유무에 따라 변경
+            $where .= $where == "" ? $where_info["where"] : " and ({$where_info["where"]})";
+        }
+        //최종 쿼리문 생성
+        if ($where != "") {
+            $sql .= " where {$where}";
+        }
+        //바인딩
+        $binding = $where_info["binding"];
+        $result = $this->db_row_array($sql, $binding, $database);
+        return $result;
     }
 
     /**
-     * 테이블 복구  
-     * mysql 서버 버전과 호환되는 mysql 클라이언트 설치 필수  
-     *   
-     * require  2025.05.29 array_value
-     * @version 2025.05.29
-     *
-     * @param  string $src      sql 파일경로
-     * @param  string $database 사용할 db
+     * - list 쿼리 결과
+     * - db/list 폴더 내 {$database}/{$table}.sql 파일 sql 사용
+     * - delete_flag 설정 안한경우 delete_flag_bool 무시함
+     * 
+     * require  2025.12.16 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
+     * @version 2025.12.16
+     * 
+     * @param  string $table    테이블명
+     * @param  array  $option   옵션
+     * - [where=array()]:array        where문, 키는 컬럼명, 값은 컬럼값
+     * - [or_bool=false]:bool         true: where or문, false: where and문
+     * - [order_by=array()]:array     정렬 배열(기본정렬인경우 빈배열)
+     * - [limit]:int                  표시갯수
+     * - [start]:int                  표시 시작점, limit 있는경우에만
+     * - [delete_flag_bool=true]:bool true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+     * - [info_bool=false]:bool       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
+     * - [where_table_bool=true]:bool true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * @param  string $database 사용 데이터베이스
+     * @return array            쿼리결과 배열
+     * - info_bool 값이 true 인경우 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열 반환
+     * - info_bool 값이 false 인경우 1차원 배열 리스트(2차원 배열)를 반환
      */
-    function db_table_restore($src, $database = "default") {
-        $db_info = $this->array_value($this->db_info, $database, true);
-        if (count($db_info) == 0) {
-            return;
+    function db_select_list($table, $option = array(), $database = "default") {
+        $where_arr = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $order_by_arr = isset($option["order_by"]) ? $option["order_by"] : array();
+        $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
+        $info_bool = isset($option["info_bool"]) ? $option["info_bool"] : false;
+        $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
+        $table_info = $this->db_add_table_info($database, $table);
+        $where_info = $this->db_create_where($where_arr, $or_bool);
+        if ($where_table_bool && !$where_info["dot_bool"]) {
+            trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
+            exit;
         }
-        shell_exec("mysql -h {$db_info["host"]} -u {$db_info["username"]} -p{$db_info["password"]} < {$src}");
+        //쿼리문 가져오기
+        $result = $this->db_select_sql($table, array(
+            "prefix_bool" => true,
+            "cnt_bool" => false
+        ), $database);
+        if ($result == "") {
+            trigger_error("{$database} 데이터베이스의 {$table} 테이블 리스트 쿼리가 없습니다.");
+            exit;
+        }
+        //쿼리문 order by 기준으로 나누기
+        $arr = explode("order by", str_ireplace("order by", "order by", $result));
+        $sql = trim($arr[0]);
+        $order_by = trim($this->array_value($arr, 1));
+        //where문 생성
+        $where = "";
+        //삭제여부 사용 하는경우
+        if ($delete_flag_bool && $table_info["delete_flag"] != "") {
+            //테이블별명 또는 테이블명 추출
+            $short = $this->db_from_table_name($sql);
+            if ($short != "") {
+                $short = "`{$short}`.";
+            }
+            //삭제여부 쿼리 추가
+            $where .= "{$short}`{$table_info["delete_flag"]}` = 'n'";
+        }
+        //where문 있는경우
+        if ($where_info["where"] != "") {
+            //삭제여부 쿼리 유무에 따라 변경
+            $where .= $where == "" ? $where_info["where"] : " and ({$where_info["where"]})";
+        }
+        //order by 있는경우
+        if (is_array($order_by_arr) && count($order_by_arr) > 0) {
+            $order_by = implode(", ", $order_by_arr);
+        }
+        //limit 있는경우
+        $limit = "";
+        if (isset($option["limit"])) {
+            $limit .= " limit " . (isset($option["start"]) ? "{$option["start"]}, " : "") . $option["limit"];
+        }
+        //최종 쿼리문 생성
+        if ($where != "") {
+            $sql .= " where {$where}";
+        }
+        if ($order_by != "") {
+            $sql .= " order by {$order_by}";
+        }
+        if ($limit != "") {
+            $sql .= $limit;
+        }
+        //바인딩
+        $binding = $where_info["binding"];
+        $result = $info_bool ? $this->db_row_array($sql, $binding, $database) : $this->db_result_array($sql, $binding, $database);
+        return $result;
+    }
+
+    /**
+     * - 테이블별 select SQL 문자열 반환
+     * - db/list 폴더와 db/cnt 폴더 내 {$database}/{$table}.sql 파일 설정필요
+     * 
+     * require  2025.12.16 db_add_prefix
+     * @version 2025.12.16
+     * 
+     * @param  string $table    테이블명
+     * @param  array  $option   옵션
+     * - [prefix_bool=true]:bool 테이블 접두어 사용여부
+     * - [cnt_bool=false]:bool   true: cnt sql, false: list sql
+     * @param  string $database 사용 데이터베이스
+     * @return string           sql 문자열, 실패시 빈문자열
+     */
+    function db_select_sql($table, $option = array(), $database = "default") {
+        $prefix_bool = isset($option["prefix_bool"]) ? $option["prefix_bool"] : true;
+        $cnt_bool = isset($option["cnt_bool"]) ? $option["cnt_bool"] : false;
+        $folder = $cnt_bool ? "cnt" : "list";
+        if (!file_exists(dirname(__FILE__) . "/db/{$folder}/{$database}/{$table}.sql")) {
+            return "";
+        }
+        $sql = file_get_contents(dirname(__FILE__) . "/db/{$folder}/{$database}/{$table}.sql");
+        //테이블 접두어 사용인경우
+        if ($prefix_bool) {
+            $sql = $this->db_add_prefix($sql, $database, $table);
+        }
+        return $sql;
+    }
+
+    /**
+     * - 데이터베이스 백업
+     * - 순차적으로 증가하는 기본키가 있는 테이블만 백업 가능
+     * - 삭제된 데이터는 백업테이블에 반영되지 않음
+     * - update_dt 설정하지 않은 테이블은 수정내역 백업 안됨
+     * - 복구시 기본키 겹치는 데이터는 업데이트 되지 않음
+     * - 백업시 겹치는 테이블명 있는지 확인필요
+     * - db/ddl 폴더 내 {$database}/{$table}.json 파일 등록해야 백업 가능
+     * - config.php
+     * - 백업이 저장될 곳 DB 접속정보만 설정
+     * - 백업이 저장될 곳에 db, tb 테이블 이미 있는경우 접두어 설정
+     * - 백업대상 DB 접속정보 설정, 테이블 정보는 prefix와 update_dt 정보만 설정
+     * 
+     * require  2025.12.16 array_value db_add_table_info db_affected_rows db_charset_info db_create_row db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
+     * @version 2025.12.16
+     * 
+     * @param array $target    백업대상 데이터베이스 배열
+     * - [{데이터베이스명}][]:string 테이블명
+     * @param string $database 백업이 저장될 곳 데이터베이스
+     */
+    function db_table_backup($target, $database = "default") {
+        //백업db prefix
+        $arr = $this->db_add_table_info($database, "db");
+        $db_prefix = $arr["prefix"];
+        $arr = $this->db_add_table_info($database, "tb");
+        $tb_prefix = $arr["prefix"];
+        //백업db charset
+        $arr = $this->db_charset_info($database);
+        $backup_charset = ") ENGINE={$arr['engine']} DEFAULT CHARSET={$arr['charset']} COLLATE={$arr['collate']}";
+        //백업db 테이블 생성
+        $sql = "
+            create table if not exists `{$db_prefix}db` (
+                `db_idx`    int(11)      not null auto_increment comment 'pk',
+                `name`      varchar(191) null     default null   comment '데이터베이스명',
+                `update_dt` datetime     null     default null   comment '수정일시',
+                primary key (`db_idx`),
+                index (`name`),
+                index (`update_dt`)
+            {$backup_charset} COMMENT='데이터베이스(d)'
+        ";
+        $this->db_query($sql, array(), $database);
+        $sql = "
+            create table if not exists `{$tb_prefix}tb` (
+                `tb_idx`    int(11)      not null auto_increment comment 'pk',
+                `db_idx`    int(11)      null     default null   comment '데이터베이스',
+                `name`      varchar(191) null     default null   comment '테이블명',
+                `fields`    text         null     default null   comment '필드리스트',
+                `backup_pk` varchar(191) null     default null   comment '백업기본키',
+                `backup_dt` datetime     null     default null   comment '백업일시',
+                `update_dt` datetime     null     default null   comment '수정일시',
+                primary key (`tb_idx`),
+                index (`db_idx`),
+                index (`name`),
+                index (`update_dt`)
+            {$backup_charset} COMMENT='테이블(t)';
+        ";
+        $this->db_query($sql, array(), $database);
+        //백업db 쿼리문
+        $db_sql = "
+            select
+                `db_idx`,
+                `name`,
+                `update_dt`
+            from
+                `{$db_prefix}db`
+        ";
+        $tb_sql = "
+            select
+                `tb_idx`,
+                `db_idx`,
+                `name`,
+                `fields`,
+                `backup_pk`,
+                `backup_dt`,
+                `update_dt`
+            from
+                `{$tb_prefix}tb`
+        ";
+        foreach ($target as $db => $tbs) {
+            //db_idx 가져오기
+            $option = array(
+                "row" => array(
+                    "name" => $db,
+                    "update_dt is" => "now()"
+                ),
+                "where" => array(
+                    "name" => $db
+                )
+            );
+            $this->db_insert("db", $option, $database);
+            $where_info = $this->db_create_where(array(
+                "name" => $db
+            ));
+            $sql = $db_sql . " where " . $where_info["where"];
+            $result = $this->db_row_array($sql, $where_info["binding"], $database);
+            $db_idx = intval($result["db_idx"]);
+            //target db charset
+            $arr = $this->db_charset_info($db);
+            $charset = ") ENGINE={$arr['engine']} DEFAULT CHARSET={$arr['charset']} COLLATE={$arr['collate']}";
+            //현재날짜 가져오기(대상DB 기준)
+            $sql = "select date_format(now(), '%Y%m%d%H%i%s') as `dt`";
+            $result = $this->db_row_array($sql, array(), $db);
+            $dt = $result["dt"];
+            foreach ($tbs as $tb) {
+                //테이블 ddl
+                $result = $this->db_table_ddl($tb, $db);
+                //ddl 없는경우 백업 안함
+                if (count($result) == 0) {
+                    trigger_error("백업하려는 database:{$db}, table:{$tb} DDL이 존재하지 않습니다.");
+                    continue;
+                }
+                //ddl, 쿼리정보 생성
+                $ddl = $select = array();
+                $primary = "";
+                foreach ($result["columns"] as $temp) {
+                    $ddl[] = array($temp[0] => $temp[1]);
+                    $select[] = "`{$temp[0]}`";
+                    if ($temp[1] == "primary") {
+                        if ($primary != "") {
+                            $primary = "";
+                            break;
+                        }
+                        $primary = $temp[0];
+                    }
+                }
+                if ($primary == "") {
+                    trigger_error("백업하려는 database:{$db}, table:{$tb} primary는 1개여야 합니다.");
+                    continue;
+                }
+                //information for backup
+                $result = $this->db_add_table_info($db, $tb);
+                $update_dt_field = count($result["update_dt"]) == 0 ? "" : $result["update_dt"][0];
+                $prefix = $result["prefix"];
+                //target 쿼리문 생성
+                $target_sql = "select " . implode(", ", $select) . " from `{$prefix}{$tb}`";
+                //백업 진행상황 가져오기
+                $where_info = $this->db_create_where(array(
+                    "db_idx" => $db_idx,
+                    "name" => $tb
+                ));
+                $sql = $tb_sql . " where " . $where_info["where"];
+                $result = $this->db_row_array($sql, $where_info["binding"], $database);
+                //백업정보 없는경우
+                if (intval($result["tb_idx"]) == 0) {
+                    //백업정보 생성
+                    $option = array(
+                        "row" => array(
+                            "db_idx" => $db_idx,
+                            "name" => $tb,
+                            "update_dt is" => "now()"
+                        ),
+                        "where" => array(
+                            "db_idx" => $db_idx,
+                            "name" => $tb
+                        )
+                    );
+                    $this->db_insert("tb", $option, $database);
+                    //백업 진행상황 가져오기
+                    $result = $this->db_row_array($sql, $where_info["binding"], $database);
+                }
+                $tb_idx = intval($result["tb_idx"]);
+                $fields = $this->decode_json($result["fields"]);
+                $backup_pk = trim(strval($result["backup_pk"]));
+                $backup_dt = trim(strval($result["backup_dt"]));
+                if ($backup_dt != "") {
+                    $backup_dt = date("YmdHis", strtotime($backup_dt));
+                }
+                //ddl 검증
+                $fail_bool = false;
+                do {
+                    //ddl 길이 다른경우
+                    if (count($ddl) != count($fields)) {
+                        $fail_bool = true;
+                        break;
+                    }
+                    foreach ($ddl as $k => $v) {
+                        foreach ($v as $field_name => $field_type) {
+                        }
+                        //ddl 달라진경우
+                        if ($field_type != $this->array_value($fields[$k], $field_name)) {
+                            $fail_bool = true;
+                            break;
+                        }
+                    }
+                } while (false);
+                //검증 실패한경우
+                if ($fail_bool) {
+                    //테이블 삭제처리
+                    $sql = "drop table if exists `{$prefix}{$tb}`";
+                    $this->db_query($sql, array(), $database);
+                    //변수 초기화
+                    $fields = $ddl;
+                    $backup_pk = $backup_dt = "";
+                }
+                //테이블 생성쿼리 조회
+                $result = $this->db_table_create_sql($tb, $db);
+                //테이블 없는경우 생성
+                $temp = str_ireplace($charset, $backup_charset, $result[0]);
+                $this->db_query($temp, array(), $database);
+                //Update for backup
+                if ($update_dt_field != "") {
+                    for ($current_idx = null; true; $current_idx = $idx) {
+                        //row 조회
+                        $where = array(
+                            "{$primary} <=" => $backup_pk
+                        );
+                        if ($backup_dt != "") {
+                            $where["{$update_dt_field} >"] = $backup_dt;
+                            $where["{$update_dt_field} <="] = $dt;
+                        }
+                        if ($current_idx !== null) {
+                            $where["{$primary} >"] = $current_idx;
+                        }
+                        $where_info = $this->db_create_where($where);
+                        $sql = "{$target_sql} where {$where_info["where"]} order by `{$primary}` limit 1";
+                        $result = $this->db_row_array($sql, $where_info["binding"], $db);
+                        //row가 없는경우
+                        $idx = intval($result[$primary]);
+                        if ($idx == 0) {
+                            break;
+                        }
+                        //row 생성
+                        $row = array();
+                        foreach ($result as $k => $v) {
+                            if (is_null($v)) {
+                                $row["{$k} is"] = "null";
+                            } else {
+                                $row[$k] = $v;
+                            }
+                        }
+                        $row_info = $this->db_create_row($row);
+                        //update
+                        $sql = "
+                            update
+                                `{$prefix}{$tb}`
+                            set
+                                {$row_info["set"]}
+                            where
+                                `{$primary}` = '{$idx}'
+                        ";
+                        $this->db_query($sql, $row_info["binding"], $database);
+                        $affected_rows = $this->db_affected_rows();
+                        if ($affected_rows > 0) {
+                            continue;
+                        }
+                        //insert
+                        $sql = "
+                            insert into `{$prefix}{$tb}` (
+                                {$row_info["into"]}
+                            )
+                            select
+                                {$row_info["values"]}
+                            from
+                                dual
+                            where not exists (
+                                select
+                                    1
+                                from
+                                    `{$prefix}{$tb}`
+                                where
+                                    `{$primary}` = '{$idx}'
+                            )
+                        ";
+                        $this->db_query($sql, $row_info["binding"], $database);
+                    }
+                    $backup_dt = $dt;
+                } else {
+                    //수정일시 필드 없는경우 백업일시 삭제
+                    $backup_dt = "";
+                }
+                //Insert for backup
+                for ($current_idx = $backup_pk; true; $current_idx = $backup_pk = $idx) {
+                    $sql = "{$target_sql} where `{$primary}` > '{$current_idx}' order by `{$primary}` limit 1";
+                    $result = $this->db_row_array($sql, array(), $db);
+                    $idx = intval($result[$primary]);
+                    if ($idx == 0) {
+                        break;
+                    }
+                    //row 생성
+                    $row = array();
+                    foreach ($result as $k => $v) {
+                        if (is_null($v)) {
+                            $row["{$k} is"] = "null";
+                        } else {
+                            $row[$k] = $v;
+                        }
+                    }
+                    $row_info = $this->db_create_row($row);
+                    //insert
+                    $sql = "
+                        insert into `{$prefix}{$tb}` (
+                            {$row_info["into"]}
+                        )
+                        select
+                            {$row_info["values"]}
+                        from
+                            dual
+                        where not exists (
+                            select
+                                1
+                            from
+                                `{$prefix}{$tb}`
+                            where
+                                `{$primary}` = '{$idx}'
+                        )
+                    ";
+                    $this->db_query($sql, $row_info["binding"], $database);
+                }
+                //백업정보 업데이트
+                $row = array(
+                    "fields" => $this->encode_json($fields),
+                    "backup_pk" => $backup_pk,
+                    "update_dt is" => "now()"
+                );
+                if ($backup_dt == "") {
+                    $row["backup_dt is"] = "null";
+                } else {
+                    $row["backup_dt"] = $backup_dt;
+                }
+                $option = array(
+                    "row" => $row,
+                    "where" => array(
+                        "tb_idx" => $tb_idx
+                    )
+                );
+                $this->db_update("tb", $option, $database);
+            }
+        }
+    }
+
+    /**
+     * - 테이블 생성 SQL 및 초기 INSERT SQL 반환
+     * - db_table_ddl() 함수 반환값 이용하여 생성
+     * - 접두어는 config.php 파일에 설정된 값으로 치환
+     * - 실패시 빈배열 반환
+     * 
+     * require  2025.12.16 db_add_table_info db_charset_info db_row_array db_table_ddl str_pad
+     * @version 2025.12.16
+     * 
+     * @param  string $table    테이블명
+     * @param  string $database 사용할 db
+     * @return array            0: 테이블 생성 SQL, 1이상: 초기 INSERT SQL
+     */
+    function db_table_create_sql($table, $database = "default") {
+        $return_arr = array();
+        //db, table 검사
+        $table_info = $this->db_table_ddl($table, $database);
+        if (count($table_info) == 0) {
+            return $return_arr;
+        }
+        //charset 검사
+        $info = $this->db_charset_info($database);
+        if ($info["charset"] == "") {
+            return $return_arr;
+        }
+        //옵션 설정
+        $add_info = $this->db_add_table_info($database, $table);
+        //접두어
+        $prefix = $add_info["prefix"];
+        //컬럼 최대길이
+        $name_len = 0;
+        $type_len = 0;
+        $null_len = 0;
+        $default_len = 0;
+        foreach ($table_info["columns"] as $k => $v) {
+            //컬럼명
+            if (strlen("`{$v[0]}`") > $name_len) {
+                $name_len = strlen("`{$v[0]}`");
+            }
+            //자료형
+            $temp_len = in_array($v[1], array("primary", "foreign")) ? strlen($table_info["primary_type"]) : strlen($v[1]);
+            if ($temp_len > $type_len) {
+                $type_len = $temp_len;
+            }
+            //null 여부
+            $temp_len = $v[1] == "primary" ? strlen("not null") : strlen("null");
+            if ($temp_len > $null_len) {
+                $null_len = $temp_len;
+            }
+            //기본값
+            if ($v[1] == "primary") {
+                $temp_len = stristr($table_info["primary_type"], "int") ? strlen("auto_increment") : 0;
+            } else if (isset($v[4])) {
+                $temp_len = strlen("default '{$v[4]}'");
+            } else {
+                $temp_len = strlen("default null");
+            }
+            if ($temp_len > $default_len) {
+                $default_len = $temp_len;
+            }
+        }
+        //쿼리문 생성
+        $sql = "create table if not exists `{$prefix}{$table}` (";
+        $primary_arr = array();
+        $index_arr = array();
+        foreach ($table_info["columns"] as $k => $v) {
+            $default_value = isset($v[4]) ? "default '{$v[4]}'" : "default null";
+            if ($v[1] == "primary") {
+                $default_value = stristr($table_info["primary_type"], "int") ? "auto_increment" : "";
+            }
+            $sql .= $k == 0 ? "" : ",";
+            $sql .= "\n    "
+                . $this->str_pad("`{$v[0]}`", $name_len)
+                . " "
+                . $this->str_pad(in_array($v[1], array("primary", "foreign")) ? $table_info["primary_type"] : $v[1], $type_len)
+                . " "
+                . $this->str_pad($v[1] == "primary" ? "not null" : "null", $null_len)
+                . " "
+                . $this->str_pad($default_value, $default_len)
+                . " comment '{$v[2]}'";
+            if ($v[1] == "primary") {
+                $primary_arr[] = $v[0];
+            } else if ($v[1] == "foreign") {
+                $index_arr[] = $v[0];
+            } else if ($v[3]) {
+                $index_arr[] = $v[0];
+            }
+        }
+        foreach ($primary_arr as $temp) {
+            $sql .= ",\n    primary key (`{$temp}`)";
+        }
+        foreach ($index_arr as $temp) {
+            $sql .= ",\n    index (`{$temp}`)";
+        }
+        $sql .= "\n) ENGINE={$info["engine"]} DEFAULT CHARSET={$info["charset"]} COLLATE={$info["collate"]} COMMENT='{$table_info["comment"]}';";
+        $return_arr[] = $sql;
+        //기본데이터 없는경우 sql문 리턴
+        if (count($table_info["data"]) == 0) {
+            return $return_arr;
+        }
+        $add_sql = array();
+        //현재일시(now()를 사용하지 않는 이유는 날짜형식이 YmdHis인 경우가 있어서)
+        $sql = "
+            select date_format(now(), '%Y%m%d%H%i%s') as dt
+        ";
+        $result = $this->db_row_array($sql, array(), $database);
+        $db_dt = $result["dt"];
+        $db_d = substr($db_dt, 0, 8);
+        $db_t = substr($db_dt, 8, 6);
+        foreach ($table_info["data"] as $k => $v) {
+            $into_arr = array();
+            $values_arr = array();
+            $primary_field = "";
+            $primary_value = "";
+            foreach ($table_info["columns"] as $kk => $vv) {
+                $column_text = $vv[0];
+                $type_text = $vv[1];
+                if (isset($v[$kk])) {
+                    $temp = addslashes($v[$kk]);
+                    $values_arr[] = "'{$temp}'";
+                } else if (in_array($column_text, $add_info["insert_dt"]) || in_array($column_text, $add_info["update_dt"])) {
+                    $values_arr[] = "'{$db_dt}'";
+                } else if (in_array($column_text, $add_info["insert_date"]) || in_array($column_text, $add_info["update_date"])) {
+                    $values_arr[] = "'{$db_d}'";
+                } else if (in_array($column_text, $add_info["insert_time"]) || in_array($column_text, $add_info["update_time"])) {
+                    $values_arr[] = "'{$db_t}'";
+                } else if ($column_text == $add_info["delete_flag"]) {
+                    $values_arr[] = "'n'";
+                } else if (isset($vv[4])) {
+                    $temp = addslashes($vv[4]);
+                    $values_arr[] = "'{$temp}'";
+                } else {
+                    continue;
+                }
+                $into_arr[] = "`{$column_text}`";
+                //기본키값 설정한경우
+                if ($type_text == "primary") {
+                    $primary_field = $column_text;
+                    $primary_value = $v[$kk];
+                }
+            }
+            $into_text = implode(", ", $into_arr);
+            $values_text = implode(", ", $values_arr);
+            if ($primary_field == "") {
+                $add_sql[] = "insert into `{$prefix}{$table}`({$into_text}) values ({$values_text});";
+            } else {
+                $return_arr[] = "insert into `{$prefix}{$table}`({$into_text}) select {$values_text} from dual where not exists (select 1 from `{$prefix}{$table}` where `{$primary_field}` = '{$primary_value}');";
+            }
+        }
+        return array_merge($return_arr, $add_sql);
+    }
+
+    /**
+     * - 테이블 DDL 배열 반환
+     * - db/ddl 폴더 내 {$database}/{$table}.json 파일 설정필요
+     * - 자료형 문자열이 타입사전 키값중에 있는경우 해당 자료형과 기본값으로 대체
+     * - 전체 컬럼에서 primary 자료형은 한개만 설정가능
+     * 
+     * require  2025.12.16 decode_json
+     * @version 2025.12.16
+     * 
+     * @param  string $table    테이블명
+     * @param  string $database 사용할 db
+     * @return array            DDL 배열, 실패시 빈배열
+     * - [primary_type="int"]:string 기본키 자료형
+     * - [comment=""]:string         테이블설명
+     * - [columns][][0]:string       컬럼명
+     * - [columns][][1]:string       자료형, primary, foreign 은 primary_type 값으로 치환됨
+     * - [columns][][2]:string       컬럼설명
+     * - [columns][][3]:bool         인덱스여부, primary, foreign은 true
+     * - [columns][][4]:string       기본값, 설정 안한경우 default null
+     * - [data][]:array              컬럼 순서대로 값 설정, null 또는 설정 안한경우 기본값으로
+     */
+    function db_table_ddl($table, $database = "default") {
+        if (!file_exists(dirname(__FILE__) . "/db/ddl/{$database}/{$table}.json")) {
+            return array();
+        }
+        $arr = $this->decode_json(file_get_contents(dirname(__FILE__) . "/db/ddl/{$database}/{$table}.json"));
+        //배열이 유효하지 않은경우
+        if (count($arr) == 0 || !isset($arr["columns"]) || !is_array($arr["columns"])) {
+            return array();
+        }
+        /*
+         * 타입사전
+         * [{변수명}][0]:string 자료형
+         * [{변수명}][1]:string 기본값, 설정 안한경우 null
+         */
+        $type_dictionary = array(
+            "bigint" => array("bigint(20)", "0"),
+            "date" => array("date"),
+            "datetime" => array("datetime"),
+            "decimal" => array("decimal(5,2)", "0"),
+            "decimal2" => array("decimal(9,6)", "0"),
+            "flag" => array("varchar(1)", "n"),
+            "int" => array("int(11)", "0"),
+            "mediumtext" => array("mediumtext"),
+            "text" => array("text"),
+            "time" => array("time"),
+            "varchar" => array("varchar(191)"),
+            "varchar2" => array("varchar(255)")
+        );
+        //기본값 설정
+        if (!isset($arr["primary_type"])) {
+            $arr["primary_type"] = "int";
+        }
+        if (!isset($arr["comment"])) {
+            $arr["comment"] = "";
+        }
+        if (!isset($arr["data"])) {
+            $arr["data"] = array();
+        }
+        //타입사전 적용
+        if (isset($type_dictionary[$arr["primary_type"]])) {
+            $arr["primary_type"] = $type_dictionary[$arr["primary_type"]][0];
+        }
+        foreach ($arr["columns"] as $k => $v) {
+            //trim, strtolower
+            for ($i = 0; $i < 3; $i++) {
+                if (!isset($v[$i])) {
+                    $arr["columns"][$k][$i] = $v[$i] = "";
+                    continue;
+                }
+                //자료형
+                if ($i == 1) {
+                    $v[$i] = strtolower($v[$i]);
+                }
+                $arr["columns"][$k][$i] = $v[$i] = trim($v[$i]);
+            }
+            $type_key = $v[1];
+            //자료형 변경
+            if (!isset($type_dictionary[$type_key])) {
+                continue;
+            }
+            $arr["columns"][$k][1] = $type_dictionary[$type_key][0];
+            //기본값 변경
+            if (isset($v[4]) || !isset($type_dictionary[$type_key][1])) {
+                continue;
+            }
+            $arr["columns"][$k][4] = $type_dictionary[$type_key][1];
+        }
+        return $arr;
+    }
+
+    /**
+     * - 백업이 저장된 곳 데이터베이스를 이용하여 복구
+     * - 백업방법은 db_table_backup() 함수 참조
+     * 
+     * require  2025.12.16 db_add_table_info db_insert db_query db_row_array db_table_create_sql db_table_ddl
+     * @version 2025.12.16
+     * 
+     * @param array  $target   복구대상 데이터베이스 배열
+     * - [{데이터베이스명}][]:string 테이블명
+     * @param string $database 백업이 저장된 곳 데이터베이스
+     */
+    function db_table_restore($target, $database = "default") {
+        foreach ($target as $db => $tbs) {
+            foreach ($tbs as $tb) {
+                //테이블 ddl
+                $result = $this->db_table_ddl($tb, $db);
+                //ddl 없는경우 백업 안함
+                if (count($result) == 0) {
+                    trigger_error("복구하려는 database:{$db}, table:{$tb} DDL이 존재하지 않습니다.");
+                    continue;
+                }
+                //ddl, 쿼리정보 생성
+                $primary = "";
+                foreach ($result["columns"] as $temp) {
+                    $select[] = "`{$temp[0]}`";
+                    if ($temp[1] == "primary") {
+                        if ($primary != "") {
+                            $primary = "";
+                            break;
+                        }
+                        $primary = $temp[0];
+                    }
+                }
+                if ($primary == "") {
+                    trigger_error("복구하려는 database:{$db}, table:{$tb} primary는 1개여야 합니다.");
+                    continue;
+                }
+                //information for backup
+                $result = $this->db_add_table_info($db, $tb);
+                $prefix = $result["prefix"];
+                //target 쿼리문 생성
+                $target_sql = "select " . implode(", ", $select) . " from `{$prefix}{$tb}`";
+                //테이블 없는경우 생성
+                $result = $this->db_table_create_sql($tb, $db);
+                $this->db_query($result[0], array(), $db);
+                //Insert for backup
+                for ($current_idx = null; true; $current_idx = $idx) {
+                    $where = "";
+                    if ($current_idx !== null) {
+                        $where = "where `{$primary}` > '{$current_idx}'";
+                    }
+                    $sql = "{$target_sql} {$where} order by `{$primary}` limit 1";
+                    $result = $this->db_row_array($sql, array(), $database);
+                    $idx = intval($result[$primary]);
+                    if ($idx == 0) {
+                        break;
+                    }
+                    //row 생성
+                    $row = array();
+                    foreach ($result as $k => $v) {
+                        if (is_null($v)) {
+                            $row["{$k} is"] = "null";
+                        } else {
+                            $row[$k] = $v;
+                        }
+                    }
+                    //insert
+                    $option = array(
+                        "row" => $row,
+                        "where" => array(
+                            $primary => $idx
+                        )
+                    );
+                    $this->db_insert($tb, $option, $db);
+                }
+            }
+        }
     }
 
     /**
