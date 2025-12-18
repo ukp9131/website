@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Ukp 라이브러리  
- *   
- * $option        옵션설정  
- * [api_bool]     true - json, false - html(기본값: false)  
- * [session_bool] 세션사용여부(기본값: true)  
- * [cors_bool]    cors 허용여부(기본값: false)  
- *   
+ * - Ukp 라이브러리
+ * - $option                  옵션설정
+ * - [api_bool=false]:bool    true: json, false: html
+ * - [session_bool=true]:bool 세션사용여부
+ * - [cors_bool=false]:bool   cors 허용여부
+ * 
  * require  2025.06.13 config.php
  * @version 2025.12.16
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
@@ -2765,12 +2764,15 @@ class Ukp {
                 $null_len = $temp_len;
             }
             //기본값
+            $temp_len = strlen("default null");
             if ($v[1] == "primary") {
                 $temp_len = stristr($table_info["primary_type"], "int") ? strlen("auto_increment") : 0;
             } else if (isset($v[4])) {
-                $temp_len = strlen("default '{$v[4]}'");
-            } else {
-                $temp_len = strlen("default null");
+                if (!stristr($v[4], "current_timestamp()")) {
+                    $temp_len = strlen("default '{$v[4]}'");
+                } else if ($info["charset"] == "utf8mb4") {
+                    $temp_len = strlen("default {$v[4]}");
+                }
             }
             if ($temp_len > $default_len) {
                 $default_len = $temp_len;
@@ -2781,9 +2783,15 @@ class Ukp {
         $primary_arr = array();
         $index_arr = array();
         foreach ($table_info["columns"] as $k => $v) {
-            $default_value = isset($v[4]) ? "default '{$v[4]}'" : "default null";
+            $default_value = "default null";
             if ($v[1] == "primary") {
                 $default_value = stristr($table_info["primary_type"], "int") ? "auto_increment" : "";
+            } else if (isset($v[4])) {
+                if (!stristr($v[4], "current_timestamp()")) {
+                    $default_value = "default '{$v[4]}'";
+                } else if ($info["charset"] == "utf8mb4") {
+                    $default_value = "default {$v[4]}";
+                }
             }
             $sql .= $k == 0 ? "" : ",";
             $sql .= "\n    "

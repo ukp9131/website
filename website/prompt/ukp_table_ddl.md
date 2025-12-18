@@ -11,14 +11,11 @@ $foreign_postfix = "";
 - columns: 순서대로 컬럼명, 자료형, 코멘트, 인덱스여부, 기본값
 ## 규칙
 - 결과물에는 주석을 달지 않는다.
-- 테이블 생성 쿼리문에서 자료형이 ```$type_dictionary``` 변수 키값으로 명확하게 선언되어있다면 자료형 대신 ```$type_dictionary``` 변수 키값을 입력한다.
-  - ```varchar(191)``` -> ```varchar```
-  - ```varchar(255)``` -> ```varchar2```
-  - ```varchar(200)``` -> ```varchar(200)```
-- ```$type_dictionary``` 변수에 자료형이 선언되어있지 않으면 자료형을 직접 입력한다.
-- 테이블 생성 쿼리문에 기본값이 설정되어있는데 해당 기본값이 ```$type_dictionary``` 변수 기본값과 다른경우 ```$database_arr``` 변수 5번째 배열에 기본값을 입력한다.
-  - ``` `field` varchar(191) null default 'n' comment '컬럼명' ``` -> ```array("field", "varchar", "컬럼명", false, "n")```
-  - ``` `delete_flag`      varchar(1)   null     default 'n'    comment '삭제여부' ``` -> ```array("delete_flag", "flag", "삭제여부", false)```
+- 테이블 생성 쿼리문에서 자료형과 기본값이 ```$type_dictionary``` 변수와 정확히 일치한다면 자료형 대신 ```$type_dictionary``` 변수 키값을 입력한다.
+  - ```varchar(1) default null``` -> ```varchar(1)```
+  - ```varchar(1) default 'n'``` -> ```flag```
+  - ```int(11) default null``` -> ```int(11)```
+  - ```int(4) default '0'``` -> ```int(4)```
 - ```date``` 자료형 기본값이 ```1970-01-01``` 보다 적은경우 기본값은 ```1970-01-01```이 된다.
 - ```datetime``` 자료형 기본값이 ```1970-01-01 00:00:00``` 보다 적은경우 기본값은 ```1970-01-01 00:00:00```이 된다.
 - 테이블 코멘트, 필드 코멘트는 값이 없는경우 빈문자열로 처리한다.
@@ -72,7 +69,9 @@ create table if not exists `ukp_sample_table` (
     `a_login` enum('Y','N') NOT NULL DEFAULT 'N' COMMENT '로그인 성공여부'
     `insert_date`      date         null     default '0000-00-00'   comment '입력일',
     `insert_time`      time         null     default null   comment '입력시',
-    `update_dt`        datetime     null     default null   comment '수정일시',
+    `insert_dt`        datetime     null     default current_timestamp()   comment '입력일시',
+    `update_date`      date       null     default current_timestamp() ON UPDATE current_timestamp()   comment '수정일',
+    `update_dt`        datetime     null     default null ON UPDATE current_timestamp()   comment '수정일시',
     `delete_flag`      varchar(1)   null     default 'n'    comment '삭제여부',
     primary key (`sample_table_idx`),
     index (`foreign_idx`),
@@ -97,7 +96,9 @@ create table if not exists `ukp_sample_table` (
         ["a_login           ", "enum('Y','N')     ", "로그인 성공여부   ", false, "N"],
         ["insert_date       ", "date              ", "입력일            ", false, "1970-01-01"],
         ["insert_time       ", "time              ", "입력시            ", false],
-        ["update_dt         ", "datetime          ", "수정일시          ", true],
+        ["insert_dt         ", "datetime          ", "입력일시          ", false, "current_timestamp()"],
+        ["update_date       ", "date              ", "수정일            ", false, "current_timestamp() on update current_timestamp()"],
+        ["update_dt         ", "datetime          ", "수정일시          ", true, "null on update current_timestamp()"],
         ["delete_flag       ", "flag              ", "삭제여부          ", false],
     ]
 }
