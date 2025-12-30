@@ -38,5 +38,5 @@
   - 누락된 테이블 있는지 확인.
   - 테이블 별칭 설정.
 ### ukp_select_sql.md
-- 쿼리 생성 후 ```__table__``` 값 실제 테이블명으로 변경
+- ddl json 파일 업로드 후 프롬프트 입력
 - cnt 쿼리는 select 부분 ``` count(*) as `cnt` ``` 으로 변경 후 order by 삭제
