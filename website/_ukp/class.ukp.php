@@ -2395,7 +2395,7 @@ class Ukp {
      * - config.php
      * - 백업이 저장될 곳 DB 접속정보만 설정
      * - 백업이 저장될 곳에 db, tb 테이블 이미 있는경우 접두어 설정
-     * - 백업대상 DB 접속정보 설정, 테이블 정보는 prefix와 update_dt 정보만 설정
+     * - 백업대상 DB 접속정보 설정, 테이블 정보는 prefix와 update_dt(인덱스 설정 필수) 정보만 설정
      * 
      * require  2025.12.16 array_value db_add_table_info db_affected_rows db_charset_info db_create_row db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
      * @version 2025.12.16
