@@ -7,8 +7,8 @@
  * - [session_bool=true]:bool 세션사용여부
  * - [cors_bool=false]:bool   cors 허용여부
  * 
- * require  2025.06.13 config.php
- * @version 2025.12.16
+ * require  2026.01.02 config.php
+ * @version 2026.01.02
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -20,7 +20,7 @@ class Ukp {
      * @version 2020.02.13
      * @var     string
      */
-    private $character_set;
+    private $charset;
 
     /**
      * 서버 타임존  
@@ -641,11 +641,11 @@ class Ukp {
         //점검중
         $this->custom_parking($config["parking_start_dt"], $config["parking_end_dt"]);
         //케릭터셋 설정
-        $this->character_set = $config["character_set"];
+        $this->charset = $config["charset"];
         if ($api_bool) {
-            header("Content-Type: application/json; charset={$this->character_set}");
+            header("Content-Type: application/json; charset={$this->charset}");
         } else {
-            header("Content-Type: text/html; charset={$this->character_set}");
+            header("Content-Type: text/html; charset={$this->charset}");
         }
         //cors 설정
         if ($cors_bool) {
@@ -1397,21 +1397,17 @@ class Ukp {
     }
 
     /**
-     * 쿼리문에 테이블 접두어 추가  
-     * select, insert, update, delete 쿼리문만 가능  
-     *   
-     * require  2025.11.21 db_add_table_info
-     * @version 2025.11.21
+     * - 쿼리문에 테이블 접두어 추가
+     * - select, insert, update, delete 쿼리문만 가능
+     * 
+     * require  2026.01.02
+     * @version 2026.01.02
      *
-     * @param  string $sql      쿼리문
-     * @param  string $database 데이터베이스
-     * @param  string $table    테이블
-     * @return string           접두어 추가된 쿼리문
+     * @param  string $sql    테이블 접두어 추가할 sql
+     * @param  string $prefix 테이블 접두어
+     * @return string         접두어 추가된 쿼리문
      */
-    function db_add_prefix($sql, $database = "default", $table = "") {
-        //테이블설정 불러오기
-        $table_info = $this->db_add_table_info($database, $table);
-        $prefix = $table_info["prefix"];
+    function db_add_prefix($sql, $prefix = "") {
         if ($prefix == "") {
             return $sql;
         }
@@ -1436,24 +1432,19 @@ class Ukp {
     }
 
     /**
-     * row 배열에 테이블 날짜설정 추가  
-     *   
-     * require  2025.03.06 db_add_table_info
-     * @version 2025.03.06
+     * - row 배열에 테이블 날짜설정 추가
+     * 
+     * require  2026.01.02
+     * @version 2026.01.02
      *
-     * @param  array  $row         row 배열
-     * @param  array  $update_bool true: update 날짜만 설정, false(기본값): insert, update 날짜 설정
-     * @param  string $database    데이터베이스
-     * @param  string $table       테이블
-     * @return array               날짜설정 추가된 row 배열
+     * @param  array $row    테이블
+     * @param  array $option 옵션
+     * - array `[date=array()]`     date 컬럼 리스트
+     * - array `[time=array()]`     time 컬럼 리스트
+     * - array `[datetime=array()]` datetime 컬럼 리스트
+     * @return array         날짜설정 추가된 row 배열
      */
-    function db_add_row($row, $update_bool = false, $database = "default", $table = "") {
-        //현재일시(now()를 사용하지 않는 이유는 날짜형식이 YmdHis인 경우가 있어서)
-        $db_dt = date("YmdHis");
-        $db_d = substr($db_dt, 0, 8);
-        $db_t = substr($db_dt, 8, 6);
-        //테이블설정 불러오기
-        $table_info = $this->db_add_table_info($database, $table);
+    function db_add_row($row, $option = array()) {
         //컬럼 찾기용 배열 생성
         $find_row = array();
         foreach ($row as $k => $v) {
@@ -1461,40 +1452,46 @@ class Ukp {
             $find_row[] = trim(str_replace("`", "", strtolower($temp[0])));
         }
         $arr = array(
-            "insert_date" => $db_d,
-            "insert_time" => $db_t,
-            "insert_dt" => $db_dt,
-            "update_date" => $db_d,
-            "update_time" => $db_t,
-            "update_dt" => $db_dt
+            "date" => "date_format(now(), '%Y%m%d')",
+            "time" => "date_format(now(), '%H%i%s')",
+            "datetime" => "date_format(now(), '%Y%m%d%H%i%s')"
         );
         foreach ($arr as $k => $v) {
-            if (substr($k, 0, 6) == "insert" && $update_bool) {
+            if (!isset($option[$k])) {
                 continue;
             }
-            foreach ($table_info[$k] as $temp) {
+            foreach ($option[$k] as $temp) {
                 if (in_array($temp, $find_row)) {
                     continue;
                 }
-                $row[$temp] = $v;
+                $key = "{$temp} is";
+                $row[$key] = $v;
             }
         }
         return $row;
     }
 
     /**
-     * 테이블 추가정보 반환  
-     * 컬럼명, 접두어 trim 처리 및 컬럼명 소문자 변환  
-     *   
-     * require  2025.05.29 array_value
-     * @version 2025.05.29
+     * - 테이블 추가정보 반환
+     * - 컬럼명, 접두어 trim 처리 및 컬럼명 소문자 변환
+     * 
+     * require  2026.01.02 array_value
+     * @version 2026.01.02
      *
+     * @param  string $table        테이블, 없는 테이블인경우 기본 db 설정
      * @param  string $database     데이터베이스, default가 기본 db
-     * @param  string $table        테이블, 공백인경우 기본 table
      * @return array                테이블 추가정보 배열
+     * - string `[prefix=""]`
+     * - string `[delete_flag=""]`
+     * - array  `[insert_date=array()]`
+     * - array  `[insert_time=array()]`
+     * - array  `[insert_dt=array()]`
+     * - array  `[update_date=array()]`
+     * - array  `[update_time=array()]`
+     * - array  `[update_dt=array()]`
      */
-    function db_add_table_info($database = "default", $table = "") {
-        $return_arr = array(
+    function db_add_table_info($table, $database = "default") {
+        $info_arr = array(
             "prefix" => "",
             "delete_flag" => "",
             "insert_date" => array(),
@@ -1504,6 +1501,7 @@ class Ukp {
             "update_time" => array(),
             "update_dt" => array()
         );
+        $return_arr = $info_arr;
         $db_info = $this->array_value($this->db_info, $database, true);
         if (count($db_info) == 0) {
             return $return_arr;
@@ -1523,19 +1521,10 @@ class Ukp {
             }
         }
         //테이블설정 확인
-        if ($table == "" || !isset($db_info["table"]) || !isset($db_info["table"][$table])) {
+        if (!isset($db_info["table"], $db_info["table"][$table])) {
             return $return_arr;
         }
-        $return_arr = array(
-            "prefix" => "",
-            "delete_flag" => "",
-            "insert_date" => array(),
-            "insert_time" => array(),
-            "insert_dt" => array(),
-            "update_date" => array(),
-            "update_time" => array(),
-            "update_dt" => array()
-        );
+        $return_arr = $info_arr;
         $table_info = $db_info["table"][$table];
         foreach ($return_arr as $k => $v) {
             if (!isset($table_info[$k])) {
@@ -1555,8 +1544,8 @@ class Ukp {
     }
 
     /**
-     * 쿼리 변경된 레코드 갯수  
-     *   
+     * - 쿼리 변경된 레코드 갯수
+     * 
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -1567,35 +1556,32 @@ class Ukp {
     }
 
     /**
-     * charset에 맞는 db정보 반환  
-     *   
-     * require  2025.05.29 array_value
-     * @version 2025.05.29
+     * - charset에 맞는 정보 반환
+     * 
+     * require  2026.01.02
+     * @version 2026.01.02
      *
-     * @param  string $database 데이터베이스
-     * @return array  [engine]  
-     *                [charset]  
-     *                [collate]
+     * @param  string $charset 캐릭터셋
+     * @return array           charset 정보
+     * - string `[engine]`
+     * - string `[charset]`
+     * - string `[collate]`
      */
-    function db_charset_info($database = "default") {
+    function db_charset_info($charset) {
         $return_arr = array(
             "engine" => "",
             "charset" => "",
             "collate" => ""
         );
-        //캐릭터셋별 설정
-        $db_info = $this->array_value($this->db_info, $database, true);
-        if (count($db_info) == 0) {
-            return $return_arr;
-        } else if ($db_info["character_set"] == "utf8mb4") {
+        if ($charset == "utf8mb4") {
             $return_arr["engine"] = "InnoDB";
             $return_arr["charset"] = "utf8mb4";
             $return_arr["collate"] = "utf8mb4_unicode_ci";
-        } else if ($db_info["character_set"] == "utf8") {
+        } else if ($charset == "utf8") {
             $return_arr["engine"] = "MyISAM";
             $return_arr["charset"] = "utf8";
             $return_arr["collate"] = "utf8_general_ci";
-        } else if ($db_info["character_set"] == "euckr") {
+        } else if ($charset == "euckr") {
             $return_arr["engine"] = "MyISAM";
             $return_arr["charset"] = "euckr";
             $return_arr["collate"] = "euckr_korean_ci";
@@ -1604,15 +1590,16 @@ class Ukp {
     }
 
     /**
-     * mysqli connect  
-     *   
-     * require  2025.05.29 array_value db_charset_info decode_base64
-     * @version 2025.05.29
+     * - mysqli connect
+     * 
+     * require  2026.01.02 array_value db_charset_info decode_base64
+     * @version 2026.01.02
      *
      * @param  string $database 데이터베이스
-     * @return array  [code]    1 - 성공, 2 - 실패  
-     *                [msg]     설명  
-     *                [link]    mysqil 객체(실패시 false)
+     * @return array            접속정보배열
+     * - int    `[code]` 1:성공, 2:실패
+     * - string `[msg]`  설명
+     * - mysqli `[link]` mysqil 객체(실패시 false)
      */
     function db_connect($database = "default") {
         $return_arr = array(
@@ -1627,9 +1614,9 @@ class Ukp {
             return $return_arr;
         }
         //캐릭터셋확인
-        $info = $this->db_charset_info($database);
+        $info = $this->db_charset_info($db_info["charset"]);
         if ($info["charset"] == "") {
-            $return_arr["msg"] = "Unknown character set '{$db_info["character_set"]}'";
+            $return_arr["msg"] = "Unknown character set '{$db_info["charset"]}'";
             return $return_arr;
         }
         //base64 디코딩
@@ -1658,11 +1645,11 @@ class Ukp {
      * @version 2025.11.21
      * 
      * @param  array  $row_arr  row 배열(escape인경우 키가 is)
-     * @return array            row 정보  
-     * - [set]:string    추가 set문
-     * - [into]:string   추가 into문
-     * - [values]:string 추가 values문
-     * - [binding]:array 추가 binding문
+     * @return array            row 정보
+     * - string `[set]`     추가 set문
+     * - string `[into]`    추가 into문
+     * - string `[values]`  추가 values문
+     * - array  `[binding]` 추가 binding문
      */
     function db_create_row($row_arr = array()) {
         $return_arr = array(
@@ -1697,26 +1684,27 @@ class Ukp {
     }
 
     /**
-     * where문 생성  
-     * 테이블명, 필드명, 연산자 소문자로 강제 변경  
-     * 연산자 없는경우 값이 배열인경우 in 쿼리, 아닌경우 일반 쿼리  
-     * 연산자 is인경우  
-     * 값이 null 또는 not null인경우 연산자 is  
-     * 값이 null 또는 not null이 아닌경우 is 뒤에 연산자 입력(입력 안하면 =) ex) is >, is <, is >=, is <=, is <>, is =  
-     * 연산자 in, not in인경우 값이 배열, 빈배열인경우 null 포함  
-     * 연산자 like, not like, is like, is not like 사용 가능  
-     * 연산자 between, is between은 연산자 필수, 0번째 배열이 시작, 1번째 배열이 끝  
-     * 백틱(\`) 생략해도 자동으로 입력  
-     * 배열 키가 숫자인경우 값배열은 서브쿼리, 키가 같은 조건문 여러개 사용시 값배열 길이가 1인 배열로 처리  
-     *   
+     * - where문 생성
+     * - 테이블명, 필드명, 연산자 소문자로 강제 변경
+     * - 연산자 없는경우 값이 배열인경우 in 쿼리, 아닌경우 일반 쿼리
+     * - 연산자 is인경우
+     * - 값이 null 또는 not null인경우 연산자 is
+     * - 값이 null 또는 not null이 아닌경우 is 뒤에 연산자 입력(입력 안하면 =) ex) is >, is <, is >=, is <=, is <>, is =
+     * - 연산자 in, not in인경우 값이 배열, 빈배열인경우 null 포함
+     * - 연산자 like, not like, is like, is not like 사용 가능
+     * - 연산자 between, is between은 연산자 필수, 0번째 배열이 시작, 1번째 배열이 끝
+     * - 백틱(\`) 생략해도 자동으로 입력
+     * - 배열 키가 숫자인경우 값배열은 서브쿼리, 키가 같은 조건문 여러개 사용시 값배열 길이가 1인 배열로 처리
+     * 
      * require  2025.03.06 db_create_where
      * @version 2025.03.06
      * 
-     * @param  array  $where_arr         where 배열
-     * @param  bool   $or_bool           true: or(서브쿼리 and), false: and(서브쿼리 or)
-     * @return array  [where]            where 쿼리  
-     *                [binding]          binding 배열  
-     *                [dot_bool]         true 인경우 모든 키에 점 포함
+     * @param  array  $where_arr where 배열
+     * @param  bool   $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
+     * @return array             where 정보
+     * - string `[where=""]`        where 쿼리
+     * - array  `[binding=array()]` binding 배열
+     * - bool   `[dot_bool=true]`   true 인경우 모든 키에 점 포함
      */
     function db_create_where($where_arr = array(), $or_bool = false) {
         $return_arr = array(
@@ -1797,28 +1785,36 @@ class Ukp {
     }
 
     /**
-     * 테이블 삭제(1개)  
-     * delete_flag 변경시 update_dt도 갱신  
-     * where 설정 안한경우 아무것도 삭제 안됨  
-     *   
-     * require  2025.08.13 db_add_row db_add_table_info db_create_row db_create_where db_query
-     * @version 2025.08.13
+     * - 테이블 삭제(1개)
+     * - delete_flag 변경시 update_dt도 갱신
+     * - where 설정 안한경우 아무것도 삭제 안됨
      * 
-     * @param  string $table       테이블명
-     * @param  array  $option      옵션  
-     *                [where]      삭제 조건문, db_create_where 사용  
-     *                [or_bool]    true: where or문, false(기본): where and문  
-     *                [force_bool] true: 삭제, false(기본값): delete_flag 변경, delete_flag 없는경우 force_bool true로 변경
-     * @param  string $database    사용할 db명
-     * @return int                 affected_rows(수정 안된경우 0)
+     * require  2026.01.02 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2026.01.02
+     * 
+     * @param  string $table    테이블명
+     * @param  array  $option   옵션
+     * - array  `[where=array()]`    삭제 조건문, db_create_where 사용
+     * - bool   `[or_bool=false]`    true: where or문, false: where and문
+     * - bool   `[force_bool=false]` true: 삭제, false(기본값): delete_flag 변경, delete_flag 없는경우 force_bool true로 변경
+     * - string `[prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
+     * - string `[delete_flag=null]` 삭제여부컬럼, 세팅 안한경우 설정값
+     * - array  `[update_date=null]` 수정일, 세팅 안한경우 설정값
+     * - array  `[update_time=null]` 수정시, 세팅 안한경우 설정값
+     * - array  `[update_dt=null]`   수정일시, 세팅 안한경우 설정값
+     * @param  string $database 사용할 db명
+     * @return int              affected_rows(수정 안된경우 0)
      */
     function db_delete($table, $option = array(), $database = "default") {
         $main_where = isset($option["where"]) ? $option["where"] : array();
         $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
         $force_bool = isset($option["force_bool"]) ? $option["force_bool"] : false;
-        $table_info = $this->db_add_table_info($database, $table);
-        $delete_flag = $table_info["delete_flag"];
-        $prefix = $table_info["prefix"];
+        $result = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
+        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $result["delete_flag"];
+        $update_date = isset($option["update_date"]) ? $option["update_date"] : $result["update_date"];
+        $update_time = isset($option["update_time"]) ? $option["update_time"] : $result["update_time"];
+        $update_dt = isset($option["update_dt"]) ? $option["update_dt"] : $result["update_dt"];
         if ($delete_flag == "") {
             $force_bool = true;
         }
@@ -1836,7 +1832,12 @@ class Ukp {
             $binding = $where_info["binding"];
         } else {
             $main_row = array($delete_flag => "y");
-            $row_arr = $this->db_add_row($main_row, true, $database, $table);
+            $option = array(
+                "date" => $update_date,
+                "time" => $update_time,
+                "datetime" => $update_dt
+            );
+            $row_arr = $this->db_add_row($main_row, $option);
             $row_info = $this->db_create_row($row_arr);
             $sql = "
                 update
@@ -1854,9 +1855,9 @@ class Ukp {
     }
 
     /**
-     * 쿼리 문자열 이스케이프  
-     * db 연결 이슈로 배열로 한번에 받아서 처리  
-     *   
+     * - 쿼리 문자열 이스케이프
+     * - db 연결 이슈로 배열로 한번에 받아서 처리
+     * 
      * require  2025.01.17 db_connect
      * @version 2025.01.17
      *
@@ -1927,16 +1928,23 @@ class Ukp {
     }
 
     /**
-     * 테이블 인서트(1개)  
-     *   
-     * require  2025.03.06 db_add_row db_add_table_info db_create_row db_create_where db_query 
-     * @version 2025.03.06
+     * - 테이블 인서트(1개)
+     * 
+     * require  2026.01.02 db_add_row db_add_table_info db_create_row db_create_where db_query 
+     * @version 2026.01.02
      * 
      * @param  string $table    테이블명
-     * @param  array  $option   옵션  
-     *                [row]     입력할 row, db_create_row 사용  
-     *                [where]   중복 조건문, db_create_where 사용  
-     *                [or_bool] true: 중복체크 where or문, false(기본값): 중복체크 where and문
+     * @param  array  $option   옵션
+     * - array  `[row=array()]`      입력할 row, db_create_row 사용
+     * - array  `[where=array()]`    중복 조건문, db_create_where 사용
+     * - bool   `[or_bool=false]`    true: 중복체크 where or문, false: 중복체크 where and문
+     * - string `[prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
+     * - array  `[insert_date=null]` 입력일, 세팅 안한경우 설정값
+     * - array  `[insert_time=null]` 입력시, 세팅 안한경우 설정값
+     * - array  `[insert_dt=null]`   입력일시, 세팅 안한경우 설정값
+     * - array  `[update_date=null]` 수정일, 세팅 안한경우 설정값
+     * - array  `[update_time=null]` 수정시, 세팅 안한경우 설정값
+     * - array  `[update_dt=null]`   수정일시, 세팅 안한경우 설정값
      * @param  string $database 사용할 db명
      * @return int              insert_id(입력 안된경우 0)
      */
@@ -1944,10 +1952,21 @@ class Ukp {
         $main_row = isset($option["row"]) ? $option["row"] : array();
         $main_where = isset($option["where"]) ? $option["where"] : array();
         $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
-        $table_info = $this->db_add_table_info($database, $table);
-        $prefix = $table_info["prefix"];
-        $row_arr = $this->db_add_row($main_row, false, $database, $table);
-        $row_info = $this->db_create_row($row_arr, $database);
+        $result = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
+        $insert_date = isset($option["insert_date"]) ? $option["insert_date"] : $result["insert_date"];
+        $insert_time = isset($option["insert_time"]) ? $option["insert_time"] : $result["insert_time"];
+        $insert_dt = isset($option["insert_dt"]) ? $option["insert_dt"] : $result["insert_dt"];
+        $update_date = isset($option["update_date"]) ? $option["update_date"] : $result["update_date"];
+        $update_time = isset($option["update_time"]) ? $option["update_time"] : $result["update_time"];
+        $update_dt = isset($option["update_dt"]) ? $option["update_dt"] : $result["update_dt"];
+        $option = array(
+            "date" => array_merge($insert_date, $update_date),
+            "time" => array_merge($insert_time, $update_time),
+            "datetime" => array_merge($insert_dt, $update_dt)
+        );
+        $row_arr = $this->db_add_row($main_row, $option);
+        $row_info = $this->db_create_row($row_arr);
         //중복체크인경우
         if (count($main_where) > 0) {
             $where_info = $this->db_create_where($main_where, $or_bool);
@@ -1998,21 +2017,21 @@ class Ukp {
     }
 
     /**
-     * 마지막 쿼리문  
-     *   
+     * - 마지막 쿼리문
+     * 
      * require  2025.01.17
      * @version 2025.01.17
      *
-     * @return int
+     * @return string
      */
     function db_last_query() {
         return $this->db_last_query;
     }
 
     /**
-     * 쿼리 보내기  
-     * 쿼리 실패시 프로그램 종료  
-     *   
+     * - 쿼리 보내기
+     * - 쿼리 실패시 프로그램 종료
+     * 
      * require  2025.11.25 db_connect db_escape
      * @version 2025.11.25
      *
@@ -2166,8 +2185,8 @@ class Ukp {
     }
 
     /**
-     * 쿼리결과 여러줄  
-     *   
+     * - 쿼리결과 여러줄
+     * 
      * require  2025.03.06 db_query
      * @version 2025.03.06
      *
@@ -2182,8 +2201,8 @@ class Ukp {
     }
 
     /**
-     * 쿼리결과 1줄  
-     *   
+     * - 쿼리결과 1줄
+     * 
      * require  2025.03.06 db_query
      * @version 2025.03.06
      *
@@ -2202,15 +2221,17 @@ class Ukp {
      * - db/cnt 폴더 내 {$database}/{$table}.sql 파일 sql 사용
      * - delete_flag 설정 안한경우 delete_flag_bool 무시함
      * 
-     * require  2025.12.16 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
-     * @version 2025.12.16
+     * require  2026.01.02 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
+     * @version 2026.01.02
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션  
-     * - [where=array()]:array        where문, 키는 컬럼명, 값은 컬럼값
-     * - [or_bool=false]:bool         true: where or문, false: where and문
-     * - [delete_flag_bool=true]:bool true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
-     * - [where_table_bool=true]:bool true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * - array  `[where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
+     * - bool   `[or_bool=false]`         true: where or문, false: where and문
+     * - bool   `[delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+     * - bool   `[where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * - string `[prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
+     * - string `[delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
      * @param  string $database 사용 데이터베이스
      * @return array            쿼리결과 배열, 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열
      */
@@ -2219,17 +2240,20 @@ class Ukp {
         $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
         $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
         $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
-        $table_info = $this->db_add_table_info($database, $table);
+        $result = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
+        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $result["delete_flag"];
         $where_info = $this->db_create_where($where_arr, $or_bool);
         if ($where_table_bool && !$where_info["dot_bool"]) {
             trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
             exit;
         }
         //쿼리문 가져오기
-        $result = $this->db_select_sql($table, array(
-            "prefix_bool" => true,
+        $option = array(
+            "prefix" => $prefix,
             "cnt_bool" => true
-        ), $database);
+        );
+        $result = $this->db_select_sql($table, $option, $database);
         if ($result == "") {
             trigger_error("{$database} 데이터베이스의 {$table} 테이블 cnt 쿼리가 없습니다.");
             exit;
@@ -2240,14 +2264,14 @@ class Ukp {
         //where문 생성
         $where = "";
         //삭제여부 사용 하는경우
-        if ($delete_flag_bool && $table_info["delete_flag"] != "") {
+        if ($delete_flag_bool && $delete_flag != "") {
             //테이블별명 또는 테이블명 추출
             $short = $this->db_from_table_name($sql);
             if ($short != "") {
                 $short = "`{$short}`.";
             }
             //삭제여부 쿼리 추가
-            $where .= "{$short}`{$table_info["delete_flag"]}` = 'n'";
+            $where .= "{$short}`{$delete_flag}` = 'n'";
         }
         //where문 있는경우
         if ($where_info["where"] != "") {
@@ -2269,19 +2293,21 @@ class Ukp {
      * - db/list 폴더 내 {$database}/{$table}.sql 파일 sql 사용
      * - delete_flag 설정 안한경우 delete_flag_bool 무시함
      * 
-     * require  2025.12.16 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
-     * @version 2025.12.16
+     * require  2026.01.02 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
+     * @version 2026.01.02
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - [where=array()]:array        where문, 키는 컬럼명, 값은 컬럼값
-     * - [or_bool=false]:bool         true: where or문, false: where and문
-     * - [order_by=array()]:array     정렬 배열(기본정렬인경우 빈배열)
-     * - [limit]:int                  표시갯수
-     * - [start]:int                  표시 시작점, limit 있는경우에만
-     * - [delete_flag_bool=true]:bool true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
-     * - [info_bool=false]:bool       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
-     * - [where_table_bool=true]:bool true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * - array  `[where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
+     * - bool   `[or_bool=false]`         true: where or문, false: where and문
+     * - array  `[order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
+     * - int    `[limit]`                 표시갯수
+     * - int    `[start]`                 표시 시작점, limit 있는경우에만
+     * - bool   `[delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+     * - bool   `[info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
+     * - bool   `[where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * - string `[prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
+     * - string `[delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
      * @param  string $database 사용 데이터베이스
      * @return array            쿼리결과 배열
      * - info_bool 값이 true 인경우 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열 반환
@@ -2294,17 +2320,20 @@ class Ukp {
         $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
         $info_bool = isset($option["info_bool"]) ? $option["info_bool"] : false;
         $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
-        $table_info = $this->db_add_table_info($database, $table);
+        $result = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
+        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $result["delete_flag"];
         $where_info = $this->db_create_where($where_arr, $or_bool);
         if ($where_table_bool && !$where_info["dot_bool"]) {
             trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
             exit;
         }
         //쿼리문 가져오기
-        $result = $this->db_select_sql($table, array(
-            "prefix_bool" => true,
+        $option = array(
+            "prefix" => $prefix,
             "cnt_bool" => false
-        ), $database);
+        );
+        $result = $this->db_select_sql($table, $option, $database);
         if ($result == "") {
             trigger_error("{$database} 데이터베이스의 {$table} 테이블 리스트 쿼리가 없습니다.");
             exit;
@@ -2316,14 +2345,14 @@ class Ukp {
         //where문 생성
         $where = "";
         //삭제여부 사용 하는경우
-        if ($delete_flag_bool && $table_info["delete_flag"] != "") {
+        if ($delete_flag_bool && $delete_flag != "") {
             //테이블별명 또는 테이블명 추출
             $short = $this->db_from_table_name($sql);
             if ($short != "") {
                 $short = "`{$short}`.";
             }
             //삭제여부 쿼리 추가
-            $where .= "{$short}`{$table_info["delete_flag"]}` = 'n'";
+            $where .= "{$short}`{$delete_flag}` = 'n'";
         }
         //where문 있는경우
         if ($where_info["where"] != "") {
@@ -2359,28 +2388,30 @@ class Ukp {
      * - 테이블별 select SQL 문자열 반환
      * - db/list 폴더와 db/cnt 폴더 내 {$database}/{$table}.sql 파일 설정필요
      * 
-     * require  2025.12.16 db_add_prefix
-     * @version 2025.12.16
+     * require  2026.01.02 db_add_prefix db_add_table_info
+     * @version 2026.01.02
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - [prefix_bool=true]:bool 테이블 접두어 사용여부
-     * - [cnt_bool=false]:bool   true: cnt sql, false: list sql
+     * - bool   `[cnt_bool=false]` true: cnt sql, false: list sql
+     * - string `[prefix=null]`    테이블 접두어, 세팅 안한경우 설정값
      * @param  string $database 사용 데이터베이스
      * @return string           sql 문자열, 실패시 빈문자열
      */
     function db_select_sql($table, $option = array(), $database = "default") {
-        $prefix_bool = isset($option["prefix_bool"]) ? $option["prefix_bool"] : true;
         $cnt_bool = isset($option["cnt_bool"]) ? $option["cnt_bool"] : false;
+        if (isset($option["prefix"])) {
+            $prefix = $option["prefix"];
+        } else {
+            $result = $this->db_add_table_info($table, $database);
+            $prefix = $result["prefix"];
+        }
         $folder = $cnt_bool ? "cnt" : "list";
-        if (!file_exists(dirname(__FILE__) . "/db/{$folder}/{$database}/{$table}.sql")) {
+        $file = dirname(__FILE__) . "/db/{$folder}/{$database}/{$table}.sql";
+        if (!file_exists($file)) {
             return "";
         }
-        $sql = file_get_contents(dirname(__FILE__) . "/db/{$folder}/{$database}/{$table}.sql");
-        //테이블 접두어 사용인경우
-        if ($prefix_bool) {
-            $sql = $this->db_add_prefix($sql, $database, $table);
-        }
+        $sql = $this->db_add_prefix(file_get_contents($file), $prefix);
         return $sql;
     }
 
@@ -2397,22 +2428,25 @@ class Ukp {
      * - 백업이 저장될 곳에 db, tb 테이블 이미 있는경우 접두어 설정
      * - 백업대상 DB 접속정보 설정, 테이블 정보는 prefix와 update_dt(인덱스 설정 필수) 정보만 설정
      * 
-     * require  2025.12.16 array_value db_add_table_info db_affected_rows db_charset_info db_create_row db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
-     * @version 2025.12.16
+     * require  2026.01.02 array_value db_add_table_info db_affected_rows db_charset_info db_create_row db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
+     * @version 2026.01.02
      * 
      * @param array $target    백업대상 데이터베이스 배열
-     * - [{데이터베이스명}][]:string 테이블명
+     * - string `[{데이터베이스명}][]` 테이블명
      * @param string $database 백업이 저장될 곳 데이터베이스
      */
     function db_table_backup($target, $database = "default") {
         //백업db prefix
-        $arr = $this->db_add_table_info($database, "db");
+        $arr = $this->db_add_table_info("db", $database);
         $db_prefix = $arr["prefix"];
-        $arr = $this->db_add_table_info($database, "tb");
+        $arr = $this->db_add_table_info("tb", $database);
         $tb_prefix = $arr["prefix"];
         //백업db charset
-        $arr = $this->db_charset_info($database);
-        $backup_charset = ") ENGINE={$arr['engine']} DEFAULT CHARSET={$arr['charset']} COLLATE={$arr['collate']}";
+        $backup_charset = "";
+        if (isset($this->db_info[$database])) {
+            $backup_charset = $this->array_value($this->db_info[$database], "charset");
+        }
+        $arr = $this->db_charset_info($backup_charset);
         //백업db 테이블 생성
         $sql = "
             create table if not exists `{$db_prefix}db` (
@@ -2422,7 +2456,7 @@ class Ukp {
                 primary key (`db_idx`),
                 index (`name`),
                 index (`update_dt`)
-            {$backup_charset} COMMENT='데이터베이스(d)'
+            ) ENGINE={$arr['engine']} DEFAULT CHARSET={$arr['charset']} COLLATE={$arr['collate']} COMMENT='데이터베이스(d)'
         ";
         $this->db_query($sql, array(), $database);
         $sql = "
@@ -2438,7 +2472,7 @@ class Ukp {
                 index (`db_idx`),
                 index (`name`),
                 index (`update_dt`)
-            {$backup_charset} COMMENT='테이블(t)';
+            ) ENGINE={$arr['engine']} DEFAULT CHARSET={$arr['charset']} COLLATE={$arr['collate']} COMMENT='테이블(t)';
         ";
         $this->db_query($sql, array(), $database);
         //백업db 쿼리문
@@ -2480,9 +2514,6 @@ class Ukp {
             $sql = $db_sql . " where " . $where_info["where"];
             $result = $this->db_row_array($sql, $where_info["binding"], $database);
             $db_idx = intval($result["db_idx"]);
-            //target db charset
-            $arr = $this->db_charset_info($db);
-            $charset = ") ENGINE={$arr['engine']} DEFAULT CHARSET={$arr['charset']} COLLATE={$arr['collate']}";
             //현재날짜 가져오기(대상DB 기준)
             $sql = "select date_format(now(), '%Y%m%d%H%i%s') as `dt`";
             $result = $this->db_row_array($sql, array(), $db);
@@ -2514,9 +2545,9 @@ class Ukp {
                     continue;
                 }
                 //information for backup
-                $result = $this->db_add_table_info($db, $tb);
-                $update_dt_field = count($result["update_dt"]) == 0 ? "" : $result["update_dt"][0];
+                $result = $this->db_add_table_info($tb, $db);
                 $prefix = $result["prefix"];
+                $update_dt = $this->array_value($result["update_dt"], 0);
                 //target 쿼리문 생성
                 $target_sql = "select " . implode(", ", $select) . " from `{$prefix}{$tb}`";
                 //백업 진행상황 가져오기
@@ -2579,20 +2610,18 @@ class Ukp {
                     $backup_pk = $backup_dt = "";
                 }
                 //테이블 생성쿼리 조회
-                $result = $this->db_table_create_sql($tb, $db);
-                //테이블 없는경우 생성
-                $temp = str_ireplace($charset, $backup_charset, $result[0]);
+                $result = $this->db_table_create_sql($tb, array("charset" => $backup_charset), $db);
                 $this->db_query($temp, array(), $database);
                 //Update for backup
-                if ($update_dt_field != "") {
+                if ($update_dt != "") {
                     for ($current_idx = null; true; $current_idx = $idx) {
                         //row 조회
                         $where = array(
                             "{$primary} <=" => $backup_pk
                         );
                         if ($backup_dt != "") {
-                            $where["{$update_dt_field} >"] = $backup_dt;
-                            $where["{$update_dt_field} <="] = $dt;
+                            $where["{$update_dt} >"] = $backup_dt;
+                            $where["{$update_dt} <="] = $dt;
                         }
                         if ($current_idx !== null) {
                             $where["{$primary} >"] = $current_idx;
@@ -2601,8 +2630,8 @@ class Ukp {
                         $sql = "{$target_sql} where {$where_info["where"]} order by `{$primary}` limit 1";
                         $result = $this->db_row_array($sql, $where_info["binding"], $db);
                         //row가 없는경우
-                        $idx = intval($result[$primary]);
-                        if ($idx == 0) {
+                        $idx = $result[$primary];
+                        if (!is_null($idx)) {
                             break;
                         }
                         //row 생성
@@ -2614,40 +2643,18 @@ class Ukp {
                                 $row[$k] = $v;
                             }
                         }
-                        $row_info = $this->db_create_row($row);
+                        $option = array(
+                            "row" => $row,
+                            "where" => array($primary => $idx),
+                            "prefix" => $prefix
+                        );
                         //update
-                        $sql = "
-                            update
-                                `{$prefix}{$tb}`
-                            set
-                                {$row_info["set"]}
-                            where
-                                `{$primary}` = '{$idx}'
-                        ";
-                        $this->db_query($sql, $row_info["binding"], $database);
-                        $affected_rows = $this->db_affected_rows();
+                        $affected_rows = $this->db_update($tb, $option, $database);
                         if ($affected_rows > 0) {
                             continue;
                         }
                         //insert
-                        $sql = "
-                            insert into `{$prefix}{$tb}` (
-                                {$row_info["into"]}
-                            )
-                            select
-                                {$row_info["values"]}
-                            from
-                                dual
-                            where not exists (
-                                select
-                                    1
-                                from
-                                    `{$prefix}{$tb}`
-                                where
-                                    `{$primary}` = '{$idx}'
-                            )
-                        ";
-                        $this->db_query($sql, $row_info["binding"], $database);
+                        $this->db_insert($tb, $option, $database);
                     }
                     $backup_dt = $dt;
                 } else {
@@ -2658,8 +2665,8 @@ class Ukp {
                 for ($current_idx = $backup_pk; true; $current_idx = $backup_pk = $idx) {
                     $sql = "{$target_sql} where `{$primary}` > '{$current_idx}' order by `{$primary}` limit 1";
                     $result = $this->db_row_array($sql, array(), $db);
-                    $idx = intval($result[$primary]);
-                    if ($idx == 0) {
+                    $idx = $result[$primary];
+                    if (!is_null($idx)) {
                         break;
                     }
                     //row 생성
@@ -2671,26 +2678,13 @@ class Ukp {
                             $row[$k] = $v;
                         }
                     }
-                    $row_info = $this->db_create_row($row);
+                    $option = array(
+                        "row" => $row,
+                        "where" => array($primary => $idx),
+                        "prefix" => $prefix
+                    );
                     //insert
-                    $sql = "
-                        insert into `{$prefix}{$tb}` (
-                            {$row_info["into"]}
-                        )
-                        select
-                            {$row_info["values"]}
-                        from
-                            dual
-                        where not exists (
-                            select
-                                1
-                            from
-                                `{$prefix}{$tb}`
-                            where
-                                `{$primary}` = '{$idx}'
-                        )
-                    ";
-                    $this->db_query($sql, $row_info["binding"], $database);
+                    $this->db_insert($tb, $option, $database);
                 }
                 //백업정보 업데이트
                 $row = array(
@@ -2720,14 +2714,24 @@ class Ukp {
      * - 접두어는 config.php 파일에 설정된 값으로 치환
      * - 실패시 빈배열 반환
      * 
-     * require  2025.12.16 db_add_table_info db_charset_info db_row_array db_table_ddl str_pad
-     * @version 2025.12.16
+     * require  2026.01.02 array_value db_add_table_info db_charset_info db_row_array db_table_ddl str_pad
+     * @version 2026.01.02
      * 
      * @param  string $table    테이블명
+     * @param  array  $option   옵션
+     * - string `[charset=null]`     캐릭터셋(utf8mb4, utf8, euckr), 세팅 안한경우 설정값
+     * - string `[prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
+     * - string `[delete_flag=null]` 삭제여부컬럼, 세팅 안한경우 설정값
+     * - array  `[insert_date=null]` 입력일, 세팅 안한경우 설정값
+     * - array  `[insert_time=null]` 입력시, 세팅 안한경우 설정값
+     * - array  `[insert_dt=null]`   입력일시, 세팅 안한경우 설정값
+     * - array  `[update_date=null]` 수정일, 세팅 안한경우 설정값
+     * - array  `[update_time=null]` 수정시, 세팅 안한경우 설정값
+     * - array  `[update_dt=null]`   수정일시, 세팅 안한경우 설정값
      * @param  string $database 사용할 db
      * @return array            0: 테이블 생성 SQL, 1이상: 초기 INSERT SQL
      */
-    function db_table_create_sql($table, $database = "default") {
+    function db_table_create_sql($table, $option = array(), $database = "default") {
         $return_arr = array();
         //db, table 검사
         $table_info = $this->db_table_ddl($table, $database);
@@ -2735,14 +2739,26 @@ class Ukp {
             return $return_arr;
         }
         //charset 검사
-        $info = $this->db_charset_info($database);
+        $charset = "";
+        if (isset($option["charset"])) {
+            $charset = $option["charset"];
+        } else if (isset($this->db_info[$database])) {
+            $charset = $this->array_value($this->db_info[$database], "charset");
+        }
+        $info = $this->db_charset_info($charset);
         if ($info["charset"] == "") {
             return $return_arr;
         }
         //옵션 설정
-        $add_info = $this->db_add_table_info($database, $table);
-        //접두어
-        $prefix = $add_info["prefix"];
+        $result = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
+        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $result["delete_flag"];
+        $insert_date = isset($option["insert_date"]) ? $option["insert_date"] : $result["insert_date"];
+        $insert_time = isset($option["insert_time"]) ? $option["insert_time"] : $result["insert_time"];
+        $insert_dt = isset($option["insert_dt"]) ? $option["insert_dt"] : $result["insert_dt"];
+        $update_date = isset($option["update_date"]) ? $option["update_date"] : $result["update_date"];
+        $update_time = isset($option["update_time"]) ? $option["update_time"] : $result["update_time"];
+        $update_dt = isset($option["update_dt"]) ? $option["update_dt"] : $result["update_dt"];
         //컬럼 최대길이
         $name_len = 0;
         $type_len = 0;
@@ -2843,13 +2859,13 @@ class Ukp {
                 if (isset($v[$kk])) {
                     $temp = addslashes($v[$kk]);
                     $values_arr[] = "'{$temp}'";
-                } else if (in_array($column_text, $add_info["insert_dt"]) || in_array($column_text, $add_info["update_dt"])) {
+                } else if (in_array($column_text, $insert_dt) || in_array($column_text, $update_dt)) {
                     $values_arr[] = "'{$db_dt}'";
-                } else if (in_array($column_text, $add_info["insert_date"]) || in_array($column_text, $add_info["update_date"])) {
+                } else if (in_array($column_text, $insert_date) || in_array($column_text, $update_date)) {
                     $values_arr[] = "'{$db_d}'";
-                } else if (in_array($column_text, $add_info["insert_time"]) || in_array($column_text, $add_info["update_time"])) {
+                } else if (in_array($column_text, $insert_time) || in_array($column_text, $update_time)) {
                     $values_arr[] = "'{$db_t}'";
-                } else if ($column_text == $add_info["delete_flag"]) {
+                } else if ($column_text == $delete_flag) {
                     $values_arr[] = "'n'";
                 } else if (isset($vv[4])) {
                     $temp = addslashes($vv[4]);
@@ -2881,28 +2897,29 @@ class Ukp {
      * - 자료형 문자열이 타입사전 키값중에 있는경우 해당 자료형과 기본값으로 대체
      * - 전체 컬럼에서 primary 자료형은 한개만 설정가능
      * 
-     * require  2025.12.16 decode_json
-     * @version 2025.12.16
+     * require  2026.01.02 decode_json
+     * @version 2026.01.02
      * 
      * @param  string $table    테이블명
      * @param  string $database 사용할 db
      * @return array            DDL 배열, 실패시 빈배열
-     * - [primary_type="int"]:string 기본키 자료형
-     * - [comment=""]:string         테이블설명
-     * - [columns][][0]:string       컬럼명
-     * - [columns][][1]:string       자료형, primary, foreign 은 primary_type 값으로 치환됨
-     * - [columns][][2]:string       컬럼설명
-     * - [columns][][3]:bool         인덱스여부, primary, foreign은 true
-     * - [columns][][4]:string       기본값, 설정 안한경우 default null
-     * - [data][]:array              컬럼 순서대로 값 설정, null 또는 설정 안한경우 기본값으로
+     * - string `[primary_type="int"]` 기본키 자료형
+     * - string `[comment=""]`         테이블설명
+     * - string `[columns][][0]`       컬럼명
+     * - string `[columns][][1]`       자료형, primary, foreign 은 primary_type 값으로 치환됨
+     * - string `[columns][][2]`       컬럼설명
+     * - bool   `[columns][][3]`       인덱스여부, primary, foreign은 true
+     * - string `[columns][][4]`       기본값, 설정 안한경우 default null
+     * - array  `[data][]`             컬럼 순서대로 값 설정, null 또는 설정 안한경우 기본값으로
      */
     function db_table_ddl($table, $database = "default") {
-        if (!file_exists(dirname(__FILE__) . "/db/ddl/{$database}/{$table}.json")) {
+        $file = dirname(__FILE__) . "/db/ddl/{$database}/{$table}.json";
+        if (!file_exists($file)) {
             return array();
         }
-        $arr = $this->decode_json(file_get_contents(dirname(__FILE__) . "/db/ddl/{$database}/{$table}.json"));
+        $arr = $this->decode_json(file_get_contents($file));
         //배열이 유효하지 않은경우
-        if (count($arr) == 0 || !isset($arr["columns"]) || !is_array($arr["columns"])) {
+        if (!isset($arr["columns"]) || !is_array($arr["columns"])) {
             return array();
         }
         /*
@@ -2970,11 +2987,11 @@ class Ukp {
      * - 백업이 저장된 곳 데이터베이스를 이용하여 복구
      * - 백업방법은 db_table_backup() 함수 참조
      * 
-     * require  2025.12.16 db_add_table_info db_insert db_query db_row_array db_table_create_sql db_table_ddl
-     * @version 2025.12.16
+     * require  2026.01.02 db_add_table_info db_insert db_query db_row_array db_table_create_sql db_table_ddl
+     * @version 2026.01.02
      * 
      * @param array  $target   복구대상 데이터베이스 배열
-     * - [{데이터베이스명}][]:string 테이블명
+     * - string `[{데이터베이스명}][]` 테이블명
      * @param string $database 백업이 저장된 곳 데이터베이스
      */
     function db_table_restore($target, $database = "default") {
@@ -3004,12 +3021,12 @@ class Ukp {
                     continue;
                 }
                 //information for backup
-                $result = $this->db_add_table_info($db, $tb);
+                $result = $this->db_add_table_info($tb, $db);
                 $prefix = $result["prefix"];
                 //target 쿼리문 생성
                 $target_sql = "select " . implode(", ", $select) . " from `{$prefix}{$tb}`";
                 //테이블 없는경우 생성
-                $result = $this->db_table_create_sql($tb, $db);
+                $result = $this->db_table_create_sql($tb, array(), $db);
                 $this->db_query($result[0], array(), $db);
                 //Insert for backup
                 for ($current_idx = null; true; $current_idx = $idx) {
@@ -3046,39 +3063,26 @@ class Ukp {
     }
 
     /**
-     * - 데이터베이스 타임존
+     * - 테이블 업데이트(1개)
+     * - add_where 설정 안한경우 중복체크 안함
      * 
-     * require  2025.11.10 array_value
-     * @version 2025.11.10
+     * require  2026.01.02 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2026.01.02
      * 
-     * @param  string $database 사용할 db
-     * @return string           타임존 문자열
-     */
-    function db_time_zone($database = "default") {
-        $db_info = $this->array_value($this->db_info, $database, true);
-        if (count($db_info) == 0) {
-            return "+00:00";
-        }
-        return $db_info["time_zone"];
-    }
-
-    /**
-     * 테이블 업데이트(1개)  
-     * add_where 설정 안한경우 중복체크 안함  
-     *   
-     * require  2025.03.06 db_add_row db_add_table_info db_create_row db_create_where db_query
-     * @version 2025.03.06
-     * 
-     * @param  string $table        테이블명
-     * @param  array  $option       옵션  
-     *                [row]         수정할 row, db_create_row 사용  
-     *                [where]       수정 조건문(중복체크 하는경우 기본키 필수), db_create_where 사용  
-     *                [or_bool]     true: where or문, false(기본): where and문  
-     *                [primary]     기본키 컬럼명(공백인경우 중복체크 안함)  
-     *                [add_where]   중복체크 조건문(없는경우 중복체크 안함), db_create_where 사용  
-     *                [add_or_bool] true: 중복체크 where or문, false(기본): 중복체크 where and문
-     * @param  string $database     사용할 db명
-     * @return int                  affected_rows(수정 안된경우 0)
+     * @param  string $table    테이블명
+     * @param  array  $option   옵션
+     * - array  `[row=array()]`       수정할 row, db_create_row 사용
+     * - array  `[where=array()]`     수정 조건문(중복체크 하는경우 기본키 필수), db_create_where 사용
+     * - bool   `[or_bool=false]`     true: where or문, false: where and문
+     * - string `[primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
+     * - array  `[add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), db_create_where 사용
+     * - bool   `[add_or_bool=false]` true: 중복체크 where or문, false: 중복체크 where and문
+     * - string `[prefix=null]`       테이블 접두어, 세팅 안한경우 설정값
+     * - array  `[update_date=null]`  수정일, 세팅 안한경우 설정값
+     * - array  `[update_time=null]`  수정시, 세팅 안한경우 설정값
+     * - array  `[update_dt=null]`    수정일시, 세팅 안한경우 설정값
+     * @param  string $database 사용할 db명
+     * @return int              affected_rows(수정 안된경우 0)
      */
     function db_update($table, $option = array(), $database = "default") {
         $main_row = isset($option["row"]) ? $option["row"] : array();
@@ -3087,11 +3091,19 @@ class Ukp {
         $main_primary = isset($option["primary"]) ? trim(strtolower($option["primary"])) : "";
         $main_add_where = isset($option["add_where"]) ? $option["add_where"] : array();
         $add_or_bool = isset($option["add_or_bool"]) ? $option["add_or_bool"] : false;
-        $table_info = $this->db_add_table_info($database, $table);
-        $prefix = $table_info["prefix"];
+        $result = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
+        $update_date = isset($option["update_date"]) ? $option["update_date"] : $result["update_date"];
+        $update_time = isset($option["update_time"]) ? $option["update_time"] : $result["update_time"];
+        $update_dt = isset($option["update_dt"]) ? $option["update_dt"] : $result["update_dt"];
         $where_info = $this->db_create_where($main_where, $or_bool);
-        $row_arr = $this->db_add_row($main_row, true, $database, $table);
-        $row_info = $this->db_create_row($row_arr, $database);
+        $option = array(
+            "date" => $update_date,
+            "time" => $update_time,
+            "datetime" => $update_dt
+        );
+        $row_arr = $this->db_add_row($main_row, $option);
+        $row_info = $this->db_create_row($row_arr);
         if ($main_primary != "" && count($main_add_where) > 0) {
             $primary_key = "";
             foreach ($main_where as $k => $v) {
@@ -3129,141 +3141,6 @@ class Ukp {
         $binding = array_merge($row_info["binding"], $where_info["binding"]);
         $this->db_query($sql, $binding, $database);
         return $this->db_affected_rows;
-    }
-
-    /**
-     * 테이블 다중행 업데이트(모자라는경우 인서트, 남는경우 삭제처리)  
-     * 리스트 한건당 한번의 쿼리이므로 속도 느릴 수 있음  
-     * 조건문 없는경우 다중행 인서트로 사용 가능  
-     * 리스트 배열이 잘못된경우 select문 쿼리에러 발생함  
-     * 연산자가 없거나 =, 값이 배열이 아닌 where문은 insert 쿼리시 자동추가  
-     *   
-     * require  2025.03.06 db_add_table_info db_create_where db_delete db_insert db_result_array db_update
-     * @version 2025.03.06
-     * 
-     * @param string $table       테이블명
-     * @param array  $option      옵션
-     *               [primary]    기본키 컬럼명  
-     *               [list]       리스트  
-     *               [where]      조건문, db_create_where 사용
-     *               [or_bool]    true: where or문, false(기본): where and문  
-     *               [force_bool] true: 삭제, false(기본값): delete_flag 변경, delete_flag 없는경우 force_bool true로 변경  
-     * @param string $database 사용할 db명
-     */
-    function db_update_multiple($table, $option = array(), $database = "default") {
-        $main_primary = isset($option["primary"]) ? trim(strtolower($option["primary"])) : "";
-        $list = isset($option["list"]) ? $option["list"] : array();
-        $main_where = isset($option["where"]) ? $option["where"] : array();
-        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
-        $force_bool = isset($option["force_bool"]) ? $option["force_bool"] : false;
-        $table_info = $this->db_add_table_info($database, $table);
-        $delete_flag = $table_info["delete_flag"];
-        $prefix = $table_info["prefix"];
-        if ($delete_flag == "") {
-            $force_bool = true;
-        }
-        //리스트 검사
-        $main_list = array();
-        $column = "";
-        $arr = array();
-        foreach ($list as $temp) {
-            if (!is_array($temp)) {
-                trigger_error("list 값이 잘못되었습니다. 확인해주세요.");
-                exit;
-            }
-            $temp_arr = array();
-            foreach ($temp as $k => $v) {
-                $temp_column = explode(" ", trim($k));
-                $temp_column = trim(str_replace("`", "", strtolower($temp_column[0])));
-                $temp_arr[$temp_column] = $v;
-                if (isset($arr[$temp_column])) {
-                    continue;
-                }
-                $arr[$temp_column] = 1;
-                $column .= ", `{$temp_column}`";
-            }
-            $main_list[] = $temp_arr;
-        }
-        //기존 리스트
-        $where_info = $this->db_create_where($main_where, $or_bool);
-        if ($where_info["where"] == "") {
-            $where_info["where"] .= "1 = 0";
-        }
-        $sql = "
-            select
-                `{$main_primary}`
-                {$column}
-            from
-                `{$prefix}{$table}`
-            where
-                {$where_info["where"]}
-        ";
-        $binding = $where_info["binding"];
-        $result = $this->db_result_array($sql, $binding, $database);
-        //삭제리스트
-        $delete_arr = array();
-        foreach ($result as $k => $v) {
-            if (isset($main_list[$k])) {
-                continue;
-            }
-            $delete_arr[] = $v[$main_primary];
-        }
-        //삭제
-        $option = array(
-            "where" => array(
-                $main_primary => $delete_arr
-            ),
-            "force_bool" => $force_bool
-        );
-        $this->db_delete($table, $option, $database);
-        //업데이트 리스트(기본키가 키값)
-        $update_arr = array();
-        //인서트 리스트
-        $insert_arr = array();
-        //처리
-        foreach ($main_list as $k => $v) {
-            //기존리스트 있는경우
-            if (isset($result[$k][$main_primary])) {
-                $primary_key = $result[$k][$main_primary];
-                $update_arr[$primary_key] = $v;
-            }
-            //없는경우
-            else {
-                $insert_arr[] = $v;
-            }
-        }
-        //업데이트
-        foreach ($update_arr as $k => $v) {
-            if ($delete_flag != "") {
-                $v[$delete_flag] = "n";
-            }
-            $option = array(
-                "row" => $v,
-                "where" => array(
-                    $main_primary => $k
-                )
-            );
-            $this->db_update($table, $option, $database);
-        }
-        //인서트
-        foreach ($insert_arr as $temp) {
-            //where배열에서 insert에 추가 가능항목은 insert 배열에 추가
-            foreach ($main_where as $k => $v) {
-                $k = trim(preg_replace("/\s+/", " ", str_replace("`", "", strtolower($k))));
-                $key_arr = explode(" ", $k);
-                $key = explode(".", $key_arr[0]);
-                $field = isset($key[1]) ? "{$key[0]}.{$key[1]}" : $key[0];
-                $operator = substr($k, strlen($key_arr[0]) + 1);
-                //추가가능항목 확인
-                if (!isset($temp[$field]) && !is_array($v) && in_array($operator, array("", "="))) {
-                    $temp[$k] = $v;
-                }
-            }
-            $option = array(
-                "row" => $temp
-            );
-            $this->db_insert($table, $option, $database);
-        }
     }
 
     /**
@@ -3704,7 +3581,7 @@ class Ukp {
      */
     function encode_xml($arr) {
         $root = key($arr);
-        $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"{$this->character_set}\"?><{$root}></{$root}>");
+        $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"{$this->charset}\"?><{$root}></{$root}>");
         $this->custom_add_xml_element($xml, $arr[$root]);
         return $xml->asXML();
     }
@@ -4355,7 +4232,7 @@ class Ukp {
      * @return string             공백추가 문자열($euckr_bool에 맞게 인코딩됨)
      */
     function str_pad($text, $length, $blank = " ", $front_bool = false, $euckr_bool = false) {
-        if ($this->character_set == "euc-kr") {
+        if ($this->charset == "euc-kr") {
             $text = mb_convert_encoding($text, "UTF-8", "EUC-KR");
             $blank = mb_convert_encoding($blank, "UTF-8", "EUC-KR");
         }

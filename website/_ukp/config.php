@@ -8,7 +8,7 @@
 $config["parking_start_dt"] = "";
 $config["parking_end_dt"] = "";
 
-$config["character_set"] = "utf-8";
+$config["charset"] = "utf-8";
 $config["time_zone"] = "Asia/Seoul";
 $config["session_limit_time"] = 0;
 $config["log_limit_day"] = 7;
@@ -33,7 +33,7 @@ $config["db"] = array(
         "password" => "",
         "database" => "",
         "port" => "",
-        "character_set" => "",
+        "charset" => "",
         "time_zone" => "+09:00",
         "base64_password_bool" => false,
         "table" => array()
