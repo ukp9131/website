@@ -2428,7 +2428,7 @@ class Ukp {
      * - 백업이 저장될 곳에 db, tb 테이블 이미 있는경우 접두어 설정
      * - 백업대상 DB 접속정보 설정, 테이블 정보는 prefix와 update_dt(인덱스 설정 필수) 정보만 설정
      * 
-     * require  2026.01.02 array_value db_add_table_info db_affected_rows db_charset_info db_create_row db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
+     * require  2026.01.02 array_value db_add_table_info db_charset_info db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
      * @version 2026.01.02
      * 
      * @param array $target    백업대상 데이터베이스 배열
