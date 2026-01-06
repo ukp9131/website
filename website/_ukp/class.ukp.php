@@ -3037,8 +3037,8 @@ class Ukp {
                     }
                     $sql = "{$target_sql} {$where} order by `{$primary}` limit 1";
                     $result = $this->db_row_array($sql, array(), $database);
-                    $idx = intval($result[$primary]);
-                    if ($idx == 0) {
+                    $idx = $result[$primary];
+                    if (is_null($idx)) {
                         break;
                     }
                     //row 생성
@@ -3053,9 +3053,7 @@ class Ukp {
                     //insert
                     $option = array(
                         "row" => $row,
-                        "where" => array(
-                            $primary => $idx
-                        )
+                        "where" => array($primary => $idx)
                     );
                     $this->db_insert($tb, $option, $db);
                 }
