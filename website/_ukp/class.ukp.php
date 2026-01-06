@@ -2611,7 +2611,7 @@ class Ukp {
                 }
                 //테이블 생성쿼리 조회
                 $result = $this->db_table_create_sql($tb, array("charset" => $backup_charset), $db);
-                $this->db_query($temp, array(), $database);
+                $this->db_query($result[0], array(), $database);
                 //Update for backup
                 if ($update_dt != "") {
                     for ($current_idx = null; true; $current_idx = $idx) {
@@ -2629,9 +2629,9 @@ class Ukp {
                         $where_info = $this->db_create_where($where);
                         $sql = "{$target_sql} where {$where_info["where"]} order by `{$primary}` limit 1";
                         $result = $this->db_row_array($sql, $where_info["binding"], $db);
-                        //row가 없는경우
                         $idx = $result[$primary];
-                        if (!is_null($idx)) {
+                        //row가 없는경우
+                        if (is_null($idx)) {
                             break;
                         }
                         //row 생성
@@ -2666,7 +2666,8 @@ class Ukp {
                     $sql = "{$target_sql} where `{$primary}` > '{$current_idx}' order by `{$primary}` limit 1";
                     $result = $this->db_row_array($sql, array(), $db);
                     $idx = $result[$primary];
-                    if (!is_null($idx)) {
+                    //row가 없는경우
+                    if (is_null($idx)) {
                         break;
                     }
                     //row 생성
