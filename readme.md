@@ -27,8 +27,18 @@
 - 하나의 명령을 여러줄에 걸쳐서 설명하면 이해도가 떨어짐
 - 프롬프트 설명은 ```## 개별파일 상세설명``` 탭에 작성
 ## 개별파일 상세설명
+- 파일 설명은 파일 이름 순서대로 작성
+### data_php_*.md
+- ukp_function.md 파일 업로드
 ### db_dump_arr.md
 - DBeaver 에서 show tables 결과 csv로 다운로드 후 메모장으로 열어서 복사 붙여넣기
+### ukp_function.md
+- 주석내용이 포맷과 다른경우 원본주석 수정
+- 주석 내용에서 require, version 제거
+- ``` $ukp->{함수명}({매개변수}); ```
+### ukp_select_sql.md
+- ddl json 파일 업로드 후 프롬프트 입력
+- cnt 쿼리는 select 부분 ``` count(*) as `cnt` ``` 으로 변경 후 order by 삭제
 ### ukp_table_ddl.md
 - ddl 생성 시 아래 사항 순차적으로 확인.
   - 탭 입력하여 줄맞춤.
@@ -37,6 +47,5 @@
 - ddl 생성 후 아래사항 순차적으로 확인.
   - 누락된 테이블 있는지 확인.
   - 테이블 별칭 설정.
-### ukp_select_sql.md
-- ddl json 파일 업로드 후 프롬프트 입력
-- cnt 쿼리는 select 부분 ``` count(*) as `cnt` ``` 으로 변경 후 order by 삭제
+### view_php_*.md
+- ukp_function.md 파일 업로드
