@@ -3,15 +3,15 @@
 1. ```.gitignore``` 파일과 ```_ukp``` 폴더를 복사 후 개발할 프로젝트에 붙여넣기.
 2. ```.gitignore``` 파일 내 폴더 경로를 개발할 프로젝트에 맞게 변경.
 3. 추가로 사용할 함수를 개발할 프로젝트의 ```class.ukp.php``` 파일 내에 추가하여 사용.
-4. ```prompt``` 폴더 내용을 참고해서 개발할 프로젝트의 ```prompt``` 폴더에 프롬프트 추가.
+4. ```_ukp/prompt``` 폴더 내용을 참고해서 개발할 프로젝트의 ```prompt``` 폴더에 프롬프트 추가.
 ### 신규 웹개발 하는경우
 1. ```www/website``` 폴더 내 파일 복사 후 개발할 프로젝트의 웹 접근 가능한 폴더에 붙여넣기.
-2. ```cli``` 폴더 추가
+2. ```cli``` 폴더에 웹접근 불가 php 파일 추가.
 ## 규칙
 - 프롬프트 파일은 .md 확장자로 작성
 ## 폴더구조 설명
 - ```cli``` 파일들은 cli 환경에서 실행되고 웹접근이 불가능.
-- ```prompt``` 파일들은 프롬프트 가이드.
+- ```prompt``` 파일들은 사용할 프롬프트 파일.
 - ```_css``` 와 ```_js``` 파일들은 ```_view``` 파일들에서 사용.
 - ```asset``` 은 정적파일용 폴더, ```upload``` 은 동적파일용 폴더.
 - ```_view``` 파일들은 뷰를 위해 사용.
@@ -28,12 +28,12 @@
 - 프롬프트 설명은 ```## 개별파일 상세설명``` 탭에 작성
 ## 개별파일 상세설명
 - 파일 설명은 파일 이름 순서대로 작성
-### data_php_*.md
-- ukp_function.md 파일 업로드
-### db_select_query.md
+### db_select_cnt_query.md, db_select_list_query.md
 - 사용하려는 테이블 쿼리 추가해서 사용
 ### dump_db_arr.md
 - DBeaver 에서 show tables 결과 csv로 다운로드 후 메모장으로 열어서 복사 붙여넣기
+### php_*.md
+- ukp_function.md, db_select_cnt_query.md, db_select_list_query.md 파일 업로드
 ### ukp_function.md
 - 주석내용이 포맷과 다른경우 원본주석 수정
 - 주석 내용에서 require, version 제거
@@ -49,5 +49,3 @@
 - ddl 생성 후 아래사항 순차적으로 확인.
   - 누락된 테이블 있는지 확인.
   - 테이블 별칭 설정.
-### view_php_*.md
-- ukp_function.md 파일 업로드
