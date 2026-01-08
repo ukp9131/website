@@ -30,12 +30,14 @@
 - 파일 설명은 파일 이름 순서대로 작성
 ### data_php_*.md
 - ukp_function.md 파일 업로드
-### db_dump_arr.md
+### db_select_query.md
+- 사용하려는 테이블 쿼리 추가해서 사용
+### dump_db_arr.md
 - DBeaver 에서 show tables 결과 csv로 다운로드 후 메모장으로 열어서 복사 붙여넣기
 ### ukp_function.md
 - 주석내용이 포맷과 다른경우 원본주석 수정
 - 주석 내용에서 require, version 제거
-- ``` $ukp->{함수명}({매개변수}); ```
+- 함수 형식: ``` $ukp->{함수명}({매개변수}); ```
 ### ukp_select_sql.md
 - ddl json 파일 업로드 후 프롬프트 입력
 - cnt 쿼리는 select 부분 ``` count(*) as `cnt` ``` 으로 변경 후 order by 삭제
