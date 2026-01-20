@@ -8,7 +8,7 @@
  * - [cors_bool=false]:bool   cors 허용여부
  * 
  * require  2026.01.02 config.php
- * @version 2026.01.08
+ * @version 2026.01.20
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -2241,7 +2241,7 @@ class Ukp {
      * - delete_flag 설정 안한경우 delete_flag_bool 무시함
      * 
      * require  2026.01.02 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
-     * @version 2026.01.02
+     * @version 2026.01.20
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션  
@@ -2268,11 +2268,11 @@ class Ukp {
             exit;
         }
         //쿼리문 가져오기
-        $option = array(
+        $sql_option = array(
             "prefix" => $prefix,
             "cnt_bool" => true
         );
-        $result = $this->db_select_sql($table, $option, $database);
+        $result = $this->db_select_sql($table, $sql_option, $database);
         if ($result == "") {
             trigger_error("{$database} 데이터베이스의 {$table} 테이블 cnt 쿼리가 없습니다.");
             exit;
@@ -2313,7 +2313,7 @@ class Ukp {
      * - delete_flag 설정 안한경우 delete_flag_bool 무시함
      * 
      * require  2026.01.02 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
-     * @version 2026.01.02
+     * @version 2026.01.20
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
@@ -2348,11 +2348,11 @@ class Ukp {
             exit;
         }
         //쿼리문 가져오기
-        $option = array(
+        $sql_option = array(
             "prefix" => $prefix,
             "cnt_bool" => false
         );
-        $result = $this->db_select_sql($table, $option, $database);
+        $result = $this->db_select_sql($table, $sql_option, $database);
         if ($result == "") {
             trigger_error("{$database} 데이터베이스의 {$table} 테이블 리스트 쿼리가 없습니다.");
             exit;
