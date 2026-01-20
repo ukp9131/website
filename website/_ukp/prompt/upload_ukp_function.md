@@ -3,6 +3,7 @@
 /**
  * - 입력받은 where 배열에 맞는 sql where 쿼리문 생성
  * - 테이블명, 필드명, 연산자는 소문자로 강제 변경
+ * - 필드명에 백틱(`) 입력하지 않아도 자동입력됨, where 배열 설명에는 백틱 생략되어있음
  * - where 배열 설명
  * - 기본적으로 배열 키는 컬럼명, 값은 컬럼값으로 구성된다
  * + `array("tb_name.foo" => "bar")` -> where: `tb_name.foo = ?`, binding: `array("bar")`

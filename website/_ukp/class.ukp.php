@@ -1684,17 +1684,36 @@ class Ukp {
     }
 
     /**
-     * - where문 생성
-     * - 테이블명, 필드명, 연산자 소문자로 강제 변경
-     * - 연산자 없는경우 값이 배열인경우 in 쿼리, 아닌경우 일반 쿼리
-     * - 연산자 is인경우
-     * - 값이 null 또는 not null인경우 연산자 is
-     * - 값이 null 또는 not null이 아닌경우 is 뒤에 연산자 입력(입력 안하면 =) ex) is >, is <, is >=, is <=, is <>, is =
-     * - 연산자 in, not in인경우 값이 배열, 빈배열인경우 null 포함
-     * - 연산자 like, not like, is like, is not like 사용 가능
-     * - 연산자 between, is between은 연산자 필수, 0번째 배열이 시작, 1번째 배열이 끝
-     * - 백틱(\`) 생략해도 자동으로 입력
-     * - 배열 키가 숫자인경우 값배열은 서브쿼리, 키가 같은 조건문 여러개 사용시 값배열 길이가 1인 배열로 처리
+     * - 입력받은 where 배열에 맞는 sql where 쿼리문 생성
+     * - 테이블명, 필드명, 연산자는 소문자로 강제 변경
+     * - 필드명에 백틱(`) 입력하지 않아도 자동입력됨, where 배열 설명에는 백틱 생략되어있음
+     * - where 배열 설명
+     * - 기본적으로 배열 키는 컬럼명, 값은 컬럼값으로 구성된다
+     * + `array("tb_name.foo" => "bar")` -> where: `tb_name.foo = ?`, binding: `array("bar")`
+     * - 배열 키가 여러개인 경우 `$or_bool` 값에 따라 조건문이 이어진다
+     * + `array("tb_name.foo" => "bar", "hello" => "world")`
+     * + `$or_bool=true` -> where: `tb_name.foo = ? or hello = ?`, binding: `array("bar", "world")`
+     * + `$or_bool=false` -> where: `tb_name.foo = ? and hello = ?`, binding: `array("bar", "world")`
+     * - 연산자는 컬럼명 다음에 공백 한칸 추가 후 작성 가능하며 생략시 `=` 으로 처리된다
+     * + `array("foo >" => "10")` -> where: `foo > ?`, binding: `array("10")`
+     * - 연산자가 between 인경우 값에오는 배열값이 순서대로 입력된다
+     * + `array("foo between" => array("1", "10"))` -> where: `foo between ? and ?`, binding: `array("1", "10")`
+     * - 연산자가 in 이면서 값이 배열인경우 배열값이 순서대로 입력된다
+     * + `array("foo in" => array("1", "10"))` -> where: `foo in(?, ?)`, binding: `array("1", "10")`
+     * - 연산자가 is 이면서 값이 null 또는 not null인경우 아래와 같이 생성된다
+     * + `array("foo is" => "null", "hello is" => "not null")` -> where: `foo is null and hello is not null`, binding: `array()`
+     * - 연산자가 is 이면서 값이 null 또는 not null이 아닌경우 값이 escape 처리되지 않고 그대로 입력된다
+     * - 사용할 연산자는 is 다음에 공백 한칸 추가 후 작성 가능하며 생략시 `=` 으로 처리된다
+     * + `array("foo is" => "now()", "hello is <" => "abs('10')")` => where: `foo = now() and hello < abs('10')`, binding: `array()`
+     * - 배열 키가 중복되는 조건문은 아래와 같이 설정할 수 있다
+     * + `array(array("foo >" => "1"), array("foo <" => "10"))` -> where: `foo > ? and foo < ?`, binding: `array("1", "10")`
+     * - 서브쿼리가 존재하는 경우 다음과같이 처리된다
+     * + `array(array("id" => "foo@bar.com", "email" => "foo@bar.com"), "pw" => "1234")`
+     * + `$or_bool=true` -> where: `(id = ? and email = ?) or pw = ?`, binding: `array("foo@bar.com", "foo@bar.com", "1234")`
+     * + `$or_bool=false` -> where: `(id = ? or email = ?) and pw = ?`, binding: `array("foo@bar.com", "foo@bar.com", "1234")`
+     * - dot_bool 은 모든 키에 점이 포함된 경우에만 true로 반환되고 테이블명 또는 alias를 모두 입력하였는지 검증용으로 사용된다
+     * + `array("tb.foo" => "bar", "mb.hello" => "world")` -> true
+     * + `array("tb.foo" => "bar", "hello" => "world")` -> false
      * 
      * require  2025.03.06 db_create_where
      * @version 2025.03.06
@@ -1794,7 +1813,7 @@ class Ukp {
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - `array  [where=array()]`    삭제 조건문, db_create_where 사용
+     * - `array  [where=array()]`    삭제 조건문, 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`    true: where or문, false: where and문
      * - `bool   [force_bool=false]` true: 삭제, false(기본값): delete_flag 변경, delete_flag 없는경우 force_bool true로 변경
      * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
@@ -1936,7 +1955,7 @@ class Ukp {
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [row=array()]`      입력할 row, db_create_row 사용
-     * - `array  [where=array()]`    중복 조건문, db_create_where 사용
+     * - `array  [where=array()]`    중복 조건문, 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`    true: 중복체크 where or문, false: 중복체크 where and문
      * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
      * - `array  [insert_date=null]` 입력일, 세팅 안한경우 설정값
@@ -3071,10 +3090,10 @@ class Ukp {
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [row=array()]`       수정할 row, db_create_row 사용
-     * - `array  [where=array()]`     수정 조건문(중복체크 하는경우 기본키 필수), db_create_where 사용
+     * - `array  [where=array()]`     수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`     true: where or문, false: where and문
      * - `string [primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
-     * - `array  [add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), db_create_where 사용
+     * - `array  [add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), 키는 컬럼명, 값은 컬럼값
      * - `bool   [add_or_bool=false]` true: 중복체크 where or문, false: 중복체크 where and문
      * - `string [prefix=null]`       테이블 접두어, 세팅 안한경우 설정값
      * - `array  [update_date=null]`  수정일, 세팅 안한경우 설정값
