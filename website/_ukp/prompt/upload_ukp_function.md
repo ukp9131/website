@@ -1,4 +1,5 @@
 # ukp 함수 리스트
+## db_create_where
 ```php
 /**
  * - 입력받은 where 배열에 맞는 sql where 쿼리문 생성
@@ -39,6 +40,9 @@
  * - `bool   [dot_bool=true]`   true 인경우 모든 키에 점 포함
  */
 $ukp->db_create_where($where_arr = array(), $or_bool = false);
+```
+## db_delete
+```php
 /**
  * - 테이블 삭제(1개)
  * - delete_flag 변경시 update_dt도 갱신
@@ -57,6 +61,9 @@ $ukp->db_create_where($where_arr = array(), $or_bool = false);
  * @return int              affected_rows(수정 안된경우 0)
  */
 $ukp->db_delete($table, $option = array(), $database = "default");
+```
+## db_insert
+```php
 /**
  * - 테이블 인서트(1개)
  * @param  string $table    테이블명
@@ -75,6 +82,9 @@ $ukp->db_delete($table, $option = array(), $database = "default");
  * @return int              insert_id(입력 안된경우 0)
  */
 $ukp->db_insert($table, $option = array(), $database = "default");
+```
+## db_select_cnt
+```php
 /**
  * - cnt 쿼리 결과
  * - db/cnt 폴더 내 {$database}/{$table}.sql 파일 sql 사용
@@ -91,6 +101,9 @@ $ukp->db_insert($table, $option = array(), $database = "default");
  * @return array            쿼리결과 배열, 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열
  */
 $ukp->db_select_cnt($table, $option = array(), $database = "default");
+```
+## db_select_list
+```php
 /**
  * - list 쿼리 결과
  * - db/list 폴더 내 {$database}/{$table}.sql 파일 sql 사용
@@ -113,6 +126,9 @@ $ukp->db_select_cnt($table, $option = array(), $database = "default");
  * - info_bool 값이 false 인경우 1차원 배열 리스트(2차원 배열)를 반환
  */
 $ukp->db_select_list($table, $option = array(), $database = "default");
+```
+## db_update
+```php
 /**
  * - 테이블 업데이트(1개)
  * - add_where 설정 안한경우 중복체크 안함
@@ -132,30 +148,45 @@ $ukp->db_select_list($table, $option = array(), $database = "default");
  * @return int              affected_rows(수정 안된경우 0)
  */
 $ukp->db_update($table, $option = array(), $database = "default");
+```
+## decode_json
+```php
 /**
  * - JSON 디코딩
  * @param  string $json JSON형태의 문자열
  * @return array        배열
  */
 $ukp->decode_json($json);
+```
+## encode_json
+```php
 /**
  * - JSON 인코딩
  * @param  array  $arr 배열
  * @return string      JSON형태의 문자열
  */
 $ukp->encode_json($arr);
+```
+## session_set
+```php
 /**
  * - 세션 값 저장
  * @param string $key   키
  * @param string $value 값
  */
 $ukp->session_set($key, $value);
+```
+## session_unset
+```php
 /**
  * - 세션 값 제거
  * - `$key` 값이 null 인경우 전체 제거
  * @param string $key
  */
 $ukp->session_unset($key = null);
+```
+## common_mysql_password
+```php
 /**
  * - mysql password 함수
  * @param  string $pw  비밀번호
