@@ -13,7 +13,7 @@
  * @author  ukp
  */
 class Ukp {
-
+// #region @ukp 필수설정
     /**
      * 서버 케릭터셋  
      *   
@@ -21,7 +21,6 @@ class Ukp {
      * @var     string
      */
     private $charset;
-
     /**
      * 서버 타임존  
      *   
@@ -29,7 +28,8 @@ class Ukp {
      * @var     string
      */
     private $time_zone;
-
+// #endregion
+// #region @ukp db
     /**
      * mysqli 접속정보  
      *   
@@ -61,7 +61,8 @@ class Ukp {
      * @var     string
      */
     private $db_last_query;
-
+// #endregion
+// #region @ukp input
     /**
      * 파일 업로드 상태값  
      *   
@@ -80,7 +81,8 @@ class Ukp {
      * @var     array
      */
     private $input_upload_info;
-
+// #endregion
+// #region @ukp common
     /**
      * api url  
      *   
@@ -408,7 +410,8 @@ class Ukp {
      * @var     string
      */
     private $common_shop_tmon_secret_key;
-
+// #endregion
+// #region @ukp custom
     /**
      * asn1 integer  
      *   
@@ -601,7 +604,8 @@ class Ukp {
      * @var     array
      */
     private $custom_shop_product_url;
-
+// #endregion
+// #region @ukp 필수함수
     /**
      * 생성자  
      *   
@@ -805,7 +809,8 @@ class Ukp {
      */
     function __destruct() {
     }
-
+// #endregion
+// #region @ukp custom
     /**
      * 커스텀 xml요소 추가(encode_xml에서 사용)  
      *   
@@ -1041,7 +1046,8 @@ class Ukp {
         }
         $this->custom_request = $request;
     }
-
+// #endregion
+// #region @ukp array
     /**
      * 배열 추가  
      *   
@@ -1223,7 +1229,8 @@ class Ukp {
             return "";
         }
     }
-
+// #endregion
+// #region @ukp convert
     /**
      * base32 to hex  
      *   
@@ -1341,7 +1348,8 @@ class Ukp {
     function convert_nl_space($text) {
         return str_replace(array("&nbsp;", "\r\n", "\r", "\n"), " ", $text);
     }
-
+// #endregion
+// #region @ukp cookie
     /**
      * 쿠키 값 불러오기  
      *   
@@ -1395,7 +1403,8 @@ class Ukp {
             unset($_COOKIE[$k]);
         }
     }
-
+// #endregion
+// #region @ukp db
     /**
      * - 쿼리문에 테이블 접두어 추가
      * - select, insert, update, delete 쿼리문만 가능
@@ -3160,7 +3169,8 @@ class Ukp {
         $this->db_query($sql, $binding, $database);
         return $this->db_affected_rows;
     }
-
+// #endregion
+// #region @ukp decode
     /**
      * 11st xml decode  
      *   
@@ -3352,7 +3362,8 @@ class Ukp {
         );
         return $arr;
     }
-
+// #endregion
+// #region @ukp decrypt
     /**
      * AES-128/CBC,ECB 복호화  
      * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
@@ -3449,7 +3460,8 @@ class Ukp {
     function decrypt_tmon($text, $secret_key) {
         return $this->decrypt_aes128($text, $secret_key);
     }
-
+// #endregion
+// #region @ukp encode
     /**
      * base32 encode by Bryan Ruiz  
      *   
@@ -3603,7 +3615,8 @@ class Ukp {
         $this->custom_add_xml_element($xml, $arr[$root]);
         return $xml->asXML();
     }
-
+// #endregion
+// #region @ukp encrypt
     /**
      * AES-128/CBC,ECB 암호화  
      * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
@@ -3707,7 +3720,8 @@ class Ukp {
     function encrypt_tmon($text, $secret_key) {
         return $this->encrypt_aes128($text, $secret_key);
     }
-
+// #endregion
+// #region @ukp input
     /**
      * 현재 실행중인 php파일  
      *   
@@ -4087,7 +4101,8 @@ class Ukp {
         }
         return isset($_SERVER[$key]) ? $_SERVER[$key] : "";
     }
-
+// #endregion
+// #region @ukp is
     /**
      * 봇 여부  
      *   
@@ -4144,7 +4159,8 @@ class Ukp {
             return false;
         }
     }
-
+// #endregion
+// #region @ukp log
     /**
      * - 로그저장
      * - require 없어야함
@@ -4171,7 +4187,8 @@ class Ukp {
         fwrite($file, "{$dt} --> {$message}\n");
         fclose($file);
     }
-
+// #endregion
+// #region @ukp session
     /**
      * - 세션 값 불러오기
      * - `$key` 값이 null 인경우 세션 전체값 배열 반환
@@ -4237,7 +4254,8 @@ class Ukp {
             unset($_SESSION[$key]);
         }
     }
-
+// #endregion
+// #region @ukp str
     /**
      * 문자열 공백추가후 반환  
      *   
@@ -4332,7 +4350,8 @@ class Ukp {
         $simplified = implode('/', $stack);
         return ($absolute_bool ? '/' : '') . $simplified . $end_slash;
     }
-
+// #endregion
+// #region @ukp unique
     /**
      * - 시간, PID, 순차 번호를 조합하여 시스템 전체에서 고유한 식별자를 생성.
      * - 생성 포맷: [년월일시분(12)][마이크로초(6)][PID(7, 0-padding)][증가값(1~)]
@@ -4364,7 +4383,8 @@ class Ukp {
         $str .= $temp_bool ? md5("{$id}_{$pw}_{$this->unique_id()}") : md5("{$id}_{$pw}");
         return $str;
     }
-
+// #endregion
+// #region @ukp user
     /**
      * 사용자 정보 문자열 설정 및 반환  
      * 로그에도 사용자 정보 문자열 출력됨  
@@ -4381,4 +4401,5 @@ class Ukp {
         }
         return $this->custom_user_info;
     }
+// #endregion
 }
