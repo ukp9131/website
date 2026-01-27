@@ -8,7 +8,7 @@
  * - [cors_bool=false]:bool   cors 허용여부
  * 
  * require  2026.01.02 config.php
- * @version 2026.01.20
+ * @version 2026.01.27
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -1709,6 +1709,8 @@ class Ukp {
      * + `array("foo between" => array("1", "10"))` -> where: `foo between ? and ?`, binding: `array("1", "10")`
      * - 연산자가 in 이면서 값이 배열인경우 배열값이 순서대로 입력된다
      * + `array("foo in" => array("1", "10"))` -> where: `foo in(?, ?)`, binding: `array("1", "10")`
+     * - 연산자가 in 이면서 값이 문자열인경우 값이 in 쿼리에 그대로 들어간다
+     * + `array("foo in" => "select idx from tb")` -> where: `foo in(select idx from tb)`, binding: `array()`
      * - 연산자가 is 이면서 값이 null 또는 not null인경우 아래와 같이 생성된다
      * + `array("foo is" => "null", "hello is" => "not null")` -> where: `foo is null and hello is not null`, binding: `array()`
      * - 연산자가 is 이면서 값이 null 또는 not null이 아닌경우 값이 escape 처리되지 않고 그대로 입력된다
@@ -1724,8 +1726,8 @@ class Ukp {
      * + `array("tb.foo" => "bar", "mb.hello" => "world")` -> true
      * + `array("tb.foo" => "bar", "hello" => "world")` -> false
      * 
-     * require  2025.03.06 db_create_where
-     * @version 2025.03.06
+     * require  2026.01.27 db_create_where
+     * @version 2026.01.27
      * 
      * @param  array  $where_arr where 배열
      * @param  bool   $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
@@ -1772,7 +1774,7 @@ class Ukp {
                     $return_arr["where"] .= "{$field} between {$v[0]} and {$v[1]}";
                 }
             }
-            //in쿼리
+            //in 쿼리(배열)
             else if (is_array($v)) {
                 if (!in_array($operator, array("in", "not in"))) {
                     $operator = "in";
@@ -1783,6 +1785,10 @@ class Ukp {
                     $return_arr["binding"][] = $temp;
                 }
                 $return_arr["where"] .= ")";
+            }
+            //in 쿼리(문자열)
+            else if (in_array($operator, array("in", "not in"))) {
+                $return_arr["where"] .= "{$field} {$operator}({$v})";
             }
             //is 쿼리
             else if (substr($operator, 0, 2) == "is") {
@@ -2249,8 +2255,8 @@ class Ukp {
      * - db/cnt 폴더 내 {$database}/{$table}.sql 파일 sql 사용
      * - delete_flag 설정 안한경우 delete_flag_bool 무시함
      * 
-     * require  2026.01.02 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
-     * @version 2026.01.20
+     * require  2026.01.27 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
+     * @version 2026.01.27
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션  
@@ -2308,7 +2314,7 @@ class Ukp {
         }
         //최종 쿼리문 생성
         if ($where != "") {
-            $sql .= " where {$where}";
+            $sql .= "\nwhere\n    {$where}";
         }
         //바인딩
         $binding = $where_info["binding"];
@@ -2321,18 +2327,19 @@ class Ukp {
      * - db/list 폴더 내 {$database}/{$table}.sql 파일 sql 사용
      * - delete_flag 설정 안한경우 delete_flag_bool 무시함
      * 
-     * require  2026.01.02 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
-     * @version 2026.01.20
+     * require  2026.01.27 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
+     * @version 2026.01.27
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`         true: where or문, false: where and문
      * - `array  [order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
+     * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
      * - `int    [limit]`                 표시갯수
      * - `int    [start]`                 표시 시작점, limit 있는경우에만
-     * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
      * - `bool   [info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
+     * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
      * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
      * - `string [prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
      * - `string [delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
@@ -2345,6 +2352,7 @@ class Ukp {
         $where_arr = isset($option["where"]) ? $option["where"] : array();
         $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
         $order_by_arr = isset($option["order_by"]) ? $option["order_by"] : array();
+        $select_arr = isset($option["select"]) ? $option["select"] : array();
         $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
         $info_bool = isset($option["info_bool"]) ? $option["info_bool"] : false;
         $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
@@ -2359,7 +2367,9 @@ class Ukp {
         //쿼리문 가져오기
         $sql_option = array(
             "prefix" => $prefix,
-            "cnt_bool" => false
+            "cnt_bool" => false,
+            "select" => $select_arr,
+            "order_by" => $order_by_arr
         );
         $result = $this->db_select_sql($table, $sql_option, $database);
         if ($result == "") {
@@ -2387,21 +2397,17 @@ class Ukp {
             //삭제여부 쿼리 유무에 따라 변경
             $where .= $where == "" ? $where_info["where"] : " and ({$where_info["where"]})";
         }
-        //order by 있는경우
-        if (is_array($order_by_arr) && count($order_by_arr) > 0) {
-            $order_by = implode(", ", $order_by_arr);
-        }
         //limit 있는경우
         $limit = "";
         if (isset($option["limit"])) {
-            $limit .= " limit " . (isset($option["start"]) ? "{$option["start"]}, " : "") . $option["limit"];
+            $limit .= "\nlimit\n    " . (isset($option["start"]) ? "{$option["start"]}, " : "") . $option["limit"];
         }
         //최종 쿼리문 생성
         if ($where != "") {
-            $sql .= " where {$where}";
+            $sql .= "\nwhere\n    {$where}";
         }
         if ($order_by != "") {
-            $sql .= " order by {$order_by}";
+            $sql .= "\norder by\n    {$order_by}";
         }
         if ($limit != "") {
             $sql .= $limit;
@@ -2417,16 +2423,20 @@ class Ukp {
      * - db/list 폴더와 db/cnt 폴더 내 {$database}/{$table}.sql 파일 설정필요
      * 
      * require  2026.01.02 db_add_prefix db_add_table_info
-     * @version 2026.01.02
+     * @version 2026.01.27
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - `bool   [cnt_bool=false]` true: cnt sql, false: list sql
-     * - `string [prefix=null]`    테이블 접두어, 세팅 안한경우 설정값
+     * - `bool   [cnt_bool=false]`   true: cnt sql, false: list sql
+     * - `array  [order_by=array()]` 정렬 배열(기본정렬인경우 빈배열), list 쿼리 한정
+     * - `array  [select=array()]`   select 컬럼 리스트(기본컬럼인경우 빈배열), list 쿼리 한정
+     * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
      * @param  string $database 사용 데이터베이스
      * @return string           sql 문자열, 실패시 빈문자열
      */
     function db_select_sql($table, $option = array(), $database = "default") {
+        $order_by_arr = isset($option["order_by"]) ? $option["order_by"] : array();
+        $select_arr = isset($option["select"]) ? $option["select"] : array();
         $cnt_bool = isset($option["cnt_bool"]) ? $option["cnt_bool"] : false;
         if (isset($option["prefix"])) {
             $prefix = $option["prefix"];
@@ -2440,6 +2450,20 @@ class Ukp {
             return "";
         }
         $sql = $this->db_add_prefix(file_get_contents($file), $prefix);
+        //cnt 쿼리인경우 바로 리턴
+        if ($cnt_bool) {
+            return $sql;
+        }
+        //select 있는경우
+        if (is_array($select_arr) && count($select_arr) > 0) {
+            $select = "select\n    " . implode(",\n    ", $select_arr) . "\nfrom";
+            $sql = preg_replace("/select\s([\S\s]*?)\sfrom/i", $select, $sql);
+        }
+        //order by 있는경우
+        if (is_array($order_by_arr) && count($order_by_arr) > 0) {
+            $order_by = "order by\n    " . implode(",\n    ", $order_by_arr);
+            $sql = preg_replace("/ORDER BY([\S\s]*)/i", $order_by, $sql);
+        }
         return $sql;
     }
 
