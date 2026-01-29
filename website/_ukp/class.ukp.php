@@ -2,13 +2,13 @@
 
 /**
  * - Ukp 라이브러리
- * - $option                  옵션설정
- * - [api_bool=false]:bool    true: json, false: html
- * - [session_bool=true]:bool 세션사용여부
- * - [cors_bool=false]:bool   cors 허용여부
+ * - $option 옵션설정
+ * - `bool [api_bool=false]`    true: json, false: html
+ * - `bool [session_bool=true]` 세션사용여부
+ * - `bool [cors_bool=false]`   cors 허용여부
  * 
  * require  2026.01.02 config.php
- * @version 2026.01.27
+ * @version 2026.01.29
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -609,13 +609,13 @@ class Ukp {
     /**
      * 생성자  
      *   
-     * require  2025.10.24 custom_error_handler custom_error_handler_fatal custom_parking session_start_check
+     * require  2025.10.24 custom_error_handler custom_error_handler_fatal custom_parking session_start
      * @version 2025.10.24
      * 
-     * @param array $option        옵션설정  
-     *              [api_bool]     true - json, false - html(기본값: false)  
-     *              [session_bool] 세션사용여부(기본값: true)  
-     *              [cors_bool]    cors 허용여부(기본값: false)
+     * @param array $option 옵션설정  
+     * `bool [api_bool]`     true - json, false - html(기본값: false)  
+     * `bool [session_bool]` 세션사용여부(기본값: true)  
+     * `bool [cors_bool]`    cors 허용여부(기본값: false)
      */
     function __construct($option = array()) {
         //에러핸들러 설정 전에 발생하는 에러 무시
@@ -696,13 +696,15 @@ class Ukp {
         //mysql report
         mysqli_report(MYSQLI_REPORT_OFF);
         //session_start
-        if ($session_bool && !$this->session_start_check()) {
+        if ($session_bool) {
+            $session_time = 0;
+            $session_dir = null;
             //세션시간 설정한경우
             if ($config["session_limit_time"] > 0) {
-                ini_set("session.save_path", dirname(__FILE__) . "/temp");
-                ini_set("session.gc_maxlifetime", $config["session_limit_time"]);
+                $session_time = $config["session_limit_time"];
+                $session_dir = dirname(__FILE__) . "/temp"; 
             }
-            session_start();
+            $this->session_start($session_time, $session_dir);
         }
         //파일업로드 코드 설정
         $this->input_upload_info = array(
@@ -1650,23 +1652,25 @@ class Ukp {
      * - set, into, values 컬럼 생성
      * - escape인경우 키가 is
      * 
-     * require  2025.11.21
-     * @version 2025.11.21
+     * require  2026.01.29
+     * @version 2026.01.29
      * 
-     * @param  array  $row_arr  row 배열(escape인경우 키가 is)
-     * @return array            row 정보
+     * @param  array $row_arr row 배열(escape인경우 키가 is)
+     * @param  int   $depth   들여쓰기 깊이
+     * @return array          row 정보
      * - `string [set]`     추가 set문
      * - `string [into]`    추가 into문
      * - `string [values]`  추가 values문
      * - `array  [binding]` 추가 binding문
      */
-    function db_create_row($row_arr = array()) {
+    function db_create_row($row_arr = array(), $depth = 1) {
         $return_arr = array(
             "set" => "",
             "into" => "",
             "values" => "",
             "binding" => array()
         );
+        $padding = str_repeat(" ", $depth * 4);
         //row 정보 설정
         $arr = array(
             "set" => array(),
@@ -1687,7 +1691,7 @@ class Ukp {
         }
         $list = array("set", "into", "values");
         foreach ($list as $temp) {
-            $return_arr[$temp] = implode(", ", $arr[$temp]);
+            $return_arr[$temp] .= implode(",\n{$padding}", $arr[$temp]);
         }
         return $return_arr;
     }
@@ -1726,34 +1730,37 @@ class Ukp {
      * + `array("tb.foo" => "bar", "mb.hello" => "world")` -> true
      * + `array("tb.foo" => "bar", "hello" => "world")` -> false
      * 
-     * require  2026.01.27 db_create_where
-     * @version 2026.01.27
+     * require  2026.01.29 db_create_where
+     * @version 2026.01.29
      * 
-     * @param  array  $where_arr where 배열
-     * @param  bool   $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
-     * @return array             where 정보
+     * @param  array $where_arr where 배열
+     * @param  bool  $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
+     * @param  int   $depth     들여쓰기 깊이
+     * @return array            where 정보
      * - `string [where=""]`        where 쿼리
      * - `array  [binding=array()]` binding 배열
      * - `bool   [dot_bool=true]`   true 인경우 모든 키에 점 포함
      */
-    function db_create_where($where_arr = array(), $or_bool = false) {
+    function db_create_where($where_arr = array(), $or_bool = false, $depth = 1) {
         $return_arr = array(
             "where" => "",
             "binding" => array(),
             "dot_bool" => true
         );
+        $padding = str_repeat(" ", $depth * 4);
         foreach ($where_arr as $k => $v) {
             if ($return_arr["where"] != "") {
-                $return_arr["where"] .= $or_bool ? " or " : " and ";
+                $return_arr["where"] .= $or_bool ? " or" : " and";
+                $return_arr["where"] .= "\n{$padding}";
             }
             //키가 숫자인경우
             if ($k == strval(intval($k))) {
-                $return_arr["where"] .= count($v) > 1 ? "(" : "";
-                $temp = $this->db_create_where($v, !$or_bool);
+                $return_arr["where"] .= count($v) > 1 ? "(\n{$padding}    " : "";
+                $temp = $this->db_create_where($v, !$or_bool, $depth + 1);
                 $return_arr["where"] .= $temp["where"];
                 $return_arr["binding"] = array_merge($return_arr["binding"], $temp["binding"]);
                 $return_arr["dot_bool"] = $temp["dot_bool"] == false ? false : $return_arr["dot_bool"];
-                $return_arr["where"] .= count($v) > 1 ? ")" : "";
+                $return_arr["where"] .= count($v) > 1 ? "\n{$padding})" : "";
                 continue;
             }
             $k = trim(preg_replace("/\s+/", " ", str_replace("`", "", strtolower($k))));
@@ -1779,16 +1786,16 @@ class Ukp {
                 if (!in_array($operator, array("in", "not in"))) {
                     $operator = "in";
                 }
-                $return_arr["where"] .= "{$field} {$operator}(null";
+                $return_arr["where"] .= "{$field} {$operator} (\n{$padding}    null";
                 foreach ($v as $temp) {
                     $return_arr["where"] .= ", ?";
                     $return_arr["binding"][] = $temp;
                 }
-                $return_arr["where"] .= ")";
+                $return_arr["where"] .= "\n{$padding})";
             }
             //in 쿼리(문자열)
             else if (in_array($operator, array("in", "not in"))) {
-                $return_arr["where"] .= "{$field} {$operator}({$v})";
+                $return_arr["where"] .= "{$field} {$operator} (\n{$v}\n{$padding})";
             }
             //is 쿼리
             else if (substr($operator, 0, 2) == "is") {
@@ -1823,8 +1830,8 @@ class Ukp {
      * - delete_flag 변경시 update_dt도 갱신
      * - where 설정 안한경우 아무것도 삭제 안됨
      * 
-     * require  2026.01.02 db_add_row db_add_table_info db_create_row db_create_where db_query
-     * @version 2026.01.02
+     * require  2026.01.29 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2026.01.29
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
@@ -1856,13 +1863,12 @@ class Ukp {
         if ($where_info["where"] == "") {
             $where_info["where"] = "1 = 0";
         }
+        $sq = "";
         if ($force_bool) {
-            $sql = "
-                delete from
-                    `{$prefix}{$table}`
-                where
-                    {$where_info["where"]}
-            ";
+            $sq .= "delete from\n";
+            $sq .= "    `{$prefix}{$table}`\n";
+            $sq .= "where\n";
+            $sq .= "    {$where_info["where"]}";
             $binding = $where_info["binding"];
         } else {
             $main_row = array($delete_flag => "y");
@@ -1873,17 +1879,16 @@ class Ukp {
             );
             $row_arr = $this->db_add_row($main_row, $option);
             $row_info = $this->db_create_row($row_arr);
-            $sql = "
-                update
-                    `{$prefix}{$table}`
-                set
-                    {$row_info["set"]}
-                where
-                    `{$delete_flag}` = 'n' and
-                    {$where_info["where"]}
-            ";
+            $sq .= "update\n";
+            $sq .= "    `{$prefix}{$table}`\n";
+            $sq .= "set\n";
+            $sq .= "    {$row_info["set"]}\n";
+            $sq .= "where\n";
+            $sq .= "    `{$delete_flag}` = 'n' and\n";
+            $sq .= "    {$where_info["where"]}";
             $binding = array_merge($row_info["binding"], $where_info["binding"]);
         }
+        $sql = $sq;
         $this->db_query($sql, $binding, $database);
         return $this->db_affected_rows;
     }
@@ -1964,8 +1969,8 @@ class Ukp {
     /**
      * - 테이블 인서트(1개)
      * 
-     * require  2026.01.02 db_add_row db_add_table_info db_create_row db_create_where db_query 
-     * @version 2026.01.02
+     * require  2026.01.29 db_add_row db_add_table_info db_create_row db_create_where db_query 
+     * @version 2026.01.29
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
@@ -2001,39 +2006,37 @@ class Ukp {
         );
         $row_arr = $this->db_add_row($main_row, $option);
         $row_info = $this->db_create_row($row_arr);
+        $sq = "";
         //중복체크인경우
         if (count($main_where) > 0) {
-            $where_info = $this->db_create_where($main_where, $or_bool);
-            $sql = "
-                insert into `{$prefix}{$table}` (
-                    {$row_info["into"]}
-                )
-                select
-                    {$row_info["values"]}
-                from
-                    dual
-                where not exists (
-                    select
-                        1
-                    from
-                        `{$prefix}{$table}`
-                    where
-                        {$where_info["where"]}
-                )
-            ";
+            $where_info = $this->db_create_where($main_where, $or_bool, 2);
+            $sq .= "insert into `{$prefix}{$table}` (\n";
+            $sq .= "    {$row_info["into"]}\n";
+            $sq .= ")\n";
+            $sq .= "select\n";
+            $sq .= "    {$row_info["values"]}\n";
+            $sq .= "from\n";
+            $sq .= "    dual\n";
+            $sq .= "where not exists (\n";
+            $sq .= "    select\n";
+            $sq .= "        1\n";
+            $sq .= "    from\n";
+            $sq .= "        `{$prefix}{$table}`\n";
+            $sq .= "    where\n";
+            $sq .= "        {$where_info["where"]}\n";
+            $sq .= ")";
             $binding = array_merge($row_info["binding"], $where_info["binding"]);
         }
         //아닌경우
         else {
-            $sql = "
-                insert into `{$prefix}{$table}` (
-                    {$row_info["into"]}
-                ) values (
-                    {$row_info["values"]}
-                )
-            ";
+            $sq .= "insert into `{$prefix}{$table}` (\n";
+            $sq .= "    {$row_info["into"]}\n";
+            $sq .= ") values (\n";
+            $sq .= "    {$row_info["values"]}\n";
+            $sq .= ")";
             $binding = $row_info["binding"];
         }
+        $sql = $sq;
         $this->db_query($sql, $binding, $database);
         return $this->db_affected_rows > 0 ? $this->db_insert_id : 0;
     }
@@ -2251,12 +2254,13 @@ class Ukp {
     }
 
     /**
-     * - cnt 쿼리 결과
-     * - db/cnt 폴더 내 {$database}/{$table}.sql 파일 sql 사용
-     * - delete_flag 설정 안한경우 delete_flag_bool 무시함
+     * - select 부분을 `count(*) as cnt` 로 변경한 쿼리 결과
+     * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
+     * - sql 파일 없는경우 `select count(*) as cnt from {테이블명}` 쿼리 사용
+     * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
      * 
-     * require  2026.01.27 db_add_table_info db_create_where db_from_table_name db_row_array db_select_sql
-     * @version 2026.01.27
+     * require  2026.01.29 db_row_array db_select_sql
+     * @version 2026.01.29
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션  
@@ -2270,201 +2274,178 @@ class Ukp {
      * @return array            쿼리결과 배열, 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열
      */
     function db_select_cnt($table, $option = array(), $database = "default") {
-        $where_arr = isset($option["where"]) ? $option["where"] : array();
-        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
-        $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
-        $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
-        $result = $this->db_add_table_info($table, $database);
-        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
-        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $result["delete_flag"];
-        $where_info = $this->db_create_where($where_arr, $or_bool);
-        if ($where_table_bool && !$where_info["dot_bool"]) {
-            trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
-            exit;
-        }
-        //쿼리문 가져오기
-        $sql_option = array(
-            "prefix" => $prefix,
-            "cnt_bool" => true
-        );
-        $result = $this->db_select_sql($table, $sql_option, $database);
-        if ($result == "") {
-            trigger_error("{$database} 데이터베이스의 {$table} 테이블 cnt 쿼리가 없습니다.");
-            exit;
-        }
-        //쿼리문 order by 기준으로 나누기
-        $arr = explode("order by", str_ireplace("order by", "order by", $result));
-        $sql = trim($arr[0]);
-        //where문 생성
-        $where = "";
-        //삭제여부 사용 하는경우
-        if ($delete_flag_bool && $delete_flag != "") {
-            //테이블별명 또는 테이블명 추출
-            $short = $this->db_from_table_name($sql);
-            if ($short != "") {
-                $short = "`{$short}`.";
-            }
-            //삭제여부 쿼리 추가
-            $where .= "{$short}`{$delete_flag}` = 'n'";
-        }
-        //where문 있는경우
-        if ($where_info["where"] != "") {
-            //삭제여부 쿼리 유무에 따라 변경
-            $where .= $where == "" ? $where_info["where"] : " and ({$where_info["where"]})";
-        }
-        //최종 쿼리문 생성
-        if ($where != "") {
-            $sql .= "\nwhere\n    {$where}";
-        }
-        //바인딩
-        $binding = $where_info["binding"];
+        $option["select"] = array("count(*) as `cnt`");
+        $option["group_by"] = array();
+        $option["order_by"] = array();
+        unset($option["limit"]);
+        //sql 추출
+        $sql_info = $this->db_select_sql($table, $option, $database);
+        $sql = $sql_info["sql"];
+        $binding = $sql_info["binding"];
+        //쿼리 실행
         $result = $this->db_row_array($sql, $binding, $database);
         return $result;
     }
 
     /**
      * - list 쿼리 결과
-     * - db/list 폴더 내 {$database}/{$table}.sql 파일 sql 사용
-     * - delete_flag 설정 안한경우 delete_flag_bool 무시함
+     * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
+     * - sql 파일 없는경우 `select * from {테이블명}` 쿼리 사용
+     * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
      * 
-     * require  2026.01.27 array_value db_add_table_info db_create_where db_from_table_name db_result_array db_row_array db_select_sql
-     * @version 2026.01.27
+     * require  2026.01.29 db_result_array db_row_array db_select_sql
+     * @version 2026.01.29
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
+     * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
      * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`         true: where or문, false: where and문
-     * - `array  [order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
-     * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
-     * - `int    [limit]`                 표시갯수
-     * - `int    [start]`                 표시 시작점, limit 있는경우에만
-     * - `bool   [info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
      * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
      * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * - `array  [group_by=array()]`      group by, 빈배열인경우 설정안함
+     * - `array  [having=array()]`        having, 빈배열이거나 group by 설정 안되어있는경우 설정안함
+     * - `bool   [having_or_bool=false]`  true: having or문, false: having and문
+     * - `array  [order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
+     * - `int    [limit]`                 표시갯수
+     * - `int    [start]`                 표시 시작점, limit 있는경우에만
      * - `string [prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
      * - `string [delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
+     * - `bool   [info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
      * @param  string $database 사용 데이터베이스
      * @return array            쿼리결과 배열
      * - info_bool 값이 true 인경우 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열 반환
      * - info_bool 값이 false 인경우 1차원 배열 리스트(2차원 배열)를 반환
      */
     function db_select_list($table, $option = array(), $database = "default") {
-        $where_arr = isset($option["where"]) ? $option["where"] : array();
-        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
-        $order_by_arr = isset($option["order_by"]) ? $option["order_by"] : array();
-        $select_arr = isset($option["select"]) ? $option["select"] : array();
-        $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
         $info_bool = isset($option["info_bool"]) ? $option["info_bool"] : false;
-        $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
-        $result = $this->db_add_table_info($table, $database);
-        $prefix = isset($option["prefix"]) ? $option["prefix"] : $result["prefix"];
-        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $result["delete_flag"];
-        $where_info = $this->db_create_where($where_arr, $or_bool);
-        if ($where_table_bool && !$where_info["dot_bool"]) {
-            trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
-            exit;
-        }
-        //쿼리문 가져오기
-        $sql_option = array(
-            "prefix" => $prefix,
-            "cnt_bool" => false,
-            "select" => $select_arr,
-            "order_by" => $order_by_arr
-        );
-        $result = $this->db_select_sql($table, $sql_option, $database);
-        if ($result == "") {
-            trigger_error("{$database} 데이터베이스의 {$table} 테이블 리스트 쿼리가 없습니다.");
-            exit;
-        }
-        //쿼리문 order by 기준으로 나누기
-        $arr = explode("order by", str_ireplace("order by", "order by", $result));
-        $sql = trim($arr[0]);
-        $order_by = trim($this->array_value($arr, 1));
-        //where문 생성
-        $where = "";
-        //삭제여부 사용 하는경우
-        if ($delete_flag_bool && $delete_flag != "") {
-            //테이블별명 또는 테이블명 추출
-            $short = $this->db_from_table_name($sql);
-            if ($short != "") {
-                $short = "`{$short}`.";
-            }
-            //삭제여부 쿼리 추가
-            $where .= "{$short}`{$delete_flag}` = 'n'";
-        }
-        //where문 있는경우
-        if ($where_info["where"] != "") {
-            //삭제여부 쿼리 유무에 따라 변경
-            $where .= $where == "" ? $where_info["where"] : " and ({$where_info["where"]})";
-        }
-        //limit 있는경우
-        $limit = "";
-        if (isset($option["limit"])) {
-            $limit .= "\nlimit\n    " . (isset($option["start"]) ? "{$option["start"]}, " : "") . $option["limit"];
-        }
-        //최종 쿼리문 생성
-        if ($where != "") {
-            $sql .= "\nwhere\n    {$where}";
-        }
-        if ($order_by != "") {
-            $sql .= "\norder by\n    {$order_by}";
-        }
-        if ($limit != "") {
-            $sql .= $limit;
-        }
-        //바인딩
-        $binding = $where_info["binding"];
+        //sql 추출
+        $sql_info = $this->db_select_sql($table, $option, $database);
+        $sql = $sql_info["sql"];
+        $binding = $sql_info["binding"];
+        //쿼리 실행
         $result = $info_bool ? $this->db_row_array($sql, $binding, $database) : $this->db_result_array($sql, $binding, $database);
         return $result;
     }
 
     /**
-     * - 테이블별 select SQL 문자열 반환
-     * - db/list 폴더와 db/cnt 폴더 내 {$database}/{$table}.sql 파일 설정필요
+     * - 테이블별 select SQL 쿼리문 정보 반환
+     * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
+     * - sql 파일 없는경우 `select * from {테이블명}` 쿼리 사용
+     * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
      * 
-     * require  2026.01.02 db_add_prefix db_add_table_info
-     * @version 2026.01.27
+     * require  2026.01.29 db_add_prefix db_add_table_info db_create_where db_from_table_name
+     * @version 2026.01.29
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - `bool   [cnt_bool=false]`   true: cnt sql, false: list sql
-     * - `array  [order_by=array()]` 정렬 배열(기본정렬인경우 빈배열), list 쿼리 한정
-     * - `array  [select=array()]`   select 컬럼 리스트(기본컬럼인경우 빈배열), list 쿼리 한정
-     * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
+     * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
+     * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
+     * - `bool   [or_bool=false]`         true: where or문, false: where and문
+     * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+     * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+     * - `array  [group_by=array()]`      group by, 빈배열인경우 설정안함
+     * - `array  [having=array()]`        having, 빈배열이거나 group by 설정 안되어있는경우 설정안함
+     * - `bool   [having_or_bool=false]`  true: having or문, false: having and문
+     * - `array  [order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
+     * - `int    [limit]`                 표시갯수
+     * - `int    [start]`                 표시 시작점, limit 있는경우에만
+     * - `string [prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
+     * - `string [delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
      * @param  string $database 사용 데이터베이스
-     * @return string           sql 문자열, 실패시 빈문자열
+     * @return array            select SQL 쿼리문 정보
+     * - `string [sql=""]`          sql문
+     * - `array  [binding=array()]` binding 배열
      */
     function db_select_sql($table, $option = array(), $database = "default") {
-        $order_by_arr = isset($option["order_by"]) ? $option["order_by"] : array();
         $select_arr = isset($option["select"]) ? $option["select"] : array();
-        $cnt_bool = isset($option["cnt_bool"]) ? $option["cnt_bool"] : false;
-        if (isset($option["prefix"])) {
-            $prefix = $option["prefix"];
+        $where_arr = isset($option["where"]) ? $option["where"] : array();
+        $or_bool = isset($option["or_bool"]) ? $option["or_bool"] : false;
+        $delete_flag_bool = isset($option["delete_flag_bool"]) ? $option["delete_flag_bool"] : true;
+        $where_table_bool = isset($option["where_table_bool"]) ? $option["where_table_bool"] : true;
+        $group_by_arr = isset($option["group_by"]) ? $option["group_by"] : array();
+        $having_arr = isset($option["having"]) ? $option["having"] : array();
+        $having_or_bool = isset($option["having_or_bool"]) ? $option["having_or_bool"] : false;
+        $order_by_arr = isset($option["order_by"]) ? $option["order_by"] : array();
+        //테이블정보
+        $table_info = $this->db_add_table_info($table, $database);
+        $prefix = isset($option["prefix"]) ? $option["prefix"] : $table_info["prefix"];
+        $delete_flag = isset($option["delete_flag"]) ? $option["delete_flag"] : $table_info["delete_flag"];
+        if ($delete_flag == "") {
+            $delete_flag_bool = false;
+        }
+        //파일 가져오기
+        $file = dirname(__FILE__) . "/db/list/{$database}/{$table}.sql";
+        if (file_exists($file)) {
+            $sql = $this->db_add_prefix(file_get_contents($file), $prefix);
         } else {
-            $result = $this->db_add_table_info($table, $database);
-            $prefix = $result["prefix"];
+            $sq = "";
+            $sq .= "select\n";
+            $sq .= "    *\n";
+            $sq .= "from\n";
+            $sq .= "    `{$prefix}{$table}`";
+            $sql = $sq;
         }
-        $folder = $cnt_bool ? "cnt" : "list";
-        $file = dirname(__FILE__) . "/db/{$folder}/{$database}/{$table}.sql";
-        if (!file_exists($file)) {
-            return "";
-        }
-        $sql = $this->db_add_prefix(file_get_contents($file), $prefix);
-        //cnt 쿼리인경우 바로 리턴
-        if ($cnt_bool) {
-            return $sql;
-        }
-        //select 있는경우
-        if (is_array($select_arr) && count($select_arr) > 0) {
+        //order by 분리
+        $arr = explode("order by", str_ireplace("order by", "order by", $sql));
+        $sql = trim($arr[0]);
+        $order_by = isset($arr[1]) ? trim($arr[1]) : "";
+        $binding = array();
+        //select
+        if (count($select_arr) > 0) {
             $select = "select\n    " . implode(",\n    ", $select_arr) . "\nfrom";
             $sql = preg_replace("/select\s([\S\s]*?)\sfrom/i", $select, $sql);
         }
-        //order by 있는경우
-        if (is_array($order_by_arr) && count($order_by_arr) > 0) {
-            $order_by = "order by\n    " . implode(",\n    ", $order_by_arr);
-            $sql = preg_replace("/ORDER BY([\S\s]*)/i", $order_by, $sql);
+        //where
+        $where_info = $this->db_create_where($where_arr, $or_bool, $delete_flag_bool ? 2 : 1);
+        if ($where_table_bool && !$where_info["dot_bool"]) {
+            trigger_error("where 문에 반드시 테이블명 또는 테이블 축약명을 적어주세요");
+            exit;
         }
-        return $sql;
+        if ($delete_flag_bool) {
+            $short = $this->db_from_table_name($sql);
+            if ($short != "") {
+                $short = "`{$short}`.";
+            }
+            if ($where_info["where"] == "") {
+                $where_info["where"] = "{$short}`{$delete_flag}` = 'n'";
+            } else {
+                $sq = "";
+                $sq .= "{$short}`{$delete_flag}` = 'n' and\n";
+                $sq .= "    (\n";
+                $sq .= "        {$where_info["where"]}\n";
+                $sq .= "    )";
+                $where_info["where"] = $sq;
+            }
+        }
+        if ($where_info["where"] != "") {
+            $sql .= "\nwhere\n    " . $where_info["where"];
+            $binding = array_merge($binding, $where_info["binding"]);
+        }
+        //group by
+        if (count($group_by_arr) > 0) {
+            $sql .= "\ngroup by\n    " . implode("\n    ", $group_by_arr);
+        }
+        //having
+        if (count($group_by_arr) > 0 && count($having_arr) > 0) {
+            $having_info = $this->db_create_where($having_arr, $having_or_bool);
+            $sql .= "\nhaving\n    " . $having_info["where"];
+            $binding = array_merge($binding, $having_info["binding"]);
+        }
+        //order by
+        if (count($order_by_arr) > 0) {
+            $order_by = implode(",\n    ", $order_by_arr);
+        }
+        if ($order_by != "") {
+            $sql .= "\norder by\n    " . $order_by;
+        }
+        if (isset($option["limit"])) {
+            $sql .= "\nlimit\n    " . (isset($option["start"]) ? "{$option["start"]}, " : "") . $option["limit"];
+        }
+        return array(
+            "sql" => $sql,
+            "binding" => $binding
+        );
     }
 
     /**
@@ -3117,8 +3098,8 @@ class Ukp {
      * - 테이블 업데이트(1개)
      * - add_where 설정 안한경우 중복체크 안함
      * 
-     * require  2026.01.02 db_add_row db_add_table_info db_create_row db_create_where db_query
-     * @version 2026.01.02
+     * require  2026.01.29 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2026.01.29
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
@@ -3164,31 +3145,35 @@ class Ukp {
                     break;
                 }
             }
-            $add_where_info = $this->db_create_where($main_add_where, $add_or_bool);
-            $where_info["where"] .= " and (
-                    select
-                        `cnt`
-                    from (
-                        select
-                            count(*) as `cnt`
-                        from
-                            `{$prefix}{$table}`
-                        where
-                            `{$main_primary}` <> ? and
-                            ({$add_where_info["where"]})
-                    ) as `t1`
-                ) = 0
-            ";
+            $add_where_info = $this->db_create_where($main_add_where, $add_or_bool, 5);
+            $sq = "";
+            $sq .= " and\n";
+            $sq .= "    (\n";
+            $sq .= "        select\n";
+            $sq .= "            `cnt`\n";
+            $sq .= "        from (\n";
+            $sq .= "            select\n";
+            $sq .= "                count(*) as `cnt`\n";
+            $sq .= "            from\n";
+            $sq .= "                `{$prefix}{$table}`\n";
+            $sq .= "            where\n";
+            $sq .= "                `{$main_primary}` <> ? and\n";
+            $sq .= "                (\n";
+            $sq .= "                    {$add_where_info["where"]}\n";
+            $sq .= "                )\n";
+            $sq .= "        ) as `t1`\n";
+            $sq .= "    ) = 0";
+            $where_info["where"] .= $sq;
             $where_info["binding"] = array_merge($where_info["binding"], array($primary_key), $add_where_info["binding"]);
         }
-        $sql = "
-            update
-                `{$prefix}{$table}`
-            set
-                {$row_info["set"]}
-            where
-                {$where_info["where"]}
-        ";
+        $sq = "";
+        $sq .= "update\n";
+        $sq .= "    `{$prefix}{$table}`\n";
+        $sq .= "set";
+        $sq .= "    {$row_info["set"]}\n";
+        $sq .= "where\n";
+        $sq .= "    {$where_info["where"]}";
+        $sql = $sq;
         $binding = array_merge($row_info["binding"], $where_info["binding"]);
         $this->db_query($sql, $binding, $database);
         return $this->db_affected_rows;
@@ -4241,6 +4226,28 @@ class Ukp {
      */
     function session_set($key, $value) {
         $_SESSION[$key] = $value;
+    }
+
+    /**
+     * - 세션 시작
+     * 
+     * require  2026.01.29 session_start_check
+     * @version 2026.01.29
+     *
+     * @param int    $time 세션만기시간, 0인경우 설정안함
+     * @param string $dir  세션저장경로(절대경로), null인경우 설정안함
+     */
+    function session_start($time = 0, $dir = null) {
+        if ($this->session_start_check()) {
+            return;
+        }
+        if ($time > 0) {
+            ini_set("session.gc_maxlifetime", $time);
+        }
+        if (isset($dir)) {
+            ini_set("session.save_path", $dir);
+        }
+        session_start();
     }
 
     /**

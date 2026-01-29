@@ -1,5 +1,5 @@
-# ukp 함수 리스트
-## db_create_where
+# PHP $ukp 함수 리스트
+## db_create_where (2026.01.29)
 ```php
 /**
  * - 입력받은 where 배열에 맞는 sql where 쿼리문 생성
@@ -18,6 +18,8 @@
  * + `array("foo between" => array("1", "10"))` -> where: `foo between ? and ?`, binding: `array("1", "10")`
  * - 연산자가 in 이면서 값이 배열인경우 배열값이 순서대로 입력된다
  * + `array("foo in" => array("1", "10"))` -> where: `foo in(?, ?)`, binding: `array("1", "10")`
+ * - 연산자가 in 이면서 값이 문자열인경우 값이 in 쿼리에 그대로 들어간다
+ * + `array("foo in" => "select idx from tb")` -> where: `foo in(select idx from tb)`, binding: `array()`
  * - 연산자가 is 이면서 값이 null 또는 not null인경우 아래와 같이 생성된다
  * + `array("foo is" => "null", "hello is" => "not null")` -> where: `foo is null and hello is not null`, binding: `array()`
  * - 연산자가 is 이면서 값이 null 또는 not null이 아닌경우 값이 escape 처리되지 않고 그대로 입력된다
@@ -32,16 +34,17 @@
  * - dot_bool 은 모든 키에 점이 포함된 경우에만 true로 반환되고 테이블명 또는 alias를 모두 입력하였는지 검증용으로 사용된다
  * + `array("tb.foo" => "bar", "mb.hello" => "world")` -> true
  * + `array("tb.foo" => "bar", "hello" => "world")` -> false
- * @param  array  $where_arr where 배열
- * @param  bool   $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
- * @return array             where 정보
+ * @param  array $where_arr where 배열
+ * @param  bool  $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
+ * @param  int   $depth     들여쓰기 깊이
+ * @return array            where 정보
  * - `string [where=""]`        where 쿼리
  * - `array  [binding=array()]` binding 배열
  * - `bool   [dot_bool=true]`   true 인경우 모든 키에 점 포함
  */
-$ukp->db_create_where($where_arr = array(), $or_bool = false);
+$ukp->db_create_where($where_arr = array(), $or_bool = false, $depth = 1);
 ```
-## db_delete
+## db_delete (2026.01.29)
 ```php
 /**
  * - 테이블 삭제(1개)
@@ -56,13 +59,13 @@ $ukp->db_create_where($where_arr = array(), $or_bool = false);
  * - `string [delete_flag=null]` 삭제여부컬럼, 세팅 안한경우 설정값
  * - `array  [update_date=null]` 수정일, 세팅 안한경우 설정값
  * - `array  [update_time=null]` 수정시, 세팅 안한경우 설정값
- * - `array  [update_dt=null]`   수정일시, 세팅 안한경우 설정값
+ * - `array  [update_dt=null]`    수정일시, 세팅 안한경우 설정값
  * @param  string $database 사용할 db명
  * @return int              affected_rows(수정 안된경우 0)
  */
 $ukp->db_delete($table, $option = array(), $database = "default");
 ```
-## db_insert
+## db_insert (2026.01.29)
 ```php
 /**
  * - 테이블 인서트(1개)
@@ -74,52 +77,58 @@ $ukp->db_delete($table, $option = array(), $database = "default");
  * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
  * - `array  [insert_date=null]` 입력일, 세팅 안한경우 설정값
  * - `array  [insert_time=null]` 입력시, 세팅 안한경우 설정값
- * - `array  [insert_dt=null]`   입력일시, 세팅 안한경우 설정값
+ * - `array  [insert_dt=null]`    입력일시, 세팅 안한경우 설정값
  * - `array  [update_date=null]` 수정일, 세팅 안한경우 설정값
  * - `array  [update_time=null]` 수정시, 세팅 안한경우 설정값
- * - `array  [update_dt=null]`   수정일시, 세팅 안한경우 설정값
+ * - `array  [update_dt=null]`    수정일시, 세팅 안한경우 설정값
  * @param  string $database 사용할 db명
- * @return int              insert_id(입력 안된경우 0)
+ * @return int               insert_id(입력 안된경우 0)
  */
 $ukp->db_insert($table, $option = array(), $database = "default");
 ```
-## db_select_cnt
+## db_select_cnt (2026.01.29)
 ```php
 /**
- * - cnt 쿼리 결과
- * - db/cnt 폴더 내 {$database}/{$table}.sql 파일 sql 사용
- * - delete_flag 설정 안한경우 delete_flag_bool 무시함
+ * - select 부분을 `count(*) as cnt` 로 변경한 쿼리 결과
+ * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
+ * - sql 파일 없는경우 `select count(*) as cnt from {테이블명}` 쿼리 사용
+ * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
  * @param  string $table    테이블명
  * @param  array  $option   옵션  
- * - array  `[where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
- * - bool   `[or_bool=false]`         true: where or문, false: where and문
- * - bool   `[delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
- * - bool   `[where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
- * - string `[prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
- * - string `[delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
+ * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
+ * - `bool   [or_bool=false]`          true: where or문, false: where and문
+ * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+ * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+ * - `string [prefix=null]`            테이블 접두어, 세팅 안한경우 설정값
+ * - `string [delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
  * @param  string $database 사용 데이터베이스
  * @return array            쿼리결과 배열, 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열
  */
 $ukp->db_select_cnt($table, $option = array(), $database = "default");
 ```
-## db_select_list
+## db_select_list (2026.01.29)
 ```php
 /**
  * - list 쿼리 결과
- * - db/list 폴더 내 {$database}/{$table}.sql 파일 sql 사용
- * - delete_flag 설정 안한경우 delete_flag_bool 무시함
+ * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
+ * - sql 파일 없는경우 `select * from {테이블명}` 쿼리 사용
+ * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
  * @param  string $table    테이블명
  * @param  array  $option   옵션
+ * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
  * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
  * - `bool   [or_bool=false]`         true: where or문, false: where and문
+ * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
+ * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
+ * - `array  [group_by=array()]`      group by, 빈배열인경우 설정안함
+ * - `array  [having=array()]`        having, 빈배열이거나 group by 설정 안되어있는경우 설정안함
+ * - `bool   [having_or_bool=false]`  true: having or문, false: having and문
  * - `array  [order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
  * - `int    [limit]`                 표시갯수
  * - `int    [start]`                 표시 시작점, limit 있는경우에만
- * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
- * - `bool   [info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
- * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
- * - `string [prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
+ * - `string [prefix=null]`            테이블 접두어, 세팅 안한경우 설정값
  * - `string [delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
+ * - `bool   [info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
  * @param  string $database 사용 데이터베이스
  * @return array            쿼리결과 배열
  * - info_bool 값이 true 인경우 배열 키가 컬럼명이고 값이 컬럼값인 1차원 배열 반환
@@ -127,7 +136,7 @@ $ukp->db_select_cnt($table, $option = array(), $database = "default");
  */
 $ukp->db_select_list($table, $option = array(), $database = "default");
 ```
-## db_update
+## db_update (2026.01.29)
 ```php
 /**
  * - 테이블 업데이트(1개)
@@ -135,8 +144,8 @@ $ukp->db_select_list($table, $option = array(), $database = "default");
  * @param  string $table    테이블명
  * @param  array  $option   옵션
  * - `array  [row=array()]`       수정할 row, db_create_row 사용
- * - `array  [where=array()]`     수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
- * - `bool   [or_bool=false]`     true: where or문, false: where and문
+ * - `array  [where=array()]`      수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
+ * - `bool   [or_bool=false]`      true: where or문, false: where and문
  * - `string [primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
  * - `array  [add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), 키는 컬럼명, 값은 컬럼값
  * - `bool   [add_or_bool=false]` true: 중복체크 where or문, false: 중복체크 where and문
@@ -145,11 +154,11 @@ $ukp->db_select_list($table, $option = array(), $database = "default");
  * - `array  [update_time=null]`  수정시, 세팅 안한경우 설정값
  * - `array  [update_dt=null]`    수정일시, 세팅 안한경우 설정값
  * @param  string $database 사용할 db명
- * @return int              affected_rows(수정 안된경우 0)
+ * @return int               affected_rows(수정 안된경우 0)
  */
 $ukp->db_update($table, $option = array(), $database = "default");
 ```
-## decode_json
+## decode_json (2025.01.17)
 ```php
 /**
  * - JSON 디코딩
@@ -158,7 +167,7 @@ $ukp->db_update($table, $option = array(), $database = "default");
  */
 $ukp->decode_json($json);
 ```
-## encode_json
+## encode_json (2025.01.17)
 ```php
 /**
  * - JSON 인코딩
@@ -167,7 +176,7 @@ $ukp->decode_json($json);
  */
 $ukp->encode_json($arr);
 ```
-## session_set
+## session_set (2025.01.17)
 ```php
 /**
  * - 세션 값 저장
@@ -176,7 +185,7 @@ $ukp->encode_json($arr);
  */
 $ukp->session_set($key, $value);
 ```
-## session_unset
+## session_unset (2026.01.08)
 ```php
 /**
  * - 세션 값 제거
@@ -184,14 +193,4 @@ $ukp->session_set($key, $value);
  * @param string $key
  */
 $ukp->session_unset($key = null);
-```
-## common_mysql_password
-```php
-/**
- * - mysql password 함수
- * @param  string $pw  비밀번호
- * @param  bool   $old old_password 여부
- * @return string
- */
-$ukp->common_mysql_password($pw, $old = false);
 ```
