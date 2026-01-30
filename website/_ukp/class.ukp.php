@@ -2276,7 +2276,7 @@ class Ukp {
     function db_select_cnt($table, $option = array(), $database = "default") {
         $option["select"] = array("count(*) as `cnt`");
         $option["group_by"] = array();
-        $option["order_by"] = array();
+        $option["order_by"] = array("`cnt`");
         unset($option["limit"]);
         //sql 추출
         $sql_info = $this->db_select_sql($table, $option, $database);
