@@ -11,6 +11,7 @@
 - 업로드한 ```upload_ukp_function_php.md``` 파일에 나와있는 함수를 최대한 사용하여 작성해줘.
 - ```$ukp->db_select_list()``` 함수 사용시 업로드한 ```upload_select_list_query.md``` 파일에 select 쿼리 참고해줘.
 - ```$ukp->db_select_cnt()``` 함수 사용시 업로드한 ```upload_select_list_query.md``` 파일에 select 부분만 ``` count(*) as `cnt` ``` 로 변경한 select 쿼리 참고해줘.
+- 데이터베이스 테이블 구조는 업로드한 ```upload_table_ddl.md``` 파일에 json 형태로 표현되어있고 json 구조 설명은 ```$ukp->db_table_ddl()`` 함수 주석 참고해줘.
 - ```$ukp``` 함수중에 where 배열, or_bool 설정하는 함수는 ```$ukp->db_create_where()``` 함수 사용하므로 해당 함수설명 참고하여 작성해줘.
 - ```$data``` 배열에 값 입력은 코드 가장 마지막부분에서 해줘.
 - php 5.2 버전 이상에서 동작하도록 작성해줘.

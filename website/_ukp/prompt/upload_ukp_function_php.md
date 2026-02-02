@@ -136,6 +136,27 @@ $ukp->db_select_cnt($table, $option = array(), $database = "default");
  */
 $ukp->db_select_list($table, $option = array(), $database = "default");
 ```
+## db_table_ddl (2026.01.02)
+```php
+/**
+ * - 테이블 DDL 배열 반환
+ * - db/ddl 폴더 내 {$database}/{$table}.json 파일 설정필요
+ * - 자료형 문자열이 타입사전 키값중에 있는경우 해당 자료형과 기본값으로 대체
+ * - 전체 컬럼에서 primary 자료형은 한개만 설정가능
+ * @param  string $table    테이블명
+ * @param  string $database 사용할 db
+ * @return array            DDL 배열, 실패시 빈배열
+ * - `string [primary_type="int"]` 기본키 자료형
+ * - `string [comment=""]`         테이블설명
+ * - `string [columns][][0]`       컬럼명
+ * - `string [columns][][1]`       자료형, primary, foreign 은 primary_type 값으로 치환됨
+ * - `string [columns][][2]`       컬럼설명
+ * - `bool   [columns][][3]`       인덱스여부, primary, foreign은 true
+ * - `string [columns][][4]`       기본값, 설정 안한경우 default null
+ * - `array  [data][]`             컬럼 순서대로 값 설정, null 또는 설정 안한경우 기본값으로
+ */
+$ukp->db_table_ddl($table, $database = "default");
+```
 ## db_update (2026.01.29)
 ```php
 /**

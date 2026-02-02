@@ -53,6 +53,9 @@
 #### upload_select_list_query.md (2026.01.21)
 - 주석내용: ```## table: {테이블명}, database: {데이터베이스명}```
 - 사용하려는 테이블 리스트 쿼리 추가해서 사용
+#### upload_select_list_query.md (2026.02.02)
+- 주석내용: ```## table: {테이블명}, database: {데이터베이스명}```
+- 사용하려는 테이블 ddl 추가해서 사용
 #### upload_ukp_function_php.md (2026.01.29)
 - 주석내용: ```## {함수명} (version 날짜)```
 - 주석내용이 포맷과 다른경우 원본주석 수정
