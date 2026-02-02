@@ -188,6 +188,20 @@ $ukp->db_update($table, $option = array(), $database = "default");
  */
 $ukp->decode_json($json);
 ```
+## decrypt_aes256 (2025.06.17)
+```php
+/**
+ * - AES-256/CBC,ECB 복호화
+ * - pkcs5padding, pkcs7padding 두 방식은 서로 같음
+ * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
+ * @param  string $text      암호화문자열
+ * @param  string $key       복호화 키
+ * @param  string $iv        복호화 iv(ecb인경우 공백으로 두면 됨)
+ * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+ * @return string           평문자열, 실패시 빈문자열
+ */
+$ukp->decrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
+```
 ## encode_json (2025.01.17)
 ```php
 /**
@@ -196,6 +210,20 @@ $ukp->decode_json($json);
  * @return string      JSON형태의 문자열
  */
 $ukp->encode_json($arr);
+```
+## encrypt_aes256 (2025.06.17)
+```php
+/**
+ * - AES-256/CBC,ECB 암호화  
+ * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+ * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+ * @param  string $text     평문자열
+ * @param  string $key      암호화 키
+ * @param  string $iv       암호화 iv(ecb인경우 공백으로 두면 됨)
+ * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+ * @return string           암호화문자열, 실패시 빈문자열
+ */
+$ukp->encrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
 ```
 ## session_set (2025.01.17)
 ```php
@@ -214,4 +242,25 @@ $ukp->session_set($key, $value);
  * @param string $key
  */
 $ukp->session_unset($key = null);
+```
+## unique_id (2025.01.17)
+```php
+/**
+ * - 시간, PID, 순차 번호를 조합하여 시스템 전체에서 고유한 식별자를 생성.
+ * - 생성 포맷: [년월일시분(12)][마이크로초(6)][PID(7, 0-padding)][증가값(1~)]
+ * @return string 숫자로만 구성된 문자열
+ */
+$ukp->unique_id();
+```
+## unique_session_id (2025.01.17)
+```php
+/**
+ * - `$id` 값 기준으로 고유한 임시값 생성
+ * - `$id`와 `$pw`를 조합하여 해싱(Hashing), 입력이 같으면 항상 결과가 같음.
+ * @param  string $id        사용자 아이디
+ * @param  string $pw        사용자 비밀번호
+ * @param  bool   $temp_bool true: 항상 다른 값, false: 항상 같은 값
+ * @return string
+ */
+$ukp->unique_session_id($id, $pw, $temp_bool = false);
 ```
