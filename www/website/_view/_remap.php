@@ -13,6 +13,8 @@
     <!-- css -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="_css/_remap.css">
+    <!-- js -->
+    <script src="asset/js/ukp.js"></script>
     <!-- SEO meta, favicon -->
 </head>
 
@@ -23,6 +25,7 @@
         </div>
     </div>
     <!-- js -->
+
     <script type="module" src="_js/_remap.js"></script>
 </body>
 

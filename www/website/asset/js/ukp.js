@@ -4,15 +4,16 @@
  * - 모듈 require는 멤버함수만 표시
  * - this 사용 대신 ukp 상수에 this 할당 후 ukp 사용
  * - 버전 변경되는경우 생성자 내 버전도 변경
- * - 기본적으로는 모듈방식이 아닌 전역으로 불러서 사용하고 `export default class` 를 `class Ukp` 로 변경
+ * - 기본적으로는 모듈방식이 아닌 전역으로 불러서 사용하고 모듈방식으로 사용하는경우 `class Ukp` 를 `export default class` 로 변경
  * - `/// <reference path="{파일경로}/ukp.js" />` 주석 최상단에 입력하여 자동완성기능 사용
  * - 주석 자료형: array, boolean, function, number, object, string
+ * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
  * @version 2025.06.17
  * @author ukp
  */
 
-export default class {
+class Ukp {
     /**
      * - 생성자  
      *   
