@@ -1,4 +1,4 @@
-# JSON 문자열 생성.
+# JSON 문자열 생성. (2026.02.04)
 ## 입력값
 ```php
 $foreign_postfix = "";

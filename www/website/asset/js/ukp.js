@@ -6,23 +6,24 @@
  * - 버전 변경되는경우 생성자 내 버전도 변경
  * - 기본적으로는 모듈방식이 아닌 전역으로 불러서 사용하고 모듈방식으로 사용하는경우 `class Ukp` 를 `export default class` 로 변경
  * - `/// <reference path="{파일경로}/ukp.js" />` 주석 최상단에 입력하여 자동완성기능 사용
- * - 주석 자료형: array, boolean, function, number, object, string
+ * - 주석 자료형: *, array, boolean, function, number, object, string
+ * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2025.06.17
+ * @version 2026.02.04
  * @author ukp
  */
 
 class Ukp {
     /**
-     * - 생성자  
-     *   
+     * - 생성자
+     * 
      * require  2025.01.17 each
      * @version 2025.06.17
      * 
      * @param {object} obj       설정값
-     * - `object [root]`         최상위요소(기본값 document)
-     * - `string [storage_name]` 스토리지 이름(기본값 ukp), 겹치는경우 설정
+     * - `object [root=document]`      최상위요소(기본값 document)
+     * - `string [storage_name="ukp"]` 스토리지 이름(기본값 ukp), 겹치는경우 설정
      */
     constructor(obj = {}) {
         const ukp = this;
@@ -41,10 +42,10 @@ class Ukp {
     }
 
     /**
-     * 컨텐츠 리사이징, 오토스케일링  
-     * 전체 컨텐츠 리사이징, 오토스케일링인경우 html, body 태그에 아래와 같이 설정  
-     * margin:0, padding:0, height:100%, min-height:100%, overflow:hidden  
-     *   
+     * - 컨텐츠 리사이징, 오토스케일링
+     * - 전체 컨텐츠 리사이징, 오토스케일링인경우 html, body 태그에 아래와 같이 설정
+     * - margin:0, padding:0, height:100%, min-height:100%, overflow:hidden
+     * 
      * require  2025.06.17 css find intval obj_type
      * @version 2025.06.17
      * 
@@ -95,14 +96,14 @@ class Ukp {
     }
 
     /**
-     * ukp 내에서 forEach 대신 이 함수 사용  
-     *   
+     * - 배열 또는 객체 반복
+     * - ukp 내에서 forEach 대신 이 함수 사용
+     * 
      * require  2025.01.17
      * @version 2025.01.17
      * 
      * @param {object}   arr 배열 또는 객체
-     * @param {function} fun 반복할 함수, false 리턴시 break  
-     *                       첫번째 매개변수: 값, 두번째 매개변수: 키
+     * @param {function} fun 반복할 함수, false 리턴시 break, 첫번째 매개변수: 값, 두번째 매개변수: 키
      */
     each(arr, fun) {
         if (typeof (arr) != "object") {
@@ -115,13 +116,14 @@ class Ukp {
     }
 
     /**
-     * ukp 내에서 document.querySelector 대신 이 함수 사용  
-     *   
+     * - querySelector
+     * - ukp 내에서 document.querySelector 대신 이 함수 사용
+     * 
      * require  2024.11.07
      * @version 2024.11.07
      * 
      * @param   {string} selector 셀렉터
-     * @returns {object}          객체
+     * @returns {object}          html 요소객체
      */
     find(selector) {
         const ukp = this;
@@ -129,13 +131,14 @@ class Ukp {
     }
 
     /**
-     * ukp 내에서 document.querySelectorAll 대신 이 함수 사용  
-     *   
+     * - querySelectorAll
+     * - ukp 내에서 document.querySelectorAll 대신 이 함수 사용
+     * 
      * require  2024.11.07
      * @version 2024.11.07
      * 
      * @param   {string} selector 셀렉터
-     * @returns {array}           객체리스트
+     * @returns {array}           html 요소객체리스트
      */
     find_all(selector) {
         const ukp = this;
@@ -143,8 +146,9 @@ class Ukp {
     }
 
     /**
-     * ukp 내에서 addEventListener 대신 이 함수 사용  
-     *   
+     * - addEventListener
+     * - ukp 내에서 addEventListener 대신 이 함수 사용
+     * 
      * require  2025.01.17 each find_all
      * @version 2025.01.17
      * 
@@ -164,9 +168,9 @@ class Ukp {
     }
 
     /**
-     * 이벤트 강제실행  
-     * 이벤트가 안먹히는 경우 이 소스 참고해서 html 속성에 직접 작성  
-     *   
+     * - 이벤트 강제실행
+     * - 이벤트가 안먹히는 경우 이 소스 참고해서 html 속성에 직접 작성
+     * 
      * require  2025.01.17 each find_all
      * @version 2025.01.17
      * 
@@ -185,8 +189,8 @@ class Ukp {
     }
 
     /**
-     * window load  
-     *   
+     * - window onload
+     * 
      * require  2025.01.17 on
      * @version 2025.01.17
      * 
@@ -198,8 +202,8 @@ class Ukp {
     }
 
     /**
-     * - window ready
-     *   
+     * - window onDOMContentLoaded
+     * 
      * require  2025.01.17 on
      * @version 2025.01.17
      * 
@@ -212,13 +216,13 @@ class Ukp {
 
     /**
      * - 태그내 style 속성 변경
-     *   
+     * 
      * require  2025.01.17 each find_all
      * @version 2025.01.17
      * 
      * @param {object|string} target 대상객체 또는 쿼리셀렉터
      * @param {string}        key    css 속성
-     * @param {string}        value  속성값, 없거나 공백인경우 해제   
+     * @param {string}        value  속성값, 없거나 공백인경우 해제
      */
     css(target, key, value = "") {
         const ukp = this;
@@ -257,15 +261,15 @@ class Ukp {
     }
 
     /**
-     * 첨부파일 생성  
-     * 단일파일만 처리  
-     * 파일 없는경우 콜백함수에 공백문자 전달  
-     *   
+     * - input file 요소에 첨부된 파일 콜백함수 매개변수로 전달(blob문자열)
+     * - 단일파일만 처리
+     * - 파일 없는경우 콜백함수에 공백문자 전달
+     * 
      * require  2025.01.17
      * @version 2025.01.17
      * 
      * @param {object}   ele input file 요소
-     * @param {function} fun file 첨부시 콜백함수, 매개변수에 파일
+     * @param {function} fun 콜백함수, 매개변수에 파일 전달
      */
     create_file(ele, fun) {
         if (ele.files[0] === undefined) {
@@ -282,8 +286,8 @@ class Ukp {
     }
 
     /**
-     * 그리기용 ctx 반환  
-     *   
+     * - 그리기용 ctx 반환
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -295,8 +299,8 @@ class Ukp {
     }
 
     /**
-     * 그리기 전체 지우기  
-     *   
+     * - 그리기 전체 지우기
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -309,8 +313,8 @@ class Ukp {
     }
 
     /**
-     * 그리기 저장  
-     *   
+     * - 그리기 저장
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -322,8 +326,8 @@ class Ukp {
     }
 
     /**
-     * 그리기 불러오기  
-     *   
+     * - 그리기 불러오기
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -342,8 +346,8 @@ class Ukp {
     }
 
     /**
-     * 그리기 펜설정  
-     *   
+     * - 그리기 펜설정
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -364,8 +368,8 @@ class Ukp {
     }
 
     /**
-     * 캔버스에 그리기  
-     *   
+     * - 캔버스에 그리기
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -383,17 +387,17 @@ class Ukp {
     }
 
     /**
-     * list에 row 추가  
-     * row 포함되어있는 태그는 template 태그 사용 추천  
-     * 이벤트유형은 on을 뺀 이름(ex onclick -> "click")  
-     *   
+     * - list에 row 추가
+     * - row 포함되어있는 태그는 template 태그 사용 추천
+     * - 이벤트유형은 on을 뺀 이름(ex onclick -> "click")
+     * 
      * require  2025.01.17 each find on
      * @version 2025.01.17
      * 
-     * @param {object|string} row_target    row 포함되어있는 요소 또는 쿼리셀렉터
-     * @param {object|string} list_target   list 요소 또는 쿼리셀렉터
-     * @param {object}        replace       ["변경할 문자열"]: 변경될 문자열
-     * @param {object}        event         ["쿼리셀렉터"]["이벤트유형"]: 실행함수
+     * @param {object|string} row_target  row 포함되어있는 요소 또는 쿼리셀렉터
+     * @param {object|string} list_target list 요소 또는 쿼리셀렉터
+     * @param {object}        replace     `string [{변경할 문자열}]` 변경될 문자열
+     * @param {object}        event       `function [{쿼리셀렉터}][{이벤트유형}]` 실행함수
      */
     add_list(row_target, list_target, replace = [], event = []) {
         const ukp = this;
@@ -431,8 +435,8 @@ class Ukp {
     }
 
     /**
-     * 숫자콤마  
-     *   
+     * - 숫자콤마
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -444,8 +448,8 @@ class Ukp {
     }
 
     /**
-     * 숫자앞에 0  
-     *   
+     * - 숫자앞에 0
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -459,8 +463,8 @@ class Ukp {
     }
 
     /**
-     * 시간범위내 포함여부  
-     *   
+     * - 시간범위내 포함여부
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -495,12 +499,12 @@ class Ukp {
     }
 
     /**
-     * 뒤로가기 또는 캐시 인경우 처리  
-     *   
+     * - 뒤로가기 또는 캐시 상태 페이지인경우 함수 실행
+     * 
      * require  2025.01.17 on
      * @version 2025.01.17
      * 
-     * @param {function} fun 처리함수, 첫번째 매개변수에 이벤트객체
+     * @param {function} fun 실행함수, 첫번째 매개변수에 이벤트객체
      */
     back_cache(fun) {
         const ukp = this;
@@ -512,8 +516,8 @@ class Ukp {
     }
 
     /**
-     * 날짜차이  
-     *   
+     * - 날짜차이
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -528,9 +532,9 @@ class Ukp {
     }
 
     /**
-     * 날짜연산  
-     * 현지시간 기준으로 생성  
-     *   
+     * - 날짜연산
+     * - 현지시간 기준으로 생성
+     * 
      * require  2024.08.13 number_pad
      * @version 2024.08.13
      * 
@@ -578,8 +582,8 @@ class Ukp {
     }
 
     /**
-     * 고유번호  
-     *   
+     * - 고유번호
+     * 
      * require  2024.08.13 number_pad
      * @version 2024.08.13
      * 
@@ -601,8 +605,8 @@ class Ukp {
     }
 
     /**
-     * 아이폰 여부  
-     *   
+     * - 아이폰 여부
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -613,8 +617,8 @@ class Ukp {
     }
 
     /**
-     * 안드로이드 여부  
-     *   
+     * - 안드로이드 여부
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -625,16 +629,17 @@ class Ukp {
     }
 
     /**
-     * 상위요소 기준 요소 또는 마우스 절대좌표  
-     * 회전이 들어간 요소는 상위요소의 절대좌표 + 요소의 top, left 값으로 구함  
-     *   
+     * - 상위요소 기준 요소 또는 마우스 절대좌표
+     * - 회전이 들어간 요소는 상위요소의 절대좌표 + 요소의 top, left 값으로 구함
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
      * @param   {object} e 요소 또는 마우스/터치 이벤트
      * @param   {object} p 상위요소
-     * @returns {object}   x: x좌표
-     *                     y: y좌표
+     * @returns {object}   좌표
+     * - `number [x]` x좌표
+     * - `number [y]` y좌표
      */
     offset(e, p) {
         var x = 0;
@@ -681,9 +686,9 @@ class Ukp {
     }
 
     /**
-     * 두 점의 기울기  
-     * deg 이므로 각도값과 부호 반대  
-     *   
+     * - 두 점의 기울기
+     * - deg 이므로 각도값과 부호 반대
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -709,12 +714,12 @@ class Ukp {
     }
 
     /**
-     * 한글키보드  
-     *   
+     * - 한글키보드
+     * 
      * require  2024.08.13 word_merge
      * @version 2024.08.13
      * 
-     * @param   {string}  before_word   문자열
+     * @param   {string}  before_word   이미 입력되어있는 문자열
      * @param   {string}  input_word    키보드 입력값
      * @param   {boolean} keyboard_bool true: 108키보드, false: 축소키보드
      * @returns {string}                적용 문자열
@@ -872,8 +877,8 @@ class Ukp {
     }
 
     /**
-     * 자음모음 합치기  
-     *   
+     * - 자음모음 합치기
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -905,8 +910,8 @@ class Ukp {
     }
 
     /**
-     * 기본메뉴 끄기  
-     *   
+     * - 기본 contextmenu 이벤트 삭제
+     * 
      * require  2025.01.17 on
      * @version 2025.01.17
      */
@@ -918,10 +923,10 @@ class Ukp {
     }
 
     /**
-     * 스토리지 저장  
-     * 현지시간 기준으로 저장  
-     * 값은 문자열로 강제변경  
-     *   
+     * - 스토리지 저장
+     * - 현지시간 기준으로 저장
+     * - 값은 문자열로 강제변경
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -956,10 +961,10 @@ class Ukp {
     }
 
     /**
-     * 스토리지 불러오기  
-     * 현지시간 기준으로 만료  
-     * 값은 문자열로 강제변경  
-     *   
+     * - 스토리지 불러오기
+     * - 현지시간 기준으로 만료
+     * - 값은 문자열로 강제변경
+     * 
      * require  2025.01.17 date_add each
      * @version 2025.01.17
      * 
@@ -1019,8 +1024,8 @@ class Ukp {
     }
 
     /**
-     * 스토리지 삭제  
-     *   
+     * - 스토리지 삭제
+     * 
      * require  2025.06.17
      * @version 2025.06.17
      * 
@@ -1042,9 +1047,9 @@ class Ukp {
     }
 
     /**
-     * 객체값 반환  
-     * 값 없는경우 공백문자열  
-     *   
+     * - 객체값 반환
+     * - 값 없는경우 공백문자열
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -1057,8 +1062,9 @@ class Ukp {
     }
 
     /**
-     * get 파라미터  
-     *   
+     * - get 파라미터에서 값 가져오기
+     * - 키에 해당하는 값 없는경우 공백문자열 반환
+     * 
      * require  2024.08.13 obj_value
      * @version 2024.08.13
      * 
@@ -1095,8 +1101,8 @@ class Ukp {
     }
 
     /**
-     * 화면 수직 여부  
-     *   
+     * - 화면 수직 여부
+     * 
      * require  2024.08.13
      * @version 2024.08.13
      * 
@@ -1107,9 +1113,9 @@ class Ukp {
     }
 
     /**
-     * html 정렬변경  
-     * row는 그대로 둔 상태에서 내부만 바꿈  
-     *   
+     * - html 정렬변경
+     * - row는 그대로 둔 상태에서 내부만 바꿈
+     * 
      * require  2025.01.17 each
      * @version 2025.01.17
      * 
@@ -1147,8 +1153,8 @@ class Ukp {
     }
 
     /**
-     * base64 to file  
-     *   
+     * - base64 to file
+     * 
      * require  2024.11.07
      * @version 2024.11.07
      * 
@@ -1169,8 +1175,8 @@ class Ukp {
     }
 
     /**
-     * 객체타입 소문자로 반환  
-     *   
+     * - 객체타입 소문자로 반환
+     * 
      * require  2024.11.07
      * @version 2024.11.07
      * 
@@ -1182,14 +1188,14 @@ class Ukp {
     }
 
     /**
-     * ajax 전송  
-     * Content-Type: multipart/form-data  
-     *   
+     * - ajax 전송
+     * - Content-Type: multipart/form-data
+     * 
      * require  2025.01.17 find obj_type on
      * @version 2025.01.17
      * 
      * @param {string}        url      url
-     * @param {object|string} data     formdata객체, form요소 셀렉터, json객체 지원
+     * @param {object|string} data     formdata객체, form요소 셀렉터, json객체 가능
      * @param {function}      com_func 완료함수, 첫번째 매개변수에 결과(text) 전달
      * @param {function}      pro_func 진행함수, 첫번째 매개변수에 퍼센트숫자 전달
      */
@@ -1223,9 +1229,9 @@ class Ukp {
     }
 
     /**
-     * ajax json 전송  
-     * Content-Type: application/json  
-     *   
+     * - ajax json 전송
+     * - Content-Type: application/json
+     * 
      * require  2024.11.07
      * @version 2024.11.07
      * 
@@ -1248,8 +1254,8 @@ class Ukp {
     }
 
     /**
-     * http_build_query  
-     *   
+     * - json 객체를 쿼리스트링으로 변환
+     * 
      * require  2024.11.07
      * @version 2024.11.07
      * 
@@ -1269,14 +1275,14 @@ class Ukp {
     }
 
     /**
-     * 클래스 여부 확인  
-     * 쿼리셀렉터인경우 첫번째 요소만 확인  
+     * - 클래스 값 가지고 있는지 확인
+     * - 쿼리셀렉터인경우 첫번째 요소만 확인
      *   
      * require  2025.01.17 each find
      * @version 2025.01.17
      * 
      * @param   {object|string} target     요소 또는 셀렉터
-     * @param   {string}        class_name 클래스명
+     * @param   {string}        class_name 확인할 클래스명
      * @returns {boolean}                  true: 클래스가 있음, false: 클래스가 없음
      */
     has_class(target, class_name) {
@@ -1297,13 +1303,13 @@ class Ukp {
     }
 
     /**
-     * 클래스 추가  
-     *   
+     * - 클래스 값 추가
+     * 
      * require  2025.01.17 each find_all has_class
      * @version 2025.01.17
      * 
      * @param   {object|string} target     요소 또는 셀렉터
-     * @param   {string}        class_name 클래스명
+     * @param   {string}        class_name 추가할 클래스명
      */
     add_class(target, class_name) {
         const ukp = this;
@@ -1320,13 +1326,13 @@ class Ukp {
     }
 
     /**
-     * 클래스 삭제  
-     *   
+     * - 클래스 값 삭제
+     * 
      * require  2025.01.17 each find_all
      * @version 2025.01.17
      * 
      * @param   {object|string} target     요소 또는 셀렉터
-     * @param   {string}        class_name 클래스명
+     * @param   {string}        class_name 삭제할 클래스명
      */
     remove_class(target, class_name) {
         const ukp = this;
@@ -1348,9 +1354,9 @@ class Ukp {
     }
 
     /**
-     * 클래스 토글  
-     *   
-     * require  2025.01.17 add_class each find_all has_class remove_class   
+     * - 클래스 값 없는경우 추가, 있는경우 삭제
+     * 
+     * require  2025.01.17 add_class each find_all has_class remove_class
      * @version 2025.01.17
      * 
      * @param   {object|string} target     요소 또는 셀렉터
@@ -1372,8 +1378,8 @@ class Ukp {
     }
 
     /**
-     * base64 디코딩  
-     *   
+     * - base64 디코딩
+     * 
      * require  2025.03.06
      * @version 2025.03.06
      * 
@@ -1387,8 +1393,8 @@ class Ukp {
     }
 
     /**
-     * base64 인코딩  
-     *   
+     * - base64 인코딩
+     * 
      * require  2025.03.06
      * @version 2025.03.06
      * 
@@ -1406,13 +1412,13 @@ class Ukp {
     }
 
     /**
-     * 문자열 정수로 변경  
-     *   
+     * - 문자열 정수로 변경
+     * 
      * require  2025.03.06
      * @version 2025.03.06
      * 
-     * @param   {string}  text 문자열
-     * @returns {number}       정수
+     * @param   {string} text 문자열
+     * @returns {number}      정수
      */
     intval(text) {
         var num = parseInt(text);
@@ -1420,17 +1426,33 @@ class Ukp {
     }
 
     /**
-     * 문자열 실수로 변경  
-     *   
+     * - 문자열 실수로 변경
+     * 
      * require  2025.03.06
      * @version 2025.03.06
      * 
-     * @param   {string}  text 문자열
-     * @returns {number}       정수
+     * @param   {string} text 문자열
+     * @returns {number}      정수
      */
     floatval(text) {
         var num = parseFloat(text);
         return Number.isNaN(num) ? 0 : num;
     }
 
+    /**
+     * - 숫자값을 문자열로 변경
+     * - 숫자, 문자열이 아닌경우 공백문자열 반환
+     * 
+     * require  2026.02.04 obj_type
+     * @version 2026.02.04
+     * 
+     * @param   {number} num 숫자
+     * @returns {string}     문자열
+     */
+    strval(num) {
+        const ukp = this;
+        var type = ukp.obj_type(num);
+        var arr = ["string", "number"];
+        return arr.includes(type) ? String(num) : "";
+    }
 }

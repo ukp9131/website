@@ -1,4 +1,4 @@
-# PHP 함수에서 require 추출
+# PHP 함수에서 require 추출 (2026.02.04)
 ## 함수
 ```php
 ```

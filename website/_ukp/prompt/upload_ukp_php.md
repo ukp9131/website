@@ -1,4 +1,4 @@
-# PHP $ukp 함수 리스트
+# PHP $ukp 함수 리스트 (2026.02.04)
 ## db_create_where (2026.01.29)
 ```php
 /**
