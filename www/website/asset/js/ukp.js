@@ -927,14 +927,14 @@ class Ukp {
      * - 현지시간 기준으로 저장
      * - 값은 문자열로 강제변경
      * 
-     * require  2024.08.13
-     * @version 2024.08.13
+     * require  2026.02.04
+     * @version 2026.02.04
      * 
      * @param {string} key           키
      * @param {string} value         값
      * @param {string} expiration_dt 만기일시, 공백인경우 영구, "session" 인경우 세션스토리지
      */
-    set_storage(key, value, expiration_dt = "") {
+    storage_set(key, value, expiration_dt = "") {
         const ukp = this;
         //로컬
         var temp = localStorage.getItem(ukp.storage_name);
@@ -965,13 +965,13 @@ class Ukp {
      * - 현지시간 기준으로 만료
      * - 값은 문자열로 강제변경
      * 
-     * require  2025.01.17 date_add each
-     * @version 2025.01.17
+     * require  2026.02.04 date_add each
+     * @version 2026.02.04
      * 
      * @param   {string}        key 키, null인경우 전체 스토리지 
      * @returns {string|object}     값, 없는 키인경우 공백문자열
      */
-    get_storage(key = null) {
+    storage_get(key = null) {
         const ukp = this;
         var temp = localStorage.getItem(ukp.storage_name);
         if (temp === null) {
@@ -1026,12 +1026,12 @@ class Ukp {
     /**
      * - 스토리지 삭제
      * 
-     * require  2025.06.17
-     * @version 2025.06.17
+     * require  2026.02.04
+     * @version 2026.02.04
      * 
      * @param {string} key 키, null인경우 전체 스토리지 삭제
      */
-    unset_storage(key = null) {
+    storage_unset(key = null) {
         const ukp = this;
         if (key === null) {
             localStorage.setItem(ukp.storage_name, "{}");

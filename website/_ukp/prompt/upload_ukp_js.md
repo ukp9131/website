@@ -1,4 +1,16 @@
 # 자바스크립트 ukp 함수 리스트 (2026.02.04)
+## ajax (2025.01.17)
+```js
+/**
+ * - ajax 전송
+ * - Content-Type: multipart/form-data
+ * @param {string}        url      url
+ * @param {object|string} data     formdata객체, form요소 셀렉터, json객체 가능
+ * @param {function}      com_func 완료함수, 첫번째 매개변수에 결과(text) 전달
+ * @param {function}      pro_func 진행함수, 첫번째 매개변수에 퍼센트숫자 전달
+ */
+ukp.ajax(url, data, com_func, pro_func = null);
+```
 ## css (2025.01.17)
 ```js
 /**
@@ -9,6 +21,46 @@
  */
 ukp.css(target, key, value = "");
 ```
+## decode_base64 (2025.03.06)
+```js
+/**
+ * - base64 디코딩
+ * @param   {string} text base64 문자열
+ * @returns {string}      문자열
+ */
+ukp.decode_base64(text);
+```
+## find (2024.11.07)
+```js
+/**
+ * - querySelector
+ * - ukp 내에서 document.querySelector 대신 이 함수 사용
+ * @param   {string} selector 셀렉터
+ * @returns {object}          html 요소객체
+ */
+ukp.find(selector);
+```
+## find_all (2024.11.07)
+```js
+/**
+ * - querySelectorAll
+ * - ukp 내에서 document.querySelectorAll 대신 이 함수 사용
+ * @param   {string} selector 셀렉터
+ * @returns {array}           html 요소객체리스트
+ */
+ukp.find_all(selector);
+```
+## on (2025.01.17)
+```js
+/**
+ * - addEventListener
+ * - ukp 내에서 addEventListener 대신 이 함수 사용
+ * @param {string}        event_name 이벤트 유형
+ * @param {object|string} target     대상객체 또는 쿼리셀렉터
+ * @param {function}      fun        실행함수, 첫번째 매개변수에 이벤트객체
+ */
+ukp.on(event_name, target, fun);
+```
 ## ready (2025.01.17)
 ```js
 /**
@@ -16,4 +68,36 @@ ukp.css(target, key, value = "");
  * @param {function} fun 실행함수, 첫번째 매개변수에 이벤트객체
  */
 ukp.ready(fun);
+```
+## storage_get (2026.02.04)
+```js
+/**
+ * - 스토리지 불러오기
+ * - 현지시간 기준으로 만료
+ * - 값은 문자열로 강제변경
+ * 
+ * @param   {string}        key 키, null인경우 전체 스토리지
+ * @returns {string|object}     값, 없는 키인경우 공백문자열
+ */
+ukp.storage_get(key = null);
+```
+## storage_set (2026.02.04)
+```js
+/**
+ * - 스토리지 저장
+ * - 현지시간 기준으로 저장
+ * - 값은 문자열로 강제변경
+ * @param {string} key           키
+ * @param {string} value         값
+ * @param {string} expiration_dt 만기일시, 공백인경우 영구, "session" 인경우 세션스토리지
+ */
+ukp.storage_set(key, value, expiration_dt = "");
+```
+## storage_unset (2026.02.04)
+```js
+/**
+ * - 스토리지 삭제
+ * @param {string} key 키, null인경우 전체 스토리지 삭제
+ */
+ukp.storage_unset(key = null);
 ```
