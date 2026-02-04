@@ -1,2 +1,2 @@
-/// <reference path="../../www/website/asset/js/ukp.js" />
+/// <reference path="_.js" />
 var ukp = new Ukp();
