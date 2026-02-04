@@ -69,7 +69,7 @@ ukp.on(event_name, target, fun);
  */
 ukp.ready(fun);
 ```
-## storage_get (2026.02.04)
+## get_storage (2026.02.04)
 ```js
 /**
  * - 스토리지 불러오기
@@ -79,9 +79,9 @@ ukp.ready(fun);
  * @param   {string}        key 키, null인경우 전체 스토리지
  * @returns {string|object}     값, 없는 키인경우 공백문자열
  */
-ukp.storage_get(key = null);
+ukp.get_storage(key = null);
 ```
-## storage_set (2026.02.04)
+## set_storage (2026.02.04)
 ```js
 /**
  * - 스토리지 저장
@@ -91,13 +91,13 @@ ukp.storage_get(key = null);
  * @param {string} value         값
  * @param {string} expiration_dt 만기일시, 공백인경우 영구, "session" 인경우 세션스토리지
  */
-ukp.storage_set(key, value, expiration_dt = "");
+ukp.set_storage(key, value, expiration_dt = "");
 ```
-## storage_unset (2026.02.04)
+## unset_storage (2026.02.04)
 ```js
 /**
  * - 스토리지 삭제
  * @param {string} key 키, null인경우 전체 스토리지 삭제
  */
-ukp.storage_unset(key = null);
+ukp.unset_storage(key = null);
 ```

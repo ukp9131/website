@@ -19,7 +19,7 @@ class Ukp {
      * - 생성자
      * 
      * require  2025.01.17 each
-     * @version 2025.06.17
+     * @version 2026.02.04
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2025.06.17");
+        console.log("ukp.js 2026.02.04");
     }
 
     /**
@@ -934,7 +934,7 @@ class Ukp {
      * @param {string} value         값
      * @param {string} expiration_dt 만기일시, 공백인경우 영구, "session" 인경우 세션스토리지
      */
-    storage_set(key, value, expiration_dt = "") {
+    set_storage(key, value, expiration_dt = "") {
         const ukp = this;
         //로컬
         var temp = localStorage.getItem(ukp.storage_name);
@@ -971,7 +971,7 @@ class Ukp {
      * @param   {string}        key 키, null인경우 전체 스토리지 
      * @returns {string|object}     값, 없는 키인경우 공백문자열
      */
-    storage_get(key = null) {
+    get_storage(key = null) {
         const ukp = this;
         var temp = localStorage.getItem(ukp.storage_name);
         if (temp === null) {
@@ -1031,7 +1031,7 @@ class Ukp {
      * 
      * @param {string} key 키, null인경우 전체 스토리지 삭제
      */
-    storage_unset(key = null) {
+    unset_storage(key = null) {
         const ukp = this;
         if (key === null) {
             localStorage.setItem(ukp.storage_name, "{}");
