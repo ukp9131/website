@@ -52,6 +52,7 @@
 - DBeaver 에서 ```show tables``` 쿼리 결과 csv로 다운로드 후 메모장으로 열어서 복사 붙여넣기
 ### modify_*.md
 - 기존에 생성된 코드를 수정하는 프롬프트
+- 업로드하려는 파일 확장자가 .php 인경우 .html로 변경하여 업로드
 #### modify_html.md (2026.02.05)
 - 변경할 html 파일과 해당 html에 적용되는 모든 css 파일 같이 업로드
 #### modify_php.md (2026.02.05)
