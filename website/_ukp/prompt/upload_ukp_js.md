@@ -69,6 +69,16 @@ ukp.toggle_class(target, class_name);
  */
 ukp.css(target, key, value = "");
 ```
+## each (2025.01.17)
+```js
+/**
+ * - 배열 또는 객체 반복
+ * - ukp 내에서 forEach 대신 이 함수 사용
+ * @param {object} arr 배열 또는 객체
+ * @param {function} fun 반복할 함수, false 리턴시 break, 첫번째 매개변수: 값, 두번째 매개변수: 키
+ */
+ukp.each(arr, fun);
+```
 ## find (2024.11.07)
 ```js
 /**
