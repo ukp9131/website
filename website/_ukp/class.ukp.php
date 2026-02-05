@@ -8,7 +8,7 @@
  * - `bool [cors_bool=false]`   cors 허용여부
  * 
  * require  2026.01.02 config.php
- * @version 2026.01.29
+ * @version 2026.02.05
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -613,9 +613,9 @@ class Ukp {
      * @version 2025.10.24
      * 
      * @param array $option 옵션설정  
-     * `bool [api_bool]`     true - json, false - html(기본값: false)  
-     * `bool [session_bool]` 세션사용여부(기본값: true)  
-     * `bool [cors_bool]`    cors 허용여부(기본값: false)
+     * `bool [api_bool=false]`    true - json, false - html(기본값: false)  
+     * `bool [session_bool=true]` 세션사용여부(기본값: true)  
+     * `bool [cors_bool=false]`   cors 허용여부(기본값: false)
      */
     function __construct($option = array()) {
         //에러핸들러 설정 전에 발생하는 에러 무시
@@ -1650,13 +1650,19 @@ class Ukp {
 
     /**
      * - set, into, values 컬럼 생성
-     * - escape인경우 키가 is
+     * - row 배열 키가 ` is` 로 끝나는경우 값 escape 처리 안함
+     * - 필드명에 백틱(`) 입력하지 않아도 자동입력됨, row 배열 설명에는 백틱 생략되어있음
+     * - 예제: `array("foo" => "bar()", "hello is" => "world()")` 인경우
+     * + set: `foo = ?, hello = world()`
+     * + into: `foo, hello`
+     * + values: `?, world()`
+     * + binding: `array("hello()")`
      * 
-     * require  2026.01.29
-     * @version 2026.01.29
+     * require  2026.02.05
+     * @version 2026.02.05
      * 
-     * @param  array $row_arr row 배열(escape인경우 키가 is)
-     * @param  int   $depth   들여쓰기 깊이
+     * @param  array $row_arr row 배열 (키가 컬럼명, 값이 컬럼값)
+     * @param  int   $depth   들여쓰기 깊이(1당 4칸 들여쓰기)
      * @return array          row 정보
      * - `string [set]`     추가 set문
      * - `string [into]`    추가 into문
@@ -1969,12 +1975,12 @@ class Ukp {
     /**
      * - 테이블 인서트(1개)
      * 
-     * require  2026.01.29 db_add_row db_add_table_info db_create_row db_create_where db_query 
-     * @version 2026.01.29
+     * require  2026.02.05 db_add_row db_add_table_info db_create_row db_create_where db_query 
+     * @version 2026.02.05
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - `array  [row=array()]`      입력할 row, db_create_row 사용
+     * - `array  [row=array()]`      입력할 값, 키는 컬럼명, 값은 컬럼값
      * - `array  [where=array()]`    중복 조건문, 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`    true: 중복체크 where or문, false: 중복체크 where and문
      * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
@@ -3098,12 +3104,12 @@ class Ukp {
      * - 테이블 업데이트(1개)
      * - add_where 설정 안한경우 중복체크 안함
      * 
-     * require  2026.01.29 db_add_row db_add_table_info db_create_row db_create_where db_query
-     * @version 2026.01.29
+     * require  2026.02.05 db_add_row db_add_table_info db_create_row db_create_where db_query
+     * @version 2026.02.05
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
-     * - `array  [row=array()]`       수정할 row, db_create_row 사용
+     * - `array  [row=array()]`       수정할 값, 키는 컬럼명, 값은 컬럼값
      * - `array  [where=array()]`     수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`     true: where or문, false: where and문
      * - `string [primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
@@ -3404,9 +3410,9 @@ class Ukp {
     }
 
     /**
-     * AES-256/CBC,ECB 복호화  
-     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
-     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+     * - AES-256/CBC,ECB 복호화  
+     * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+     * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
      *   
      * require  2025.06.17 str_pkcs7_unpadding
      * @version 2025.06.17
@@ -3657,9 +3663,9 @@ class Ukp {
     }
 
     /**
-     * AES-256/CBC,ECB 암호화  
-     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
-     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+     * - AES-256/CBC,ECB 암호화  
+     * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+     * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
      *   
      * require  2025.06.17 str_pkcs7_padding
      * @version 2025.06.17

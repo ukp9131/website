@@ -1,4 +1,4 @@
-# 자바스크립트 ukp 함수 리스트 (2026.02.04)
+# 자바스크립트 ukp 함수 리스트 (2026.02.05)
 ## ajax (2025.01.17)
 ```js
 /**
@@ -11,6 +11,54 @@
  */
 ukp.ajax(url, data, com_func, pro_func = null);
 ```
+## decode_base64 (2025.03.06)
+```js
+/**
+ * - base64 디코딩
+ * @param   {string} text base64 문자열
+ * @returns {string}      문자열
+ */
+ukp.decode_base64(text);
+```
+## add_class (2025.01.17)
+```js
+/**
+ * - 클래스 값 추가
+ * @param   {object|string} target     요소 또는 셀렉터
+ * @param   {string}        class_name 추가할 클래스명
+ */
+ukp.add_class(target, class_name);
+```
+## has_class (2025.01.17)
+```js
+/**
+ * - 클래스 값 가지고 있는지 확인
+ * - 쿼리셀렉터인경우 첫번째 요소만 확인
+ *
+ * @param   {object|string} target     요소 또는 셀렉터
+ * @param   {string}        class_name 확인할 클래스명
+ * @returns {boolean}                  true: 클래스가 있음, false: 클래스가 없음
+ */
+ukp.has_class(target, class_name);
+```
+## remove_class (2025.01.17)
+```js
+/**
+ * - 클래스 값 삭제
+ * @param   {object|string} target     요소 또는 셀렉터
+ * @param   {string}        class_name 삭제할 클래스명
+ */
+ukp.remove_class(target, class_name);
+```
+## toggle_class (2026.02.04)
+```js
+/**
+ * - 클래스 값 없는경우 추가, 있는경우 삭제
+ * @param   {object|string} target     요소 또는 셀렉터
+ * @param   {string}        class_name 클래스명
+ */
+ukp.toggle_class(target, class_name);
+```
 ## css (2025.01.17)
 ```js
 /**
@@ -20,15 +68,6 @@ ukp.ajax(url, data, com_func, pro_func = null);
  * @param {string} value 속성값, 없거나 공백인경우 해제
  */
 ukp.css(target, key, value = "");
-```
-## decode_base64 (2025.03.06)
-```js
-/**
- * - base64 디코딩
- * @param   {string} text base64 문자열
- * @returns {string}      문자열
- */
-ukp.decode_base64(text);
 ```
 ## find (2024.11.07)
 ```js
@@ -101,3 +140,4 @@ ukp.set_storage(key, value, expiration_dt = "");
  */
 ukp.unset_storage(key = null);
 ```
+

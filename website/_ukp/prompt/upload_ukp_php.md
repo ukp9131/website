@@ -1,4 +1,25 @@
-# PHP $ukp 함수 리스트 (2026.02.04)
+# PHP $ukp 함수 리스트 (2026.02.05)
+## db_create_row (2026.02.05)
+```php
+/**
+ * - set, into, values 컬럼 생성
+ * - row 배열 키가 ` is` 로 끝나는경우 값 escape 처리 안함
+ * - 필드명에 백틱(`) 입력하지 않아도 자동입력됨, row 배열 설명에는 백틱 생략되어있음
+ * - 예제: `array("foo" => "bar()", "hello is" => "world()")` 인경우
+ * + set: `foo = ?, hello = world()`
+ * + into: `foo, hello`
+ * + values: `?, world()`
+ * + binding: `array("hello()")`
+ * @param  array $row_arr row 배열 (키가 컬럼명, 값이 컬럼값)
+ * @param  int   $depth   들여쓰기 깊이(1당 4칸 들여쓰기)
+ * @return array          row 정보
+ * - `string [set]`     추가 set문
+ * - `string [into]`    추가 into문
+ * - `string [values]`  추가 values문
+ * - `array  [binding]` 추가 binding문
+ */
+$ukp->db_create_row($row_arr = array(), $depth = 1);
+```
 ## db_create_where (2026.01.29)
 ```php
 /**
@@ -65,13 +86,13 @@ $ukp->db_create_where($where_arr = array(), $or_bool = false, $depth = 1);
  */
 $ukp->db_delete($table, $option = array(), $database = "default");
 ```
-## db_insert (2026.01.29)
+## db_insert (2026.02.05)
 ```php
 /**
  * - 테이블 인서트(1개)
  * @param  string $table    테이블명
  * @param  array  $option   옵션
- * - `array  [row=array()]`      입력할 row, db_create_row 사용
+ * - `array  [row=array()]`      입력할 값, 키는 컬럼명, 값은 컬럼값
  * - `array  [where=array()]`    중복 조건문, 키는 컬럼명, 값은 컬럼값
  * - `bool   [or_bool=false]`    true: 중복체크 where or문, false: 중복체크 where and문
  * - `string [prefix=null]`      테이블 접두어, 세팅 안한경우 설정값
@@ -85,6 +106,28 @@ $ukp->db_delete($table, $option = array(), $database = "default");
  * @return int               insert_id(입력 안된경우 0)
  */
 $ukp->db_insert($table, $option = array(), $database = "default");
+```
+## db_update (2026.02.05)
+```php
+/**
+ * - 테이블 업데이트(1개)
+ * - add_where 설정 안한경우 중복체크 안함
+ * @param  string $table    테이블명
+ * @param  array  $option   옵션
+ * - `array  [row=array()]`       수정할 값, 키는 컬럼명, 값은 컬럼값
+ * - `array  [where=array()]`      수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
+ * - `bool   [or_bool=false]`      true: where or문, false: where and문
+ * - `string [primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
+ * - `array  [add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), 키는 컬럼명, 값은 컬럼값
+ * - `bool   [add_or_bool=false]` true: 중복체크 where or문, false: 중복체크 where and문
+ * - `string [prefix=null]`        테이블 접두어, 세팅 안한경우 설정값
+ * - `array  [update_date=null]`   수정일, 세팅 안한경우 설정값
+ * - `array  [update_time=null]`   수정시, 세팅 안한경우 설정값
+ * - `array  [update_dt=null]`     수정일시, 세팅 안한경우 설정값
+ * @param  string $database 사용할 db명
+ * @return int               affected_rows(수정 안된경우 0)
+ */
+$ukp->db_update($table, $option = array(), $database = "default");
 ```
 ## db_select_cnt (2026.01.29)
 ```php
@@ -157,37 +200,6 @@ $ukp->db_select_list($table, $option = array(), $database = "default");
  */
 $ukp->db_table_ddl($table, $database = "default");
 ```
-## db_update (2026.01.29)
-```php
-/**
- * - 테이블 업데이트(1개)
- * - add_where 설정 안한경우 중복체크 안함
- * @param  string $table    테이블명
- * @param  array  $option   옵션
- * - `array  [row=array()]`       수정할 row, db_create_row 사용
- * - `array  [where=array()]`      수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
- * - `bool   [or_bool=false]`      true: where or문, false: where and문
- * - `string [primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
- * - `array  [add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), 키는 컬럼명, 값은 컬럼값
- * - `bool   [add_or_bool=false]` true: 중복체크 where or문, false: 중복체크 where and문
- * - `string [prefix=null]`       테이블 접두어, 세팅 안한경우 설정값
- * - `array  [update_date=null]`  수정일, 세팅 안한경우 설정값
- * - `array  [update_time=null]`  수정시, 세팅 안한경우 설정값
- * - `array  [update_dt=null]`    수정일시, 세팅 안한경우 설정값
- * @param  string $database 사용할 db명
- * @return int               affected_rows(수정 안된경우 0)
- */
-$ukp->db_update($table, $option = array(), $database = "default");
-```
-## decode_json (2025.01.17)
-```php
-/**
- * - JSON 디코딩
- * @param  string $json JSON형태의 문자열
- * @return array        배열
- */
-$ukp->decode_json($json);
-```
 ## decrypt_aes256 (2025.06.17)
 ```php
 /**
@@ -202,15 +214,6 @@ $ukp->decode_json($json);
  */
 $ukp->decrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
 ```
-## encode_json (2025.01.17)
-```php
-/**
- * - JSON 인코딩
- * @param  array  $arr 배열
- * @return string      JSON형태의 문자열
- */
-$ukp->encode_json($arr);
-```
 ## encrypt_aes256 (2025.06.17)
 ```php
 /**
@@ -224,6 +227,24 @@ $ukp->encode_json($arr);
  * @return string           암호화문자열, 실패시 빈문자열
  */
 $ukp->encrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
+```
+## decode_json (2025.01.17)
+```php
+/**
+ * - JSON 디코딩
+ * @param  string $json JSON형태의 문자열
+ * @return array        배열
+ */
+$ukp->decode_json($json);
+```
+## encode_json (2025.01.17)
+```php
+/**
+ * - JSON 인코딩
+ * @param  array  $arr 배열
+ * @return string      JSON형태의 문자열
+ */
+$ukp->encode_json($arr);
 ```
 ## session_set (2025.01.17)
 ```php
