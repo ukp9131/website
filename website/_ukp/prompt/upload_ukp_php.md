@@ -48,12 +48,13 @@ $ukp->encrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
  */
 $ukp->db_create_row($row_arr = array(), $depth = 1);
 ```
-## db_create_where (2026.01.29)
+## db_create_where (2026.02.06)
 ```php
 /**
  * - 입력받은 where 배열에 맞는 sql where 쿼리문 생성
  * - 테이블명, 필드명, 연산자는 소문자로 강제 변경
  * - 필드명에 백틱(`) 입력하지 않아도 자동입력됨, where 배열 설명에는 백틱 생략되어있음
+ * - 같지 않음을 표현하는 연산자는 `!=` 을 사용하지 말고 `<>` 을 사용
  * - where 배열 설명
  * - 기본적으로 배열 키는 컬럼명, 값은 컬럼값으로 구성된다
  * + `array("tb_name.foo" => "bar")` -> where: `tb_name.foo = ?`, binding: `array("bar")`
