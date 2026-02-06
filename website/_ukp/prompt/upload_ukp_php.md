@@ -107,18 +107,18 @@ $ukp->db_delete($table, $option = array(), $database = "default");
  */
 $ukp->db_insert($table, $option = array(), $database = "default");
 ```
-## db_update (2026.02.05)
+## db_update (2026.02.06)
 ```php
 /**
  * - 테이블 업데이트(1개)
- * - add_where 설정 안한경우 중복체크 안함
+ * - 중복체크 후 업데이트 하려는경우 primary, add_where 값 설정
  * @param  string $table    테이블명
  * @param  array  $option   옵션
  * - `array  [row=array()]`       수정할 값, 키는 컬럼명, 값은 컬럼값
  * - `array  [where=array()]`      수정 조건문(중복체크 하는경우 기본키 필수), 키는 컬럼명, 값은 컬럼값
  * - `bool   [or_bool=false]`      true: where or문, false: where and문
- * - `string [primary=""]`        기본키 컬럼명(공백인경우 중복체크 안함)
- * - `array  [add_where=array()]` 중복체크 조건문(없는경우 중복체크 안함), 키는 컬럼명, 값은 컬럼값
+ * - `string [primary=""]`         중복체크시 사용되는 기본키 컬럼명
+ * - `array  [add_where=array()]` 중복체크 조건문, 키는 컬럼명, 값은 컬럼값
  * - `bool   [add_or_bool=false]` true: 중복체크 where or문, false: 중복체크 where and문
  * - `string [prefix=null]`        테이블 접두어, 세팅 안한경우 설정값
  * - `array  [update_date=null]`   수정일, 세팅 안한경우 설정값
