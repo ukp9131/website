@@ -1,4 +1,32 @@
-# PHP $ukp 함수 리스트 (2026.02.05)
+# PHP $ukp 함수 리스트 (2026.02.06)
+## decrypt_aes256 (2025.06.17)
+```php
+/**
+ * - AES-256/CBC,ECB 복호화
+ * - pkcs5padding, pkcs7padding 두 방식은 서로 같음
+ * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
+ * @param  string $text      암호화문자열
+ * @param  string $key       복호화 키
+ * @param  string $iv        복호화 iv(ecb인경우 공백으로 두면 됨)
+ * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+ * @return string           평문자열, 실패시 빈문자열
+ */
+$ukp->decrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
+```
+## encrypt_aes256 (2025.06.17)
+```php
+/**
+ * - AES-256/CBC,ECB 암호화  
+ * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
+ * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+ * @param  string $text     평문자열
+ * @param  string $key      암호화 키
+ * @param  string $iv       암호화 iv(ecb인경우 공백으로 두면 됨)
+ * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
+ * @return string           암호화문자열, 실패시 빈문자열
+ */
+$ukp->encrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
+```
 ## db_create_row (2026.02.05)
 ```php
 /**
@@ -200,33 +228,16 @@ $ukp->db_select_list($table, $option = array(), $database = "default");
  */
 $ukp->db_table_ddl($table, $database = "default");
 ```
-## decrypt_aes256 (2025.06.17)
+## input_request (2026.02.06)
 ```php
 /**
- * - AES-256/CBC,ECB 복호화
- * - pkcs5padding, pkcs7padding 두 방식은 서로 같음
- * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
- * @param  string $text      암호화문자열
- * @param  string $key       복호화 키
- * @param  string $iv        복호화 iv(ecb인경우 공백으로 두면 됨)
- * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
- * @return string           평문자열, 실패시 빈문자열
+ * - $_REQUEST 배열의 값 가져오기
+ * - 키에 해당하는 값이 없는경우 $array_bool 값이 true이면 빈배열, false인경우 빈문자열
+ * @param  string       $key        키, 공백인경우 배열전체
+ * @param  bool         $array_bool 반환값형태, true - 배열, false - 문자열
+ * @return string|array
  */
-$ukp->decrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
-```
-## encrypt_aes256 (2025.06.17)
-```php
-/**
- * - AES-256/CBC,ECB 암호화  
- * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
- * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
- * @param  string $text     평문자열
- * @param  string $key      암호화 키
- * @param  string $iv       암호화 iv(ecb인경우 공백으로 두면 됨)
- * @param  bool   $cbc_bool true: CBC, false: ECB(기본값)
- * @return string           암호화문자열, 실패시 빈문자열
- */
-$ukp->encrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
+$ukp->input_request($key = "", $array_bool = false);
 ```
 ## decode_json (2025.01.17)
 ```php

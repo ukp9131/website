@@ -4080,10 +4080,11 @@ class Ukp {
     }
 
     /**
-     * - request
+     * - $_REQUEST 배열의 값 가져오기
+     * - 키에 해당하는 값이 없는경우 $array_bool 값이 true이면 빈배열, false인경우 빈문자열
      * 
-     * require  2025.08.05 array_value
-     * @version 2025.08.05
+     * require  2026.02.06 array_value
+     * @version 2026.02.06
      *
      * @param  string       $key        키, 공백인경우 배열전체
      * @param  bool         $array_bool 반환값형태, true - 배열, false - 문자열
