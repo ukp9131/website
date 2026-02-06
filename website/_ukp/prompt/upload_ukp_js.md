@@ -1,4 +1,4 @@
-# 자바스크립트 ukp 함수 리스트 (2026.02.05)
+# 자바스크립트 ukp 함수 리스트 (2026.02.06)
 ## ajax (2025.01.17)
 ```js
 /**
@@ -98,6 +98,16 @@ ukp.find(selector);
  * @returns {array}           html 요소객체리스트
  */
 ukp.find_all(selector);
+```
+## http_build_query (2026.02.06)
+```js
+/**
+ * - json 객체를 쿼리스트링으로 변환
+ * - `{foo:"bar", hi:"hello"}` -> `foo=bar&hi=hello`
+ * @param {object} json json 객체
+ * @returns {string} 쿼리스트링
+ */
+ukp.http_build_query(json);
 ```
 ## on (2025.01.17)
 ```js

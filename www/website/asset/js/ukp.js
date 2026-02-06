@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.02.04
+ * @version 2026.02.06
  * @author ukp
  */
 
@@ -1255,9 +1255,10 @@ class Ukp {
 
     /**
      * - json 객체를 쿼리스트링으로 변환
+     * - `{foo:"bar", hi:"hello"}` -> `foo=bar&hi=hello`
      * 
-     * require  2024.11.07
-     * @version 2024.11.07
+     * require  2026.02.06
+     * @version 2026.02.06
      * 
      * @param   {object} json json 객체
      * @returns {string}      쿼리스트링
@@ -1432,7 +1433,7 @@ class Ukp {
      * @version 2025.03.06
      * 
      * @param   {string} text 문자열
-     * @returns {number}      정수
+     * @returns {number}      실수
      */
     floatval(text) {
         var num = parseFloat(text);
