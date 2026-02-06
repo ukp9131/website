@@ -178,13 +178,14 @@ $ukp->db_update($table, $option = array(), $database = "default");
  */
 $ukp->db_select_cnt($table, $option = array(), $database = "default");
 ```
-## db_select_list (2026.01.29)
+## db_select_list (2026.02.06)
 ```php
 /**
  * - list 쿼리 결과
  * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
  * - sql 파일 없는경우 `select * from {테이블명}` 쿼리 사용
  * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
+ * - 정렬배열은 빈배열인경우 쿼리문에 있는 기본 정렬 사용
  * @param  string $table    테이블명
  * @param  array  $option   옵션
  * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
@@ -192,13 +193,13 @@ $ukp->db_select_cnt($table, $option = array(), $database = "default");
  * - `bool   [or_bool=false]`         true: where or문, false: where and문
  * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
  * - `bool   [where_table_bool=true]` true 인경우 where 문에 축약테이블명 필수, ex) array("`st`.`field`" => "value")
- * - `array  [group_by=array()]`      group by, 빈배열인경우 설정안함
+ * - `array  [group_by=array()]`      group by 컬럼 1차원배열, 빈배열인경우 설정안함
  * - `array  [having=array()]`        having, 빈배열이거나 group by 설정 안되어있는경우 설정안함
  * - `bool   [having_or_bool=false]`  true: having or문, false: having and문
- * - `array  [order_by=array()]`      정렬 배열(기본정렬인경우 빈배열)
+ * - `array  [order_by=array()]`      정렬 배열, "컬럼명 정렬방향" 문자열을 값으로 가지는 1차원 배열 (예: array("`a`.`idx` desc"))
  * - `int    [limit]`                 표시갯수
  * - `int    [start]`                 표시 시작점, limit 있는경우에만
- * - `string [prefix=null]`            테이블 접두어, 세팅 안한경우 설정값
+ * - `string [prefix=null]`           테이블 접두어, 세팅 안한경우 설정값
  * - `string [delete_flag=null]`      삭제여부 컬럼, 세팅 안한경우 설정값
  * - `bool   [info_bool=false]`       true: 하나의 row 배열 반환, false: 다중 row 배열 반환
  * @param  string $database 사용 데이터베이스
