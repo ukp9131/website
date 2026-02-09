@@ -1,24 +1,26 @@
-# 변수에 값을 입력하는 php 코드 작성(dp) (2026.02.06)
+# 변수에 값을 입력하는 php 코드 작성(dp) (2026.02.09)
 ## 프롬프트
 - 
-## 이미 세팅 되어있는 변수 리스트 (변수명: 변수 설명)
+## 이미 세팅 되어있는 변수 리스트 (변수명 = 변수 설명)
 ```
-$ukp: ukp 객체참조변수
-$global: 빈 배열
-$data: 빈 배열
+$ukp = ukp 객체참조변수
+$global = 빈 배열
+$data = 빈 배열
 ```
-## 값을 입력할 변수 (변수명: 값 설명)
+## 값을 입력할 변수 (변수명 = 입력할 값 설명)
 ```
-$data["code"]: 성공인경우 1, 실패인경우 2
-$data["msg"]: code 값이 1 인경우 성공, 2 인경우 실패
+$data["code"] = 성공인경우 1, 실패인경우 2
+$data["msg"] = code 값이 1 인경우 성공, 2 인경우 실패
 ```
 ## 규칙
 - 업로드한 ```upload_ukp_php.md``` 파일에 나와있는 함수를 최대한 사용하여 작성해줘.
-- ```$ukp->db_select_list()``` 함수 사용시 업로드한 ```upload_db_select_sql.md``` 파일에 select 쿼리 참고해줘.
-- ```$ukp->db_select_cnt()``` 함수 사용시 업로드한 ```upload_db_select_sql.md``` 파일에 select 부분만 ``` count(*) as `cnt` ``` 로 변경한 select 쿼리 참고해줘.
-- 데이터베이스 테이블 구조는 업로드한 ```upload_db_table_ddl.md``` 파일에 json 형태로 표현되어있고 json 구조 설명은 ```$ukp->db_table_ddl()`` 함수 주석 참고해줘.
+- ```$ukp->db_select_list()``` 함수 사용시 업로드한 sql 확장자 파일에 select 쿼리 참고해줘.
+- ```$ukp->db_select_cnt()``` 함수 사용시 업로드한 sql 확장자 파일에 select 부분만 ``` count(*) as `cnt` ``` 로 변경한 select 쿼리 참고해줘.
+- 데이터베이스 테이블 구조는 업로드한 json 확장자 파일에 json 형태로 표현되어있고 json 구조 설명은 ```$ukp->db_table_ddl()`` 함수 주석 참고해줘.
+- 업로드한 sql, json 파일은 파일명이 테이블명이고 database 명은 프롬프트에 언급이 없다면 default 라고 생각해줘.
 - ```$ukp``` 함수중에 where 배열, or_bool 설정하는 함수는 ```$ukp->db_create_where()``` 함수 사용하므로 해당 함수설명 참고하여 작성해줘.
 - ```$ukp``` 함수중에 row 배열 설정하는 함수는 ```$ukp->db_create_row()``` 함수 사용하므로 해당 함수설명 참고하여 작성해줘.
+- ```$ukp->db_*()``` 함수중에 ```$option``` 매개변수 설정시 prefix, delete_flag, insert_date, insert_time, insert_dt, update_date, update_time, update_dt 값은 설정하지 않음.
 - ```## 값을 입력할 변수``` 에 입력할 값이 최종적으로 정해지기 전에 다른 변수를 사용하고 소스코드 마지막에서 변수에 값 입력해줘.
 - ```$ukp->db_select_list()```, ```$ukp->db_select_cnt()``` 함수에서 where 조건문 키값에는 반드시 테이블별칭 붙여줘.
 - ```## 이미 세팅 되어있는 변수 리스트```**는 시스템에서 이미 초기화되었습니다.**, 코드 내에서 이 변수들을 다시 선언(예: ```$data = array();```)하거나 덮어쓰지 말고, **제공된 객체와 배열을 그대로 사용**하여 비즈니스 로직만 구현하세요.
