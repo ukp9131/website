@@ -14,13 +14,12 @@ $data["msg"] = code 값이 1 인경우 성공, 2 인경우 실패
 ```
 ## 규칙
 - 업로드한 ```upload_ukp_php.md``` 파일에 나와있는 함수를 최대한 사용하여 작성해줘.
-- ```$ukp->db_select_list()``` 함수 사용시 업로드한 sql 확장자 파일에 select 쿼리 참고해줘.
-- ```$ukp->db_select_cnt()``` 함수 사용시 업로드한 sql 확장자 파일에 select 부분만 ``` count(*) as `cnt` ``` 로 변경한 select 쿼리 참고해줘.
+- ```$ukp->db_select_list()``` 함수 사용시 업로드한 ```upload_db_select_sql.md``` 파일에 select 쿼리 참고해줘.
+- ```$ukp->db_select_cnt()``` 함수 사용시 업로드한 ```upload_db_select_sql.md``` 파일에 select 부분만 ``` count(*) as `cnt` ``` 로 변경한 select 쿼리 참고해줘.
+- 데이터베이스 테이블 구조는 업로드한 ```upload_db_table_ddl.md``` 파일에 json 형태로 표현되어있고 json 구조 설명은 ```$ukp->db_table_ddl()`` 함수 주석 참고해줘.
 - DB 쿼리 결과 변수는 항상 초기화되어 있다고 가정한다.
   - 1줄 결과: 데이터가 없더라도 쿼리의 모든 컬럼명이 키(key)로 존재하며 값은 null로 세팅된다. **데이터 존재 여부는 기본키(PK) 컬럼 값이 null인지 확인하여 판단해줘.** (키 존재 여부를 확인하는 isset()은 사용 금지)
   - 여러 줄 결과: 데이터가 없으면 빈 배열(```array()```)임이 보장된다. **데이터 존재 여부는 결과값이 빈 배열인지 확인하여 판단해줘.** (is_array()나 isset() 검사 없이 바로 foreach문 사용 가능)
-- 데이터베이스 테이블 구조는 업로드한 json 확장자 파일에 json 형태로 표현되어있고 json 구조 설명은 ```$ukp->db_table_ddl()`` 함수 주석 참고해줘.
-- 업로드한 sql, json 파일은 파일명이 테이블명이고 database 명은 프롬프트에 언급이 없다면 default 라고 생각해줘.
 - ```$ukp``` 함수중에 where 배열, or_bool 설정하는 함수는 ```$ukp->db_create_where()``` 함수 사용하므로 해당 함수설명 참고하여 작성해줘.
 - ```$ukp``` 함수중에 row 배열 설정하는 함수는 ```$ukp->db_create_row()``` 함수 사용하므로 해당 함수설명 참고하여 작성해줘.
 - ```$ukp->db_*()``` 함수중에 ```$option``` 매개변수 설정시 prefix, delete_flag, insert_date, insert_time, insert_dt, update_date, update_time, update_dt 값은 설정하지 않음.
