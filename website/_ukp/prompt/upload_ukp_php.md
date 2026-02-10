@@ -298,3 +298,20 @@ $ukp->unique_id();
  */
 $ukp->unique_session_id($id, $pw, $temp_bool = false);
 ```
+## common_pagination (2026.01.08)
+```php
+/**
+ * - 페이지네이션 생성
+ * @param  int    $total_row    총 데이터 갯수
+ * @param  int    $per_page     페이지네이션 1개당 데이터 갯수
+ * @param  int    $num_links    페이지네이션 번호출력 갯수(홀수권장)
+ * @param  string $query_string 페이지네이션 쿼리스트링 파라미터
+ * @return array                페이지네이션 정보 배열
+ * - `string [first_link]`          가장처음 링크
+ * - `string [last_link]`            가장끝 링크
+ * - `string [list][][link]`        해당번호 링크
+ * - `int    [list][][num]`          해당번호
+ * - `bool   [list][][active_bool]` 현재번호여부
+ */
+$ukp->common_pagination($total_row = 0, $per_page = 10, $num_links = 5, $query_string = "start");
+```
