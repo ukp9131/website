@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.02.06
+ * @version 2026.02.11
  * @author ukp
  */
 
@@ -19,7 +19,7 @@ class Ukp {
      * - 생성자
      * 
      * require  2025.01.17 each
-     * @version 2026.02.04
+     * @version 2026.02.11
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.02.04");
+        console.log("ukp.js 2026.02.11");
     }
 
     /**
@@ -1254,25 +1254,38 @@ class Ukp {
     }
 
     /**
-     * - json 객체를 쿼리스트링으로 변환
-     * - `{foo:"bar", hi:"hello"}` -> `foo=bar&hi=hello`
+     * - `foo=bar&hi=hello` 형태의 쿼리스트링 반환
+     * - json 객체는 키=값 형태로 생성
+     * - 매개변수가 문자열인경우 해당 쿼리셀렉터를 가진 form 태그 객체 있는지 확인
+     * - form 태그 객체는 객체 내에 value 값을 가질 수 있는 요소의 name=value 형태로 생성
      * 
-     * require  2026.02.06
-     * @version 2026.02.06
+     * require  2026.02.11
+     * @version 2026.02.11
      * 
-     * @param   {object} json json 객체
-     * @returns {string}      쿼리스트링
+     * @param   {object|string} target json 객체, form 태그 객체, form 태그 쿼리셀렉터
+     * @returns {string}               쿼리스트링
      */
-    http_build_query(json) {
-        var str = "";
-        for (var k in json) {
-            var v = json[k];
-            if (str != "") {
-                str += "&";
-            }
-            str += encodeURIComponent(k) + "=" + encodeURIComponent(v);
+    http_build_query(target) {
+        const ukp = this;
+        var type = ukp.obj_type(target);
+        if (type == "string") {
+            const element = ukp.find_all(target);
+            ukp.each(element, function(v) {
+                if (ukp.obj_type(v) == "htmlformelement") {
+                    target = v;
+                    type = "htmlformelement";
+                    return false;
+                }
+            });
         }
-        return str;
+        if (type == "htmlformelement") {
+            const formData = new FormData(target);
+            return new URLSearchParams(formData).toString();
+        }
+        if (typeof target === 'object') {
+            return new URLSearchParams(target).toString();
+        }
+        return "";
     }
 
     /**

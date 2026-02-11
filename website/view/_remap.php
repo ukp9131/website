@@ -13,10 +13,10 @@
     <!-- css -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&display=swap" rel="stylesheet">
     <!-- js -->
-    <script src="asset/js/ukp.js"></script>
+    <script src="_.php?file=<?php echo urlencode("_.js") ?>"></script>
     <!-- SEO meta, favicon -->
     <!-- style -->
-    <style><?php echo file_get_contents("{$global["dir_css"]}/_remap.css"); ?></style>
+    <link rel="stylesheet" href="_.php?file=<?php echo urlencode("_remap.css") ?>">
 </head>
 
 <body>
@@ -26,7 +26,7 @@
         </div>
     </div>
     <!-- script -->
-    <script type="module"><?php echo file_get_contents("{$global["dir_js"]}/_remap.js"); ?></script>
+    <script src="_.php?file=<?php echo urlencode("_remap.js") ?>"></script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
-<style><?php echo file_get_contents("{$global["dir_css"]}/index.css"); ?></style>
+<link rel="stylesheet" href="_.php?file=<?php echo urlencode("index.css") ?>">
 <div class="ukpb__content">
     hello world!
 </div>
-<script type="module"><?php echo file_get_contents("{$global["dir_js"]}/index.js"); ?></script>
+<script type="module" src="_.php?file=<?php echo urlencode("index.js") ?>"></script>

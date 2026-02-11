@@ -99,15 +99,17 @@ ukp.find(selector);
  */
 ukp.find_all(selector);
 ```
-## http_build_query (2026.02.06)
+## http_build_query (2026.02.11)
 ```js
 /**
- * - json 객체를 쿼리스트링으로 변환
- * - `{foo:"bar", hi:"hello"}` -> `foo=bar&hi=hello`
- * @param {object} json json 객체
- * @returns {string} 쿼리스트링
+ * - `foo=bar&hi=hello` 형태의 쿼리스트링 반환
+ * - json 객체는 키=값 형태로 생성
+ * - 매개변수가 문자열인경우 해당 쿼리셀렉터를 가진 form 태그 객체 있는지 확인
+ * - form 태그 객체는 객체 내에 value 값을 가질 수 있는 요소의 name=value 형태로 생성
+ * @param   {object|string} target json 객체, form 태그 객체, form 태그 쿼리셀렉터
+ * @returns {string}               쿼리스트링
  */
-ukp.http_build_query(json);
+ukp.http_build_query(target);
 ```
 ## on (2025.01.17)
 ```js
@@ -160,4 +162,3 @@ ukp.set_storage(key, value, expiration_dt = "");
  */
 ukp.unset_storage(key = null);
 ```
-
