@@ -1,4 +1,4 @@
-# PHP $ukp 함수 리스트 (2026.02.06)
+# PHP $ukp 함수 리스트 (2026.02.12)
 ## decrypt_aes256 (2025.06.17)
 ```php
 /**
@@ -229,6 +229,83 @@ $ukp->db_select_list($table, $option = array(), $database = "default");
  * - `array  [data][]`             컬럼 순서대로 값 설정, null 또는 설정 안한경우 기본값으로
  */
 $ukp->db_table_ddl($table, $database = "default");
+```
+## input_file (2026.02.06)
+```php
+/**
+ * - `$_FILES` 정보
+ * - `$array_bool` 값이 true 인경우 업로드한 파일 리스트정보로 반환, 파일 없는경우 빈배열
+ * - `$array_bool` 값이 false 인경우 업로드한 파일정보 1차원배열로 반환, 파일 없는경우 값이 빈문자열, 0으로 채워진 배열
+ * @param  string $name       파일 태그 name속성
+ * @param  bool   $array_bool true - 배열이름, false - 단일이름
+ * @return array              `$array_bool` 값에 따라 1차원배열 또는 2차원배열 반환
+ * - `string [name]`
+ * - `string [type]`
+ * - `string [tmp_name]`
+ * - `int    [error]`
+ * - `int    [size]`
+ */
+$ukp->input_file($name, $array_bool = false);
+```
+## input_file_upload (2026.02.06)
+```php
+/**
+ * - 단일 파일업로드
+ * - 함수 실행 후 input_file_upload_info 함수 호출하여 반환값으로 결과확인
+ * @param  string $name             파일 태그 name속성
+ * @param  string $src              파일 저장할 폴더경로
+ * @param  array  $allow_ext        업로드 허용 확장자 배열(.제외하여 입력)
+ * @param  bool   $unique_name_bool true인경우 업로드한 파일명을 유니크한 파일명으로 변경
+ * @return bool                     업로드 성공시 true, 실패시 false
+ */
+$ukp->input_file_upload($name = "file", $src = ".", $allow_ext = array(), $unique_name_bool = false);
+```
+## input_file_upload_arr (2026.02.06)
+```php
+/**
+ * - 배열파일 일괄업로드
+ * @param  string $name             파일 태그 name속성
+ * @param  string $src              파일 저장할 폴더경로
+ * @param  array  $allow_ext        업로드 허용 확장자 배열(.제외하여 입력)
+ * @param  bool   $unique_name_bool true인경우 업로드한 파일명을 유니크한 파일명으로 변경
+ * @return array                    업로드 결과 배열
+ * - `bool   [success_bool]`         true: 성공, false: 업로드할 폴더 없음
+ * - `bool   [list][][success_bool]` true: 성공, false: 허용확장자 아님
+ * - `string [list][][name]`         업로드 파일명
+ * - `string [list][][ext]`          업로드 파일 확장자
+ * - `string [list][][full_name]`    확장자 포함 파일명
+ */
+$ukp->input_file_upload_arr($name = "file", $src = ".", $allow_ext = array(), $unique_name_bool = false);
+```
+## input_file_upload_base64 (2026.02.06)
+```php
+/**
+ * - base64 문자열로 되어있는 이미지를 파일로 저장
+ * - 함수 실행 후 input_file_upload_info 함수 호출하여 반환값으로 결과확인
+ * @param  string $file base64 문자열로 되어있는 이미지 데이터
+ * @param  string $src  파일 저장할 폴더경로
+ * @return bool
+ */
+$ukp->input_file_upload_base64($file, $src = ".");
+```
+## input_file_upload_info (2026.02.06)
+```php
+/**
+ * - 단일 파일업로드 결과
+ * - 업로드 결과코드 정보
+ * + 0: 업로드한적 없음
+ * + 1: 업로드 성공
+ * + 2: 업로드파일 없음
+ * + 3: 업로드할 폴더 없음
+ * + 4: 허용확장자 없음
+ * @return array 업로드한 파일정보
+ * - `int    [code]`      업로드 결과코드
+ * - `string [name]`      업로드 파일명  
+ * - `string [ext]`       업로드 파일 확장자  
+ * - `string [full_name]` 확장자 포함 파일명  
+ * - `string [src]`       업로드 경로
+ */
+$ukp->input_file_upload_info();
 ```
 ## input_request (2026.02.06)
 ```php
