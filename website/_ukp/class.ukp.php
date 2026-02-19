@@ -7,610 +7,125 @@
  * - `bool [session_bool=true]` 세션사용여부
  * - `bool [cors_bool=false]`   cors 허용여부
  * 
- * require  2026.01.02 config.php
- * @version 2026.02.06
+ * require  2026.02.19 config.php
+ * @version 2026.02.19
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
 class Ukp {
-// #region @ukp 필수설정
+// #region @ukp 필수변수
     /**
-     * 서버 케릭터셋  
-     *   
+     * - 서버 케릭터셋
+     * 
      * @version 2020.02.13
      * @var     string
      */
     private $charset;
+
     /**
-     * 서버 타임존  
-     *   
+     * - 서버 타임존
+     * 
      * @version 2020.07.29
      * @var     string
      */
     private $time_zone;
-// #endregion
-// #region @ukp db
+
     /**
-     * mysqli 접속정보  
-     *   
+     * - api url
+     * 
+     * @version 2026.02.19
+     * @var     string
+     */
+    private $api_url;
+
+    /**
+     * - api 토큰
+     * 
+     * @version 2026.02.19
+     * @var     string
+     */
+    private $api_token;
+
+    /**
+     * - mysqli 접속정보
+     * 
      * @version 2020.07.10
      * @var     array
      */
     private $db_info;
 
     /**
-     * mysqli insert_id  
-     *   
+     * - mysqli insert_id
+     * 
      * @version 2020.07.10
      * @var     int
      */
     private $db_insert_id;
 
     /**
-     * mysqli affected_rows  
-     *   
+     * - mysqli affected_rows
+     * 
      * @version 2020.07.10
      * @var     int
      */
     private $db_affected_rows;
 
     /**
-     * mysqli last_query  
-     *   
+     * - mysqli last_query
+     * 
      * @version 2022.12.19
      * @var     string
      */
     private $db_last_query;
-// #endregion
-// #region @ukp input
+
     /**
-     * 파일 업로드 상태값  
-     *   
-     * [code]: 업로드 결과코드  
-     *         0 - 업로드한적 없음  
-     *         1 - 업로드 성공  
-     *         2 - 업로드파일 없음  
-     *         3 - 업로드할 폴더 없음  
-     *         4 - 허용확장자 없음  
-     * [name]: 업로드 파일명  
-     * [ext]: 업로드 파일 확장자  
-     * [full_name]: 확장자 포함 파일명  
-     * [src]: 업로드 경로  
-     *   
+     * - request
+     * 
+     * @version 2026.02.19
+     * @var     array
+     */
+    private $input_request;
+
+    /**
+     * - 파일 업로드 상태값
+     * - `int [code]`         업로드 결과코드
+     * + 0 - 업로드한적 없음
+     * + 1 - 업로드 성공
+     * + 2 - 업로드파일 없음
+     * + 3 - 업로드할 폴더 없음
+     * + 4 - 허용확장자 없음
+     * - `string [name]`      업로드 파일명
+     * - `string [ext]`       업로드 파일 확장자
+     * - `string [full_name]` 확장자 포함 파일명
+     * - `string [src]`       업로드 경로
+     * 
      * @version 2020.02.13
      * @var     array
      */
     private $input_upload_info;
-// #endregion
-// #region @ukp common
-    /**
-     * api url  
-     *   
-     * @version 2025.03.06
-     * @var     string
-     */
-    private $common_api_url;
 
     /**
-     * api 토큰  
-     *   
-     * @version 2025.03.06
-     * @var     string
-     */
-    private $common_api_token;
-
-    /**
-     * User-Agent(크롤링용)  
-     *   
-     * @version 2020.05.26
-     * @var     string
-     */
-    private $common_user_agent;
-
-    /**
-     * 페이누리 암호화키  
-     *   
-     * @version 2020.02.13
-     * @var     string
-     */
-    private $common_keyin_paynuri_crypto;
-
-    /**
-     * 웰컴페이 API키  
-     *   
-     * @version 2020.02.13
-     * @var     string
-     */
-    private $common_keyin_welcome_api_key;
-
-    /**
-     * 웰컴페이 IV값  
-     *   
-     * @version 2020.02.13
-     * @var     string
-     */
-    private $common_keyin_welcome_iv;
-
-    /**
-     * 원시그널 앱아이디  
-     *   
-     * @version 2020.02.13
-     * @var     string
-     */
-    private $common_onesignal_app_id;
-
-    /**
-     * 원시그널 rest api 키  
-     *   
-     * @version 2024.10.29
-     * @var     string
-     */
-    private $common_onesignal_rest_api_key;
-
-    /**
-     * 공공데이터포털 날씨 서비스키  
-     *   
-     * @version 2020.02.13
-     * @var     string
-     */
-    private $common_godata_weather;
-
-    /**
-     * 공공데이터포털 휴일 서비스키  
-     *   
-     * @version 2020.09.11
-     * @var     string
-     */
-    private $common_godata_holiday;
-
-    /**
-     * 카카오맵 REST API 키  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_kakao_rest_api;
-
-    /**
-     * 카카오 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_kakao_redirect_url;
-
-    /**
-     * 카카오 로그인 REST API 키  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_kakao_rest_api;
-
-    /**
-     * 카카오 로그인 client secret  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_kakao_client_secret;
-
-    /**
-     * 네이버 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_naver_redirect_url;
-
-    /**
-     * 네이버 로그인 client id  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_naver_client_id;
-
-    /**
-     * 네이버 로그인 client secret  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_naver_client_secret;
-
-    /**
-     * 페이스북 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_facebook_redirect_url;
-
-    /**
-     * 페이스북 로그인 client id  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_facebook_client_id;
-
-    /**
-     * 페이스북 로그인 client secret  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_facebook_client_secret;
-
-    /**
-     * 구글 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_google_redirect_url;
-
-    /**
-     * 구글 로그인 client id  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_google_client_id;
-
-    /**
-     * 구글 로그인 client secret  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_google_client_secret;
-
-    /**
-     * PASS 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_pass_redirect_url;
-
-    /**
-     * PASS 로그인 client id  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_pass_client_id;
-
-    /**
-     * PASS 로그인 client secret  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_pass_client_secret;
-
-    /**
-     * 애플 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_apple_redirect_url;
-
-    /**
-     * 애플 로그인 identifier(service id)  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_apple_identifier;
-
-    /**
-     * 애플 로그인 key id(key)  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_apple_key_id;
-
-    /**
-     * 애플 로그인 team id  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_apple_team_id;
-
-    /**
-     * 애플 로그인 private key file  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_apple_private_key_file;
-
-    /**
-     * 카페24 로그인 redirect url  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_cafe24_redirect_url;
-
-    /**
-     * 카페24 로그인 client id  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_cafe24_client_id;
-
-    /**
-     * 카페24 로그인 client secret  
-     *   
-     * @version 2025.01.17
-     * @var     string
-     */
-    private $common_social_cafe24_client_secret;
-
-    /**
-     * 톡스토어 api 인증키  
-     *   
-     * @version 2021.05.24
-     * @var     string
-     */
-    private $common_shop_kakao_admin_app_key;
-
-    /**
-     * esm 비밀키  
-     *   
-     * @version 2022.01.11
-     * @var     string
-     */
-    private $common_shop_esm_secret_key;
-
-    /**
-     * 커머스 client id  
-     *   
-     * @version 2023.05.18
-     * @var     string
-     */
-    private $common_shop_commerce_client_id;
-
-    /**
-     * 커머스 client secret  
-     *   
-     * @version 2023.05.18
-     * @var     string
-     */
-    private $common_shop_commerce_client_secret;
-
-    /**
-     * 티몬 client id  
-     *   
-     * @version 2023.05.18
-     * @var     string
-     */
-    private $common_shop_tmon_client_id;
-
-    /**
-     * 티몬 client secret  
-     *   
-     * @version 2023.05.18
-     * @var     string
-     */
-    private $common_shop_tmon_client_secret;
-
-    /**
-     * 티몬 복호화 키  
-     *   
-     * @version 2023.05.18
-     * @var     string
-     */
-    private $common_shop_tmon_secret_key;
-// #endregion
-// #region @ukp custom
-    /**
-     * asn1 integer  
-     *   
-     * @version 2021.03.10
+     * - unique id 중복방지
+     * 
+     * @version 2026.02.19
      * @var     int
      */
-    private $custom_asn1_integer;
+    private $unique_index;
 
     /**
-     * asn1 sequence  
-     *   
-     * @version 2021.03.10
-     * @var     int
-     */
-    private $custom_asn1_sequence;
-
-    /**
-     * asn1 bit string  
-     *   
-     * @version 2021.03.10
-     * @var     int
-     */
-    private $custom_asn1_bit_string;
-
-    /**
-     * unique id 중복방지  
-     *   
-     * @version 2022.06.28
-     * @var     int
-     */
-    private $custom_unique_index;
-
-    /**
-     * 사용자 정보  
-     *   
-     * @version 2025.10.24
+     * - 사용자 정보
+     * 
+     * @version 2026.02.19
      * @var     string
      */
-    private $custom_user_info;
-
-    /**
-     * request  
-     *   
-     * @version 2025.08.05
-     * @var     array
-     */
-    private $custom_request;
-
-    /**
-     * 스마트스토어 api url  
-     *   
-     * @version 2023.06.14
-     * @var     string
-     */
-    private $custom_shop_smartstore_api_url;
-
-    /**
-     * 티몬 api url  
-     *   
-     * @version 2023.06.14
-     * @var     string
-     */
-    private $custom_shop_tmon_api_url;
-
-    /**
-     * 위메프 api url  
-     *   
-     * @version 2023.06.14
-     * @var     string
-     */
-    private $custom_shop_wemakeprice_api_url;
-
-    /**
-     * 스마트스토어 api 수집딜레이(마이크로초)  
-     *   
-     * @version 2023.06.14
-     * @var     int
-     */
-    private $custom_shop_smartstore_api_delay;
-
-    /**
-     * 톡스토어 api 수집딜레이(마이크로초)  
-     *   
-     * @version 2023.07.10
-     * @var     int
-     */
-    private $custom_shop_kakao_api_delay;
-
-    /**
-     * 주문/클레임정보  
-     * 주문리스트에 결제일이 누락된 부분이 있는경우 구매일자 주문일, 아닌경우 결제일  
-     * 선물하기 주문은 주문일과 결제일이 같음  
-     *   
-     * 상점별 기준(order_no / product_price / buy_dt / 선물주문여부)  
-     * 스마트스토어: 상품주문번호 / 상품별 총 주문금액 / 결제일 / y  
-     * 티몬: 주문번호-옵션번호 / 총 주문금액 / 결제일 / n  
-     * ESM: 주문번호 / 정산예정금액 / 결제일 / y  
-     * 쿠팡:주문번호-(vendorItemId 또는 targetItemId) / 주문금액 - 할인금액 + 쿠팡지원할인 / 결제일 / n  
-     * 위메프: 옵션주문번호 / 판매단가 * 수량 / 결제일 / n  
-     * 11번가: 주문번호-주문순번 / 판매단가 * 수량 + 옵션가 / 주문일 / y  
-     * 톡스토어: 주문번호 / 총 주문금액 - 총 할인금액 / 결제일 / n  
-     * 인터파크: 주문번호-주문순번 / 판매단가 * 수량 / 결제일 / n  
-     * 롯데ON: 주문번호-주문순번 / 판매금액 / 결제일 / n  
-     * 카페24: ord-item-code / 상품구매금액(계정방식 배송중,배송완료는 총 상품구매금액) / 주문일 / n  
-     * 고도몰5: 상품주문번호 / 총 상품금액 / 결제일 / n  
-     * 샵바이: 주문상품옵션번호 / 즉시할인가 * 수량 / 주문일 / n  
-     * SSG: 주문번호-주문순번 / 판매단가 * 수량 / 결제일 / n  
-     * 셀러허브: 주문아이템번호(sno) / 결제가격(sprice) / 주문일 / n  
-     * 멸치쇼핑: 주문번호-상품번호(ordercd-productcd) / 정산예정금액(calamount + chargedshippingfee) / 주문일 / n  
-     * 아임웹: 품목주문번호 / 옵션가격 / 주문일 / n  
-     * 블로그페이: 주문상품번호 / 상품주문가격 / 주문일 / n  
-     * GS SHOP: 주문번호 / 협력사지급금액 / 주문일 / n  
-     *   
-     * [status](주문,클레임)(필수): 선물수락전-gift, 신규-new, 확인-confirm, 배송대기,배송중-progress 배송완료,구매확정-end  
-     *                              취소요청-cancel, 반품요청-refund, 교환요청-exchange  
-     *                              취소처리-cancel_end, 반품처리-refund_end, 교환처리-exchange_end  
-     * [code](주문): 주문처리코드(^구분자)  
-     * [order_no](주문,클레임)(필수): 주문고유번호  
-     * [shop_order_no](주문,클레임): 상점주문번호  
-     * [buy_code](주문): 개인통관고유부호  
-     * [buy_dt](주문)(필수): 구매일자  
-     * [buy_name](주문,클레임): 주문자명  
-     * [buy_tel](주문): 주문자 전화번호  
-     * [buy_phone](주문): 주문자 핸드폰번호  
-     * [product_code](주문): 판매자코드  
-     * [product_url](주문,클레임): 상품URL  
-     * [product_name](주문,클레임): 상품명  
-     * [product_option](주문,클레임): 옵션  
-     * [product_option_code](주문): 옵션코드  
-     * [product_cnt](주문,클레임)(필수): 수량  
-     * [product_price](주문,클레임)(필수): 총금액  
-     * [to_dt](주문): 발송예정일  
-     * [to_name](주문,클레임): 수취인명  
-     * [to_tel](주문): 수취인 전화번호  
-     * [to_phone](주문): 수취인 핸드폰번호  
-     * [to_postcode](주문): 우편번호  
-     * [to_address](주문): 수취인 주소  
-     * [to_message](주문): 배송메세지  
-     * [to_type](주문): 배송비지불방법  
-     * [to_price](주문): 배송비  
-     * [delivery](주문): 배송코드  
-     * [invoicing_no](주문): 송장번호  
-     * [claim_dt](클레임)(필수): 클레임요청일자  
-     * [claim_reason](클레임): 클레임사유  
-     * [search_date](주문,클레임)(필수): 검색기준일  
-     *   
-     * @version 2023.07.10
-     * @var     array
-     */
-    private $custom_shop_order_row;
-
-    /**
-     * 문의정보  
-     * [question_code]: 문의처리번호  
-     * [question_no](필수): 문의고유번호  
-     * [question_title]: 문의제목  
-     * [question_content]: 문의내용  
-     * [question_dt](필수): 문의일자  
-     * [product_url]: 상품URL  
-     * [product_name]: 상품명  
-     *   
-     * @version 2023.07.10
-     * @var     array
-     */
-    private $custom_shop_question_row;
-
-    /**
-     * 상품url  
-     * [smartstore]: 스마트스토어  
-     * [tmon]: 티몬  
-     * [esm_g]: 지마켓  
-     * [esm_a]: 옥션  
-     * [coupang]: 쿠팡  
-     * [wemakeprice2]: 위메프  
-     * [11st]: 11번가  
-     * [kakao]: 톡스토어  
-     * [interpark]: 인터파크  
-     * [lotte_on]: 롯데ON  
-     * [cafe24]: 카페24  
-     * [godo5_pro]: 고도몰5  
-     * [godo_shopby]: 샵바이  
-     * [ssg]: SSG  
-     * [sellerhub]: 셀러허브  
-     * [smelchi]: 멸치쇼핑  
-     * [imweb]: 아임웹  
-     * [blogpay]: 블로그페이  
-     * [gsshop]: GS SHOP  
-     *   
-     * @version 2023.07.10
-     * @var     array
-     */
-    private $custom_shop_product_url;
+    private $user_info;
 // #endregion
 // #region @ukp 필수함수
     /**
      * 생성자  
      *   
-     * require  2025.10.24 custom_error_handler custom_error_handler_fatal custom_parking session_start
-     * @version 2025.10.24
+     * require  2026.02.19 custom_error_handler custom_error_handler_fatal custom_parking custom_set_cookie custom_set_request session_start
+     * @version 2026.02.19
      * 
      * @param array $option 옵션설정  
      * `bool [api_bool=false]`    true - json, false - html(기본값: false)  
@@ -685,7 +200,7 @@ class Ukp {
         }
         //에러핸들러 설정
         error_reporting(E_ALL);
-        $this->custom_user_info = "";
+        $this->user_info = "";
         set_error_handler(array($this, "custom_error_handler"));
         register_shutdown_function(array($this, "custom_error_handler_fatal"));
         ini_set("display_errors", 0);
@@ -706,6 +221,9 @@ class Ukp {
             }
             $this->session_start($session_time, $session_dir);
         }
+        //api 설정
+        $this->api_url = $config["api_url"];
+        $this->api_token = $config["api_token"];
         //파일업로드 코드 설정
         $this->input_upload_info = array(
             "code" => "0",
@@ -714,92 +232,14 @@ class Ukp {
             "full_name" => "",
             "src" => ""
         );
-        //asn1 세팅
-        $this->custom_asn1_integer = 0x02;
-        $this->custom_asn1_sequence = 0x10;
-        $this->custom_asn1_bit_string = 0x03;
         //preg 제한
         ini_set("pcre.backtrack_limit", -1);
         //unique id 중복방지
-        $this->custom_unique_index = 0;
+        $this->unique_index = 0;
         //setting cookie
         $this->custom_set_cookie();
         //setting request
         $this->custom_set_request();
-        //api url 세팅
-        //$this->custom_shop_smartstore_api_url = "https://sandbox-api.commerce.naver.com/partner"; //스마트스토어 개발
-        $this->custom_shop_smartstore_api_url = "https://api.commerce.naver.com/partner"; //스마트스토어 운영
-        //$this->custom_shop_tmon_api_url = "http://interworkapi-test.tmon.co.kr"; //티몬 개발
-        $this->custom_shop_tmon_api_url = "https://interworkapi.tmon.co.kr"; //티몬 운영
-        //$this->custom_shop_wemakeprice_api_url = "https://wapi-stg.wemakeprice.com"; //위메프 개발
-        $this->custom_shop_wemakeprice_api_url = "https://w-api.wemakeprice.com"; //위메프 운영
-        //api 딜레이(마이크로초)
-        $this->custom_shop_smartstore_api_delay = 100000;
-        $this->custom_shop_kakao_api_delay = 100000;
-        //주문, 클레임, 문의정보 초기화
-        $this->custom_shop_order_row = array(
-            "status" => "",
-            "code" => "",
-            "order_no" => "",
-            "shop_order_no" => "",
-            "buy_code" => "",
-            "buy_dt" => "",
-            "buy_name" => "",
-            "buy_tel" => "",
-            "buy_phone" => "",
-            "product_code" => "",
-            "product_url" => "",
-            "product_name" => "",
-            "product_option" => "",
-            "product_option_code" => "",
-            "product_cnt" => "",
-            "product_price" => "",
-            "to_dt" => "",
-            "to_name" => "",
-            "to_tel" => "",
-            "to_phone" => "",
-            "to_postcode" => "",
-            "to_address" => "",
-            "to_message" => "",
-            "to_type" => "",
-            "to_price" => "",
-            "delivery" => "",
-            "invoicing_no" => "",
-            "claim_dt" => "",
-            "claim_reason" => "",
-            "search_date" => ""
-        );
-        $this->custom_shop_question_row = array(
-            "question_code" => "",
-            "question_no" => "",
-            "question_title" => "",
-            "question_content" => "",
-            "question_dt" => "",
-            "product_url" => "",
-            "product_name" => ""
-        );
-        //상품url
-        $this->custom_shop_product_url = array(
-            "smartstore" => "https://smartstore.naver.com/main/products/",
-            "tmon" => "https://www.tmon.co.kr/deal/",
-            "esm_g" => "https://item.gmarket.co.kr/Item?goodscode=",
-            "esm_a" => "https://itempage3.auction.co.kr/DetailView.aspx?itemno=",
-            "coupang" => "https://www.coupang.com/vp/products/777?vendorItemId=",
-            "wemakeprice2" => "https://front.wemakeprice.com/product/",
-            "11st" => "https://www.11st.co.kr/products/",
-            "kakao" => "https://store.kakao.com/__php__id__/products/",
-            "interpark" => "https://shopping.interpark.com/product/productInfo.do?prdNo=",
-            "lotte_on" => "https://www.lotteon.com/p/product/",
-            "cafe24" => "https://__php__id__.cafe24.com/shop__php__shop_no__/front/php/product.php?product_no=",
-            "godo5_pro" => "__php__extra__/goods/goods_view.php?goodsNo=",
-            "godo_shopby" => "__php__url__/product-detail?productNo=",
-            "ssg" => "https://www.ssg.com/item/itemView.ssg?itemId=",
-            "sellerhub" => "https://admin.sellerhub.co.kr/shop/goods/goods_view.php?goodsno=",
-            "smelchi" => "http://www.smelchi.com/product/detail?productCd=",
-            "imweb" => "__php__url__/shop/?idx=",
-            "blogpay" => "https://__php__id__.shop.blogpay.co.kr/good/product_view?goodNum=",
-            "gsshop" => "https://www.gsshop.com/prd/prd.gs?prdid="
-        );
     }
 
     /**
@@ -854,8 +294,8 @@ class Ukp {
      * 이진데이터는 base64 인코딩해서 전송  
      * 변수참조반환 함수인경우 반환값이 bool, 변수참조값이 return
      *   
-     * require  2025.05.30 array_value decode_json encode_json
-     * @version 2025.05.30
+     * require  2026.02.19 array_value decode_json encode_json
+     * @version 2026.02.19
      *
      * @param  string $func    실행할 함수
      * @param  array  $param   함수에 전달할 파라미터 리스트
@@ -867,12 +307,12 @@ class Ukp {
         if ($func == "openssl_verify") {
             $param[1] = base64_encode($param[1]);
         }
-        $curl_url = $this->common_api_url;
+        $curl_url = $this->api_url;
         $curl_header = array(
             "Content-Type: application/x-www-form-urlencoded"
         );
         $curl_query = http_build_query(array(
-            "token" => $this->common_api_token,
+            "token" => $this->api_token,
             "func" => $func,
             "param" => $this->encode_json($param)
         ));
@@ -1046,7 +486,7 @@ class Ukp {
                 array_shift($stack);
             }
         }
-        $this->custom_request = $request;
+        $this->input_request = $request;
     }
 // #endregion
 // #region @ukp array
@@ -3264,47 +2704,6 @@ class Ukp {
     }
 
     /**
-     * DER decode  
-     *   
-     * require  2025.01.17
-     * @version 2025.01.17
-     * 
-     * @param  string $der    the binary data in DER format
-     * @param  int    $offset the offset of the data stream containing the object
-     * @return array          [$offset, $data] the new offset and the decoded object
-     */
-    function decode_der($der, $offset = 0) {
-        $pos = $offset;
-        $size = strlen($der);
-        $constructed = (ord($der[$pos]) >> 5) & 0x01;
-        $type = ord($der[$pos++]) & 0x1f;
-
-        // Length
-        $len = ord($der[$pos++]);
-        if ($len & 0x80) {
-            $n = $len & 0x1f;
-            $len = 0;
-            while ($n-- && $pos < $size) {
-                $len = ($len << 8) | ord($der[$pos++]);
-            }
-        }
-
-        // Value
-        if ($type == $this->custom_asn1_bit_string) {
-            $pos++; // Skip the first contents octet (padding indicator)
-            $data = substr($der, $pos, $len - 1);
-            $pos += $len - 1;
-        } else if (!$constructed) {
-            $data = substr($der, $pos, $len);
-            $pos += $len;
-        } else {
-            $data = null;
-        }
-
-        return array($pos, $data);
-    }
-
-    /**
      * html decode(&amp; &lt; &gt; &quot;)  
      *   
      * require  2025.01.17
@@ -3535,28 +2934,6 @@ class Ukp {
             $enc_text = str_replace(array("+", "/", "="), array("-", "_", ""), $enc_text);
         }
         return $enc_text;
-    }
-
-    /**
-     * DER encode  
-     *   
-     * require  2025.01.17
-     * @version 2025.01.17
-     * 
-     * @param  int    $type  DER tag
-     * @param  bool   $value the value to encode
-     * @return string        the encoded object
-     */
-    function encode_der($type, $value) {
-        $tag_header = 0;
-        if ($type === $this->custom_asn1_sequence) {
-            $tag_header |= 0x20;
-        }
-        // Type
-        $der = chr($tag_header | $type);
-        // Length
-        $der .= chr(strlen($value));
-        return $der . $value;
     }
 
     /**
@@ -4021,7 +3398,7 @@ class Ukp {
      * @return string|array
      */
     function input_request($key = "", $array_bool = false) {
-        $request = $this->custom_request;
+        $request = $this->input_request;
         if ($key == "") {
             return $request;
         }
@@ -4126,8 +3503,8 @@ class Ukp {
         //문자열 예외처리
         $message = (is_numeric($str) || is_string($str)) ? $str : var_export($str, true);
         //회원정보 있는경우 표시
-        if ($this->custom_user_info != "") {
-            $message .= "\n" . $this->custom_user_info;
+        if ($this->user_info != "") {
+            $message .= "\n" . $this->user_info;
         }
         $file = fopen(dirname(__FILE__) . "/log/{$prefix}{$date}.log", "a");
         fwrite($file, "{$dt} --> {$message}\n");
@@ -4331,7 +3708,7 @@ class Ukp {
      */
     function unique_id() {
         $time = explode(" ", str_replace("0.", "", microtime()));
-        return date("YmdHis", $time[1]) . substr($time[0], 0, -2) . sprintf("%07d", getmypid()) . $this->custom_unique_index++;
+        return date("YmdHis", $time[1]) . substr($time[0], 0, -2) . sprintf("%07d", getmypid()) . $this->unique_index++;
     }
 
     /**
@@ -4365,9 +3742,9 @@ class Ukp {
      */
     function user_info($str = null) {
         if ($str !== null) {
-            $this->custom_user_info = strval($str);
+            $this->user_info = strval($str);
         }
-        return $this->custom_user_info;
+        return $this->user_info;
     }
 // #endregion
 }
