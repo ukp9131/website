@@ -39,5 +39,6 @@ $config["db"] = array(
         "table" => array()
     )
 );
+
 $config["api_url"] = "";
 $config["api_token"] = "";
