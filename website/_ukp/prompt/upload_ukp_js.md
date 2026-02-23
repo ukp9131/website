@@ -11,7 +11,7 @@
  */
 ukp.ajax(url, data, com_func, pro_func = null);
 ```
-## append (2025.02.23)
+## append (2026.02.23)
 ```js
 /**
  * - list 요소 내용 마지막에 row 요소 추가
