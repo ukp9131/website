@@ -175,3 +175,31 @@ ukp.set_storage(key, value, expiration_dt = "");
  */
 ukp.unset_storage(key = null);
 ```
+## floatval (2025.03.06)
+```js
+/**
+ * - 문자열 실수로 변경
+ * @param {string} text 문자열
+ * @returns {number} 실수
+ */
+ukp.floatval(text);
+```
+## intval (2025.03.06)
+```js
+/**
+ * - 문자열 정수로 변경
+ * @param {string} text 문자열
+ * @returns {number} 정수
+ */
+ukp.intval(text);
+```
+## strval (2026.02.04)
+```js
+/**
+ * - 숫자값을 문자열로 변경
+ * - 숫자, 문자열이 아닌경우 공백문자열 반환
+ * @param {number} num 숫자
+ * @returns {string} 문자열
+ */
+ukp.strval(num);
+```
