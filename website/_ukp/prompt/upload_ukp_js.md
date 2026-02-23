@@ -175,12 +175,22 @@ ukp.set_storage(key, value, expiration_dt = "");
  */
 ukp.unset_storage(key = null);
 ```
+## trigger (2025.01.17)
+```js
+/**
+ * - 이벤트 강제실행
+ * - 이벤트가 안먹히는 경우 이 소스 참고해서 html 속성에 직접 작성
+ * @param {string}        event_name 이벤트 유형
+ * @param {object|string} target     대상객체 또는 쿼리셀렉터
+ */
+ukp.trigger(event_name, target);
+```
 ## floatval (2025.03.06)
 ```js
 /**
  * - 문자열 실수로 변경
- * @param {string} text 문자열
- * @returns {number} 실수
+ * @param   {string} text 문자열
+ * @returns {number}      실수
  */
 ukp.floatval(text);
 ```
@@ -188,8 +198,8 @@ ukp.floatval(text);
 ```js
 /**
  * - 문자열 정수로 변경
- * @param {string} text 문자열
- * @returns {number} 정수
+ * @param   {string} text 문자열
+ * @returns {number}      정수
  */
 ukp.intval(text);
 ```
@@ -198,8 +208,8 @@ ukp.intval(text);
 /**
  * - 숫자값을 문자열로 변경
  * - 숫자, 문자열이 아닌경우 공백문자열 반환
- * @param {number} num 숫자
- * @returns {string} 문자열
+ * @param   {number} num 숫자
+ * @returns {string}     문자열
  */
 ukp.strval(num);
 ```
