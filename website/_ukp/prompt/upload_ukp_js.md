@@ -11,6 +11,19 @@
  */
 ukp.ajax(url, data, com_func, pro_func = null);
 ```
+## append (2025.02.23)
+```js
+/**
+ * - list 요소 내용 마지막에 row 요소 추가
+ * - row 를 감싸고 있는 태그는 template 태그 사용 추천
+ * - 이벤트유형은 on을 뺀 이름(ex onclick -> "click")
+ * @param {object|string} row_target row 감싸고있는 태그의 요소 또는 쿼리셀렉터
+ * @param {object|string} list_target list 요소 또는 쿼리셀렉터
+ * @param {object} replace `string [{변경할 문자열}]` 변경될 문자열
+ * @param {object} event `function [{쿼리셀렉터}][{이벤트유형}]` 실행함수
+ */
+ukp.append(row_target, list_target, replace = {}, event = {});
+```
 ## decode_base64 (2025.03.06)
 ```js
 /**

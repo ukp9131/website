@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.02.11
+ * @version 2026.02.23
  * @author ukp
  */
 
@@ -19,7 +19,7 @@ class Ukp {
      * - 생성자
      * 
      * require  2025.01.17 each
-     * @version 2026.02.11
+     * @version 2026.02.23
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.02.11");
+        console.log("ukp.js 2026.02.23");
     }
 
     /**
@@ -387,19 +387,19 @@ class Ukp {
     }
 
     /**
-     * - list에 row 추가
-     * - row 포함되어있는 태그는 template 태그 사용 추천
+     * - list 요소 내용 마지막에 row 요소 추가
+     * - row 를 감싸고 있는 태그는 template 태그 사용 추천
      * - 이벤트유형은 on을 뺀 이름(ex onclick -> "click")
      * 
-     * require  2025.01.17 each find on
-     * @version 2025.01.17
+     * require  2026.02.23 each find on
+     * @version 2026.02.23
      * 
-     * @param {object|string} row_target  row 포함되어있는 요소 또는 쿼리셀렉터
+     * @param {object|string} row_target  row 감싸고있는 태그의 요소 또는 쿼리셀렉터
      * @param {object|string} list_target list 요소 또는 쿼리셀렉터
      * @param {object}        replace     `string [{변경할 문자열}]` 변경될 문자열
      * @param {object}        event       `function [{쿼리셀렉터}][{이벤트유형}]` 실행함수
      */
-    add_list(row_target, list_target, replace = [], event = []) {
+    append(row_target, list_target, replace = {}, event = {}) {
         const ukp = this;
         if (typeof (row_target) == "string") {
             row_target = ukp.find(row_target);
