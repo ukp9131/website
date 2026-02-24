@@ -1,11 +1,12 @@
 # 자바스크립트 ukp 함수 리스트 (2026.02.06)
-## ajax (2025.01.17)
+## ajax (2026.02.24)
 ```js
 /**
  * - ajax 전송
  * - Content-Type: multipart/form-data
+ *
  * @param {string}        url      url
- * @param {object|string} data     formdata객체, form요소 셀렉터, json객체 가능
+ * @param {object|string} data     json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
  * @param {function}      com_func 완료함수, 첫번째 매개변수에 결과(text) 전달
  * @param {function}      pro_func 진행함수, 첫번째 매개변수에 퍼센트숫자 전달
  */
@@ -112,14 +113,14 @@ ukp.find(selector);
  */
 ukp.find_all(selector);
 ```
-## http_build_query (2026.02.11)
+## http_build_query (2026.02.24)
 ```js
 /**
  * - `foo=bar&hi=hello` 형태의 쿼리스트링 반환
  * - json 객체는 키=값 형태로 생성
  * - 매개변수가 문자열인경우 해당 쿼리셀렉터를 가진 form 태그 객체 있는지 확인
  * - form 태그 객체는 객체 내에 value 값을 가질 수 있는 요소의 name=value 형태로 생성
- * @param   {object|string} target json 객체, form 태그 객체, form 태그 쿼리셀렉터
+ * @param   {object|string} target json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
  * @returns {string}               쿼리스트링
  */
 ukp.http_build_query(target);

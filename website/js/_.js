@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.02.23
+ * @version 2026.02.24
  * @author ukp
  */
 
@@ -19,7 +19,7 @@ class Ukp {
      * - 생성자
      * 
      * require  2025.01.17 each
-     * @version 2026.02.23
+     * @version 2026.02.24
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.02.23");
+        console.log("ukp.js 2026.02.24");
     }
 
     /**
@@ -1191,11 +1191,11 @@ class Ukp {
      * - ajax 전송
      * - Content-Type: multipart/form-data
      * 
-     * require  2025.01.17 find obj_type on
-     * @version 2025.01.17
+     * require  2026.02.24 find obj_type on
+     * @version 2026.02.24
      * 
      * @param {string}        url      url
-     * @param {object|string} data     formdata객체, form요소 셀렉터, json객체 가능
+     * @param {object|string} data     json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
      * @param {function}      com_func 완료함수, 첫번째 매개변수에 결과(text) 전달
      * @param {function}      pro_func 진행함수, 첫번째 매개변수에 퍼센트숫자 전달
      */
@@ -1206,6 +1206,8 @@ class Ukp {
         //data 변환
         if (type == "string") {
             form_data = new FormData(ukp.find(data));
+        } else if (type == "htmlformelement") {
+            form_data = new FormData(data);
         } else if (type == "object") {
             form_data = new FormData();
             for (var k in data) {
@@ -1259,10 +1261,10 @@ class Ukp {
      * - 매개변수가 문자열인경우 해당 쿼리셀렉터를 가진 form 태그 객체 있는지 확인
      * - form 태그 객체는 객체 내에 value 값을 가질 수 있는 요소의 name=value 형태로 생성
      * 
-     * require  2026.02.11
-     * @version 2026.02.11
+     * require  2026.02.24
+     * @version 2026.02.24
      * 
-     * @param   {object|string} target json 객체, form 태그 객체, form 태그 쿼리셀렉터
+     * @param   {object|string} target json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
      * @returns {string}               쿼리스트링
      */
     http_build_query(target) {
@@ -1278,12 +1280,12 @@ class Ukp {
                 }
             });
         }
-        if (type == "htmlformelement") {
-            const formData = new FormData(target);
-            return new URLSearchParams(formData).toString();
+        if (["formdata", "object"].includes(type)) {
+            return new URLSearchParams(form_data).toString();
         }
-        if (typeof target === 'object') {
-            return new URLSearchParams(target).toString();
+        if (type == "htmlformelement") {
+            const form_data = new FormData(target);
+            return new URLSearchParams(form_data).toString();
         }
         return "";
     }
