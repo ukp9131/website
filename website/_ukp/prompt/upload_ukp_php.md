@@ -1,4 +1,4 @@
-# PHP $ukp 함수 리스트 (2026.02.12)
+# PHP $ukp 함수 리스트 (2026.03.04)
 ## decrypt_aes256 (2025.06.17)
 ```php
 /**
@@ -335,6 +335,16 @@ $ukp->decode_json($json);
  * @return string      JSON형태의 문자열
  */
 $ukp->encode_json($arr);
+```
+## session_get (2026.01.08)
+```php
+/**
+ * - 세션 값 불러오기
+ * - `$key` 값이 null 인경우 세션 전체값 배열 반환
+ * @param  string       $key 키
+ * @return string|array      값
+ */
+$ukp->session_get($key = null);
 ```
 ## session_set (2025.01.17)
 ```php
