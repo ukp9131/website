@@ -1,4 +1,4 @@
-# PHP $ukp 함수 리스트 (2026.03.04)
+# PHP $ukp 함수 리스트 (2026.03.09)
 ## decrypt_aes256 (2025.06.17)
 ```php
 /**
@@ -350,8 +350,8 @@ $ukp->session_get($key = null);
 ```php
 /**
  * - 세션 값 저장
- * @param string $key   키
- * @param string $value 값
+ * @param string       $key   키
+ * @param string|array $value 값
  */
 $ukp->session_set($key, $value);
 ```

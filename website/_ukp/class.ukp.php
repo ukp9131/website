@@ -3535,8 +3535,8 @@ class Ukp {
      * require  2025.01.17
      * @version 2025.01.17
      *
-     * @param string $key   키
-     * @param string $value 값
+     * @param string       $key   키
+     * @param string|array $value 값
      */
     function session_set($key, $value) {
         $_SESSION[$key] = $value;
