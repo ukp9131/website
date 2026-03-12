@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.02.24
+ * @version 2026.03.09
  * @author ukp
  */
 
@@ -19,7 +19,7 @@ class Ukp {
      * - 생성자
      * 
      * require  2025.01.17 each
-     * @version 2026.02.24
+     * @version 2026.03.09
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.02.24");
+        console.log("ukp.js 2026.03.09");
     }
 
     /**
@@ -1261,8 +1261,8 @@ class Ukp {
      * - 매개변수가 문자열인경우 해당 쿼리셀렉터를 가진 form 태그 객체 있는지 확인
      * - form 태그 객체는 객체 내에 value 값을 가질 수 있는 요소의 name=value 형태로 생성
      * 
-     * require  2026.02.24
-     * @version 2026.02.24
+     * require  2026.03.09
+     * @version 2026.03.09
      * 
      * @param   {object|string} target json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
      * @returns {string}               쿼리스트링
@@ -1281,7 +1281,7 @@ class Ukp {
             });
         }
         if (["formdata", "object"].includes(type)) {
-            return new URLSearchParams(form_data).toString();
+            return new URLSearchParams(target).toString();
         }
         if (type == "htmlformelement") {
             const form_data = new FormData(target);
