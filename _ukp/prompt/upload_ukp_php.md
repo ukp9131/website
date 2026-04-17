@@ -408,3 +408,90 @@ $ukp->unique_id();
  */
 $ukp->unique_session_id($id, $pw, $temp_bool = false);
 ```
+
+## common_curl (2025.12.04)
+```php
+/**
+ * - curl 요청  
+ * - 파일첨부인경우
+ * + 기존 $header 값에 Content-Type: multipart/form-data 추가(띄어쓰기, 대소문자 구분)
+ * + $method 값은 GET이 아닌 값, $query는 배열, 파일은 @ + 파일경로
+ * - method 변수 설명
+ * + 소문자로 입력해도 대문자로 강제변경
+ * + false - GET, true - POST
+ * + GET, POST 이외 값인경우 CURLOPT_POST = true, CURLOPT_CUSTOMREQUEST 설정
+ * @param  string       $url     요청 url
+ * @param  string|array $query   요청 파라미터, 파일첨부인경우 배열
+ * @param  string|bool  $method  요청 메소드 text, bool인경우 true: POST, false: GET
+ * @param  array        $header  요청 header
+ * @param  string       $cookie  요청 cookie
+ * @param  int          $timeout 요청 제한시간
+ * @return array                 curl 결과배열  
+ * - `string [http_code]`    http 상태코드  
+ * - `string [header]`       응답헤더  
+ * - `string [content]`      응답결과  
+ * - `string [redirect_url]` 리다이렉트url(해당하는경우만)
+ */
+$ukp->common_curl($url, $query = "", $method = "GET", $header = array(), $cookie = "", $timeout = 10);
+```
+## common_date_range (2025.01.17)
+```php
+/**
+ * - 해당월의 일요일시작부터 토요일끝까지 날짜범위 반환
+ * - ex)2019-05 = 2019-04-28 ~ 2019-06-08 - fix
+ * - ex)2019-05 = 2019-04-28 ~ 2019-06-01 - unfix
+ * @param  string $date        (YYYY-mm)
+ * @param  bool   $fix_bool    6줄 고정여부
+ * @return array               날짜정보
+ * - `string [start_date]` 시작일(YYYY-mm-dd)
+ * - `string [end_date]`   종료일(YYYY-mm-dd)
+ */
+$ukp->common_date_range($date, $fix_bool = true);
+```
+## common_mysql_password (2025.01.17)
+```php
+/**
+ * - mysql password 함수
+ * @param  string $pw  비밀번호
+ * @param  bool   $old old_password 여부
+ * @return string
+ */
+$ukp->common_mysql_password($pw, $old = false);
+```
+## common_pagination (2026.01.08)
+```php
+/**
+ * - 페이지네이션 생성
+ * @param  int    $total_row    총 데이터 갯수
+ * @param  int    $per_page     페이지네이션 1개당 데이터 갯수
+ * @param  int    $num_links    페이지네이션 번호출력 갯수(홀수권장)
+ * @param  string $query_string 페이지네이션 쿼리스트링 파라미터
+ * @return array                페이지네이션 정보 배열
+ * - `string [first_link]`          가장처음 링크
+ * - `string [last_link]`            가장끝 링크
+ * - `string [list][][link]`        해당번호 링크
+ * - `int    [list][][num]`          해당번호
+ * - `bool   [list][][active_bool]` 현재번호여부
+ */
+$ukp->common_pagination($total_row = 0, $per_page = 10, $num_links = 5, $query_string = "start");
+```
+## common_get_sido_sigungu (2026.02.19)
+```php
+/**
+ * - 주소의 축약 시도명과 시군구명을 반환
+ * @param  string $address 주소
+ * @return array           배열
+ * - `string [sido]`    시도, 없는경우 빈문자열
+ * - `string [sigungu]` 시군구, 없는경우 빈문자열
+ */
+$ukp->common_get_sido_sigungu($address);
+```
+## common_sido_replace (2026.02.06)
+```php
+/**
+ * - 주소의 시도명을 축약시도명으로 변환
+ * @param  string $address 주소
+ * @return string          축약시도명으로 변환된 주소
+ */
+$ukp->common_sido_replace($address);
+```

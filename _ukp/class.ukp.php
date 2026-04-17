@@ -8,7 +8,7 @@
  * - `bool [cors_bool=false]`   cors 허용여부
  * 
  * require  2026.02.19 config.php
- * @version 2026.03.31
+ * @version 2026.04.16
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -1085,6 +1085,65 @@ class Ukp {
         mysqli_query($return_arr["link"], "set names '{$info["charset"]}' collate '{$info["collate"]}'");
         mysqli_query($return_arr["link"], "set time_zone = '{$db_info["time_zone"]}'");
         $return_arr["code"] = "1";
+        return $return_arr;
+    }
+
+    /**
+     * - 프롬프트 작성시 업로드할 md파일 생성
+     * - ddl 기준으로 전체 데이터베이스 생성
+     * - src 는 빈문자열인경우 prompt/upload_db.md 파일에 저장됨
+     * 
+     * require  2026.04.15
+     * @version 2026.04.15
+     * 
+     * @param  array  $table 키는 데이터베이스명, 값은 테이블명 배열
+     * @param  string $src   파일명이 포함된 저장경로
+     * @return array         생성결과
+     * - `bool   [bool]` 생성성공여부
+     * - `string [msg]`  결과상세내용
+     */
+    function db_create_md($table, $src = "") {
+        $return_arr = array(
+            "bool" => false,
+            "msg" => "성공"
+        );
+        if ($src == "") {
+            $src = dirname(__FILE__) . "/prompt/upload_db.md";
+        }
+        $db_dir = dirname(__FILE__) . "/db";
+        $content = "";
+        foreach ($table as $database => $temp) {
+            $content .= "# database: {$database}\n";
+            foreach ($temp as $table) {
+                $ddl_file = "{$db_dir}/ddl/{$database}/{$table}.json";
+                $list_file = "{$db_dir}/list/{$database}/{$table}.sql";
+                if (!file_exists($ddl_file)) {
+                    $return_arr["msg"] = "{$ddl_file} 파일이 존재하지 않습니다.";
+                    return $return_arr;
+                }
+                if (!file_exists($list_file)) {
+                    $return_arr["msg"] = "{$list_file} 파일이 존재하지 않습니다.";
+                    return $return_arr;
+                }
+                $content .= "## table: {$table}\n";
+                $content .= "### ddl\n```json\n";
+                $content .= trim(file_get_contents($ddl_file));
+                $content .= "\n```\n";
+                $content .= "### list sql\n```sql\n";
+                $content .= trim(file_get_contents($list_file));
+                $content .= "\n```\n";
+            }
+        }
+        if ($content == "") {
+            $return_arr["msg"] = "table 배열이 빈배열이거나 잘못된 배열입니다.";
+            return $return_arr;
+        }
+        $result = file_put_contents($src, $content);
+        if ($result === false) {
+            $return_arr["msg"] = "파일생성에 실패하였습니다.";
+            return $return_arr;
+        }
+        $return_arr["bool"] = true;
         return $return_arr;
     }
 
