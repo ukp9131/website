@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.04.17
+ * @version 2026.04.29
  * @author ukp
  */
 
@@ -18,8 +18,8 @@ class Ukp {
     /**
      * - 생성자
      * 
-     * require  2026.04.17 each
-     * @version 2026.04.17
+     * require  2026.04.29 each
+     * @version 2026.04.29
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.04.17");
+        console.log("ukp.js 2026.04.29");
     }
 
     /**
@@ -577,6 +577,33 @@ class Ukp {
             ukp.number_pad(date.getMinutes(), 2) +
             ":" +
             ukp.number_pad(date.getSeconds(), 2);
+        return dt;
+    }
+
+    /**
+     * - 현재 국제표준시 반환
+     * - 기본 반환형태: YYYY-mm-dd HH:ii:ss
+     * 
+     * require  2026.04.29 number_pad
+     * @version 2026.04.29
+     * 
+     * @param   {boolean} short_bool true 인경우 YYYYmmddHHiiss 형태로 반환
+     * @returns {string}             년월일시분초
+     */
+    date_utc(short_bool = false) {
+        var date = new Date();
+        var dt = "" +
+            date.getUTCFullYear() +
+            (short_bool ? "" : "-") +
+            ukp.number_pad(date.getUTCMonth() + 1, 2) +
+            (short_bool ? "" : "-") +
+            ukp.number_pad(date.getUTCDate(), 2) +
+            (short_bool ? "" : " ") +
+            ukp.number_pad(date.getUTCHours(), 2) +
+            (short_bool ? "" : ":") +
+            ukp.number_pad(date.getUTCMinutes(), 2) +
+            (short_bool ? "" : ":") +
+            ukp.number_pad(date.getUTCSeconds(), 2);
         return dt;
     }
 
