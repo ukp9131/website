@@ -10,7 +10,7 @@
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
  * 
- * @version 2026.04.29
+ * @version 2026.04.30
  * @author ukp
  */
 
@@ -18,8 +18,8 @@ class Ukp {
     /**
      * - 생성자
      * 
-     * require  2026.04.29 each
-     * @version 2026.04.29
+     * require  2026.04.30 each
+     * @version 2026.04.30
      * 
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
@@ -38,7 +38,7 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.04.29");
+        console.log("ukp.js 2026.04.30");
     }
 
     /**
@@ -1298,7 +1298,7 @@ class Ukp {
         var type = ukp.obj_type(target);
         if (type == "string") {
             const element = ukp.find_all(target);
-            ukp.each(element, function(v) {
+            ukp.each(element, function (v) {
                 if (ukp.obj_type(v) == "htmlformelement") {
                     target = v;
                     type = "htmlformelement";
@@ -1496,5 +1496,24 @@ class Ukp {
         var type = ukp.obj_type(num);
         var arr = ["string", "number"];
         return arr.includes(type) ? String(num) : "";
+    }
+
+    /**
+     * - sha256 해시생성
+     * - 비동기 함수 사용하므로 생성완료시 콜백함수에 해시값 전달
+     * 
+     * require  2026.04.30 obj_type
+     * @version 2026.04.30
+     * 
+     * @param {string}   text 변환할 값
+     * @param {function} func 첫번째 매개변수에 sha256 값 전달
+     */
+    sha256(text, func) {
+        const text_buffer = new TextEncoder().encode(text);
+        crypto.subtle.digest("SHA-256", text_buffer).then(function (hash_buffer) {
+            const hash_array = Array.from(new Uint8Array(hash_buffer));
+            const hash_hex = hash_array.map(b => b.toString(16).padStart(2, '0')).join('');
+            func(hash_hex);
+        });
     }
 }
