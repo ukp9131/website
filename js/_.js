@@ -584,13 +584,14 @@ class Ukp {
      * - 현재 국제표준시 반환
      * - 기본 반환형태: YYYY-mm-dd HH:ii:ss
      * 
-     * require  2026.04.29 number_pad
-     * @version 2026.04.29
+     * require  2026.04.30 number_pad
+     * @version 2026.04.30
      * 
      * @param   {boolean} short_bool true 인경우 YYYYmmddHHiiss 형태로 반환
      * @returns {string}             년월일시분초
      */
     date_utc(short_bool = false) {
+        const ukp = this;
         var date = new Date();
         var dt = "" +
             date.getUTCFullYear() +
