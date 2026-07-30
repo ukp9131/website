@@ -8,7 +8,7 @@
  * - `bool [cors_bool=false]`   cors 허용여부
  * 
  * require  2026.02.19 config.php
- * @version 2026.04.16
+ * @version 2026.07.24
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -1849,8 +1849,8 @@ class Ukp {
      * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
      * - 정렬배열은 빈배열인경우 쿼리문에 있는 기본 정렬 사용
      * 
-     * require  2026.02.06 db_add_prefix db_add_table_info db_create_where db_from_table_name
-     * @version 2026.02.06
+     * require  2026.07.24 db_add_prefix db_add_table_info db_create_where db_from_table_name
+     * @version 2026.07.24
      * 
      * @param  string $table    테이블명
      * @param  array  $option   옵션
@@ -1939,7 +1939,7 @@ class Ukp {
         }
         //group by
         if (count($group_by_arr) > 0) {
-            $sql .= "\ngroup by\n    " . implode("\n    ", $group_by_arr);
+            $sql .= "\ngroup by\n    " . implode(",\n    ", $group_by_arr);
         }
         //having
         if (count($group_by_arr) > 0 && count($having_arr) > 0) {
