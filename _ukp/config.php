@@ -36,6 +36,14 @@ $config["db"] = array(
         "charset" => "",
         "time_zone" => "+09:00",
         "base64_password_bool" => false,
+        "prefix" => "",
+        "delete_flag" => "",
+        "insert_date" => array(),
+        "insert_time" => array(),
+        "insert_dt" => array(),
+        "update_date" => array(),
+        "update_time" => array(),
+        "update_dt" => array(),
         "table" => array()
     )
 );
