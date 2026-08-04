@@ -8,7 +8,7 @@
 5. `_.php` 파일에 `$ukp` 변수 추가, `$option` 설정 필요한경우 `$option` 설정 후 require
 ## 신규 웹개발 하는경우 (현재 폴더구조 무시하고 아래 내용대로 진행)
 1. `www/website` 폴더 내의 `asset`, `upload` 폴더를 웹접근 가능한 곳에 세팅
-2. `asset` 폴더 내 `js` 폴더에 `_.js` 파일 세팅 후 `_remap.php` 에서 불러오기
+2. `asset` 폴더 내 `js` 폴더에 `ukp.js` 파일 세팅 후 `_remap.php` 에서 불러오기
 3. 웹 접근 가능한 곳에 `_.php`, `_remap.php` 파일 추가.
 4. 페이지별로 폴더 생성 후 `index.php`, `view.php`, `style.css`, `script.js` 파일 추가
 5. 웹 접근 불가능한 곳에 `cli`, `prompt` 폴더 추가.
