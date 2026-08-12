@@ -7,21 +7,18 @@
 4. 사용할 폴더에 `_.php` 파일 생성 후 `$global` 변수값 세팅, `$data` 변수 빈배열로 초기화
 5. `_.php` 파일에 `$ukp` 변수 추가, `$option` 설정 필요한경우 `$option` 설정 후 require
 ## 신규 웹개발 하는경우 (현재 폴더구조 무시하고 아래 내용대로 진행)
-1. `www/website` 폴더 내의 `asset`, `upload` 폴더를 웹접근 가능한 곳에 세팅
-2. `asset` 폴더 내 `js` 폴더에 `ukp.js` 파일 세팅 후 `_remap.php` 에서 불러오기
+1. `_api`, `_assets`, `_uploads` 폴더를 웹접근 가능한 곳에 세팅
+2. `_assets` 폴더 내 `js` 폴더에 `ukp.js` 파일 세팅 후 `_remap.php` 에서 불러오기
 3. 웹 접근 가능한 곳에 `_.php`, `_remap.php` 파일 추가.
-4. 페이지별로 폴더 생성 후 `index.php`, `view.php`, `style.css`, `script.js` 파일 추가
+4. 페이지별로 폴더 생성(index 페이지는 폴더생성 없이) 후 `index.php`, `view.php`, `style.css`, `script.js` 파일 추가
 5. 웹 접근 불가능한 곳에 `cli`, `prompt` 폴더 추가.
 6. `prompt` 폴더 내에 `backend`, `frontend`, ```ui``` 폴더 추가.
 ## 규칙
 - 프롬프트 파일은 .md 확장자로 작성
 ## 폴더구조 설명
-- ```cli```: cli 환경에서 실행되는 파일. 웹접근 불가.
-- ```css```: view 에서 페이지별로 불러오는 css 파일. 웹접근 불가.
-- ```js```: view 에서 페이지별로 불러오는 js 파일. 웹접근 불가.
-- ```prompt```: 소스생성을 위해 작성한 md 파일, 웹접근 불가.
-- ```view```: 보여지는 페이지를 위해 사용되는 php 파일. 웹접근 불가.
-- ```asset``` 은 정적파일용 폴더, ```upload``` 은 동적파일용 폴더.
+- `cli`: cli 환경에서 실행되는 파일. 웹접근 불가.
+- `prompt`: 소스생성을 위해 작성한 md 파일, 웹접근 불가.
+- `_api` 는 json 출력하는 페이지용 폴더, `_assets` 는 정적파일용 폴더, `_uploads` 는 동적파일용 폴더.
 ## 파일구조 설명
 - 웹루트에 접두어가 ```_``` 인 php 파일은 ajax 통신 전용 파일. ```$data``` 배열에 값 세팅 후 json으로 출력.
 - ```view``` 폴더 php 파일에서는 웹루트 php 파일 변수중 ```$global```, ```$data``` 변수만 사용 가능.
