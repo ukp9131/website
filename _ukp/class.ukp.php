@@ -6,9 +6,9 @@
  * - `bool [api_bool=false]`    true: json, false: html
  * - `bool [session_bool=true]` 세션사용여부
  * - `bool [cors_bool=false]`   cors 허용여부
- * 
+ *
  * require  2026.02.19 config.php
- * @version 2026.07.24
+ * @version 2026.09.22
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -16,7 +16,7 @@ class Ukp {
 // #region @ukp 필수변수
     /**
      * - 서버 케릭터셋
-     * 
+     *
      * @version 2020.02.13
      * @var     string
      */
@@ -24,7 +24,7 @@ class Ukp {
 
     /**
      * - 서버 타임존
-     * 
+     *
      * @version 2020.07.29
      * @var     string
      */
@@ -32,7 +32,7 @@ class Ukp {
 
     /**
      * - api url
-     * 
+     *
      * @version 2026.02.19
      * @var     string
      */
@@ -40,7 +40,7 @@ class Ukp {
 
     /**
      * - api 토큰
-     * 
+     *
      * @version 2026.02.19
      * @var     string
      */
@@ -48,7 +48,7 @@ class Ukp {
 
     /**
      * - mysqli 접속정보
-     * 
+     *
      * @version 2020.07.10
      * @var     array
      */
@@ -56,7 +56,7 @@ class Ukp {
 
     /**
      * - mysqli insert_id
-     * 
+     *
      * @version 2020.07.10
      * @var     int
      */
@@ -64,7 +64,7 @@ class Ukp {
 
     /**
      * - mysqli affected_rows
-     * 
+     *
      * @version 2020.07.10
      * @var     int
      */
@@ -72,7 +72,7 @@ class Ukp {
 
     /**
      * - mysqli last_query
-     * 
+     *
      * @version 2022.12.19
      * @var     string
      */
@@ -80,7 +80,7 @@ class Ukp {
 
     /**
      * - request
-     * 
+     *
      * @version 2026.02.19
      * @var     array
      */
@@ -98,7 +98,7 @@ class Ukp {
      * - `string [ext]`       업로드 파일 확장자
      * - `string [full_name]` 확장자 포함 파일명
      * - `string [src]`       업로드 경로
-     * 
+     *
      * @version 2020.02.13
      * @var     array
      */
@@ -106,7 +106,7 @@ class Ukp {
 
     /**
      * - unique id 중복방지
-     * 
+     *
      * @version 2026.02.19
      * @var     int
      */
@@ -114,7 +114,7 @@ class Ukp {
 
     /**
      * - 사용자 정보
-     * 
+     *
      * @version 2026.02.19
      * @var     string
      */
@@ -122,14 +122,14 @@ class Ukp {
 // #endregion
 // #region @ukp 필수함수
     /**
-     * 생성자  
-     *   
+     * 생성자
+     *
      * require  2026.02.19 custom_error_handler custom_error_handler_fatal custom_parking custom_set_cookie custom_set_request session_start
      * @version 2026.02.19
-     * 
-     * @param array $option 옵션설정  
-     * `bool [api_bool=false]`    true - json, false - html(기본값: false)  
-     * `bool [session_bool=true]` 세션사용여부(기본값: true)  
+     *
+     * @param array $option 옵션설정
+     * `bool [api_bool=false]`    true - json, false - html(기본값: false)
+     * `bool [session_bool=true]` 세션사용여부(기본값: true)
      * `bool [cors_bool=false]`   cors 허용여부(기본값: false)
      */
     function __construct($option = array()) {
@@ -243,19 +243,19 @@ class Ukp {
     }
 
     /**
-     * 소멸자  
-     *   
+     * 소멸자
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      */
     function __destruct() {
     }
 // #endregion
 // #region @ukp custom
     /**
-     * 커스텀 xml요소 추가(encode_xml에서 사용)  
-     *   
+     * 커스텀 xml요소 추가(encode_xml에서 사용)
+     *
      * require  2025.01.17 custom_add_xml_element
      * @version 2025.01.17
      *
@@ -290,16 +290,16 @@ class Ukp {
     }
 
     /**
-     * api로 함수 실행  
-     * 이진데이터는 base64 인코딩해서 전송  
+     * api로 함수 실행
+     * 이진데이터는 base64 인코딩해서 전송
      * 변수참조반환 함수인경우 반환값이 bool, 변수참조값이 return
-     *   
+     *
      * require  2026.02.19 array_value decode_json encode_json
      * @version 2026.02.19
      *
      * @param  string $func    실행할 함수
      * @param  array  $param   함수에 전달할 파라미터 리스트
-     * @return array  [bool]   접속성공여부  
+     * @return array  [bool]   접속성공여부
      *                [return] 함수결과값
      */
     function custom_api_func($func, $param) {
@@ -344,8 +344,8 @@ class Ukp {
     }
 
     /**
-     * 커스텀 에러 핸들러  
-     *   
+     * 커스텀 에러 핸들러
+     *
      * require  2025.10.24 log_message
      * @version 2025.10.24
      *
@@ -371,8 +371,8 @@ class Ukp {
     }
 
     /**
-     * 커스텀 에러 핸들러  
-     *   
+     * 커스텀 에러 핸들러
+     *
      * require  2025.10.24 array_value log_message
      * @version 2025.10.24
      *
@@ -389,9 +389,9 @@ class Ukp {
     }
 
     /**
-     * 점검중인경우 생성자에서 함수실행  
-     * 점검일시는 값이 있는경우에만 노출  
-     *   
+     * 점검중인경우 생성자에서 함수실행
+     * 점검일시는 값이 있는경우에만 노출
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -437,10 +437,10 @@ class Ukp {
     }
 
     /**
-     * cookie 변수 세팅  
-     * magic_quotes_gpc on 인경우 stripslashes 처리  
-     * $_COOKIE 변수 직접 수정  
-     *   
+     * cookie 변수 세팅
+     * magic_quotes_gpc on 인경우 stripslashes 처리
+     * $_COOKIE 변수 직접 수정
+     *
      * require  2025.08.05 is_magic_quotes_gpc
      * @version 2025.08.05
      */
@@ -454,10 +454,10 @@ class Ukp {
     }
 
     /**
-     * request 변수 세팅  
-     * magic_quotes_gpc on 인경우 stripslashes 처리  
-     * post > get  
-     *   
+     * request 변수 세팅
+     * magic_quotes_gpc on 인경우 stripslashes 처리
+     * post > get
+     *
      * require  2025.08.05 is_magic_quotes_gpc
      * @version 2025.08.05
      */
@@ -491,8 +491,8 @@ class Ukp {
 // #endregion
 // #region @ukp array
     /**
-     * 배열 추가  
-     *   
+     * 배열 추가
+     *
      * require  2025.01.17 array_change
      * @version 2025.01.17
      *
@@ -513,8 +513,8 @@ class Ukp {
     }
 
     /**
-     * 연관배열정렬(같은 인덱스는 임의로 정렬, 문자열 기준으로 정렬, 숫자정렬은 10.2자리수까지)  
-     *   
+     * 연관배열정렬(같은 인덱스는 임의로 정렬, 문자열 기준으로 정렬, 숫자정렬은 10.2자리수까지)
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -554,8 +554,8 @@ class Ukp {
     }
 
     /**
-     * 배열 치환  
-     *   
+     * 배열 치환
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -582,10 +582,10 @@ class Ukp {
     }
 
     /**
-     * 배열 값 찾아서 삭제  
-     * 값이 중복인경우 처음 나오는 값만 삭제  
-     * 연관배열에서 사용 불가능  
-     *   
+     * 배열 값 찾아서 삭제
+     * 값이 중복인경우 처음 나오는 값만 삭제
+     * 연관배열에서 사용 불가능
+     *
      * require  2025.03.06
      * @version 2025.03.06
      *
@@ -603,8 +603,8 @@ class Ukp {
     }
 
     /**
-     * 배열정렬(같은 인덱스는 임의로 정렬, 문자열 기준으로 정렬, 숫자정렬은 10.2자리수까지)  
-     *   
+     * 배열정렬(같은 인덱스는 임의로 정렬, 문자열 기준으로 정렬, 숫자정렬은 10.2자리수까지)
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -642,8 +642,8 @@ class Ukp {
     }
 
     /**
-     * 배열값 반환, stdClass인경우 배열로 변환해서 확인  
-     *   
+     * 배열값 반환, stdClass인경우 배열로 변환해서 확인
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -674,11 +674,11 @@ class Ukp {
 // #endregion
 // #region @ukp convert
     /**
-     * base32 to hex  
-     *   
+     * base32 to hex
+     *
      * require  2025.10.24
      * @version 2025.10.24
-     * 
+     *
      * @param  string $base32 base32 문자열
      * @return string         hex 문자열
      */
@@ -703,10 +703,10 @@ class Ukp {
 
     /**
      * - 로컬시간 다른 타임존 시간으로 변환
-     * 
+     *
      * require  2025.11.10
      * @version 2025.11.10
-     * 
+     *
      * @param  string $local_dt  로컬시간(YYYY-mm-dd HH:ii:ss)
      * @param  string $to        변경할 타임존 (+09:00 -05:00 등)
      * @param  string $from      변환전 타임존 (+09:00 -05:00 등), null인경우 서버 타임존
@@ -726,11 +726,11 @@ class Ukp {
     }
 
     /**
-     * rsa ne to public key  
-     *   
+     * rsa ne to public key
+     *
      * require  2025.10.24
      * @version 2025.10.24
-     * 
+     *
      * @param  string $n n(base64 or url safe)
      * @param  string $e e(base64 or url safe)
      * @return string    public key
@@ -750,11 +750,11 @@ class Ukp {
     }
 
     /**
-     * public key to rsa ne  
-     *   
+     * public key to rsa ne
+     *
      * require  2025.10.24 encode_base64
      * @version 2025.10.24
-     * 
+     *
      * @param  string $public_key    public key
      * @param  bool   $url_safe_bool true: url safe, false: base64
      * @return array                 [n] - n(base64 or url safe)<br>
@@ -779,8 +779,8 @@ class Ukp {
     }
 
     /**
-     * 개행문자, &nbsp; 공백변환  
-     *   
+     * 개행문자, &nbsp; 공백변환
+     *
      * require  2025.10.24
      * @version 2025.10.24
      *
@@ -793,8 +793,8 @@ class Ukp {
 // #endregion
 // #region @ukp cookie
     /**
-     * 쿠키 값 불러오기  
-     *   
+     * 쿠키 값 불러오기
+     *
      * require  2025.08.05
      * @version 2025.08.05
      *
@@ -809,8 +809,8 @@ class Ukp {
     }
 
     /**
-     * 쿠키 저장  
-     *   
+     * 쿠키 저장
+     *
      * require  2025.08.05
      * @version 2025.08.05
      *
@@ -823,8 +823,8 @@ class Ukp {
     }
 
     /**
-     * 쿠키 제거  
-     *   
+     * 쿠키 제거
+     *
      * require  2025.01.17 cookie_get
      * @version 2025.01.17
      *
@@ -850,7 +850,7 @@ class Ukp {
     /**
      * - 쿼리문에 테이블 접두어 추가
      * - select, insert, update, delete 쿼리문만 가능
-     * 
+     *
      * require  2026.01.02
      * @version 2026.01.02
      *
@@ -884,7 +884,7 @@ class Ukp {
 
     /**
      * - row 배열에 테이블 날짜설정 추가
-     * 
+     *
      * require  2026.03.31
      * @version 2026.03.31
      *
@@ -925,7 +925,7 @@ class Ukp {
     /**
      * - 테이블 추가정보 반환
      * - 컬럼명, 접두어 trim 처리 및 컬럼명 소문자 변환
-     * 
+     *
      * require  2026.01.02 array_value
      * @version 2026.01.02
      *
@@ -996,7 +996,7 @@ class Ukp {
 
     /**
      * - 쿼리 변경된 레코드 갯수
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -1008,7 +1008,7 @@ class Ukp {
 
     /**
      * - charset에 맞는 정보 반환
-     * 
+     *
      * require  2026.01.02
      * @version 2026.01.02
      *
@@ -1042,7 +1042,7 @@ class Ukp {
 
     /**
      * - mysqli connect
-     * 
+     *
      * require  2026.01.02 array_value db_charset_info decode_base64
      * @version 2026.01.02
      *
@@ -1092,17 +1092,17 @@ class Ukp {
      * - 프롬프트 작성시 업로드할 md파일 생성
      * - ddl 기준으로 전체 데이터베이스 생성
      * - src 는 빈문자열인경우 prompt/upload_db.md 파일에 저장됨
-     * 
-     * require  2026.04.15
-     * @version 2026.04.15
-     * 
-     * @param  array  $table 키는 데이터베이스명, 값은 테이블명 배열
-     * @param  string $src   파일명이 포함된 저장경로
-     * @return array         생성결과
+     *
+     * require  2026.09.22
+     * @version 2026.09.22
+     *
+     * @param  array  $db_arr 키는 데이터베이스명, 값은 테이블명 배열
+     * @param  string $src    파일명이 포함된 저장경로
+     * @return array          생성결과
      * - `bool   [bool]` 생성성공여부
      * - `string [msg]`  결과상세내용
      */
-    function db_create_md($table, $src = "") {
+    function db_create_md($db_arr, $src = "") {
         $return_arr = array(
             "bool" => false,
             "msg" => "성공"
@@ -1112,7 +1112,7 @@ class Ukp {
         }
         $db_dir = dirname(__FILE__) . "/db";
         $content = "";
-        foreach ($table as $database => $temp) {
+        foreach ($db_arr as $database => $temp) {
             $content .= "# database: {$database}\n";
             foreach ($temp as $table) {
                 $ddl_file = "{$db_dir}/ddl/{$database}/{$table}.json";
@@ -1156,10 +1156,10 @@ class Ukp {
      * + into: `foo, hello`
      * + values: `?, world()`
      * + binding: `array("hello()")`
-     * 
+     *
      * require  2026.03.31
      * @version 2026.03.31
-     * 
+     *
      * @param  array $row_arr row 배열 (키가 컬럼명, 값이 컬럼값)
      * @param  int   $depth   1 이상인경우 개행 후 $depth * 4 만큼 들여쓰기
      * @return array          row 정보
@@ -1235,10 +1235,10 @@ class Ukp {
      * - dot_bool 은 모든 키에 점이 포함된 경우에만 true로 반환되고 테이블명 또는 alias를 모두 입력하였는지 검증용으로 사용된다
      * + `array("tb.foo" => "bar", "mb.hello" => "world")` -> true
      * + `array("tb.foo" => "bar", "hello" => "world")` -> false
-     * 
+     *
      * require  2026.03.18 db_create_where
      * @version 2026.03.18
-     * 
+     *
      * @param  array $where_arr where 배열
      * @param  bool  $or_bool   true: or(서브쿼리 and), false: and(서브쿼리 or)
      * @param  int   $depth     들여쓰기 깊이
@@ -1342,10 +1342,10 @@ class Ukp {
      * - 테이블 삭제(1개)
      * - delete_flag 변경시 update_dt도 갱신
      * - where 설정 안한경우 아무것도 삭제 안됨
-     * 
+     *
      * require  2026.01.29 db_add_row db_add_table_info db_create_row db_create_where db_query
      * @version 2026.01.29
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [where=array()]`    삭제 조건문, 키는 컬럼명, 값은 컬럼값
@@ -1409,7 +1409,7 @@ class Ukp {
     /**
      * - 쿼리 문자열 이스케이프
      * - db 연결 이슈로 배열로 한번에 받아서 처리
-     * 
+     *
      * require  2025.01.17 db_connect
      * @version 2025.01.17
      *
@@ -1437,10 +1437,10 @@ class Ukp {
     /**
      * - from 절 테이블명 추출
      * - 테이블 별칭을 우선적으로 추출
-     * 
+     *
      * require  2025.11.10
      * @version 2025.11.10
-     * 
+     *
      * @param  string $sql 쿼리문
      * @return string      테이블명 또는 테이블별칭, 에러인경우 빈문자열
      */
@@ -1481,10 +1481,10 @@ class Ukp {
 
     /**
      * - 테이블 인서트(1개)
-     * 
-     * require  2026.02.05 db_add_row db_add_table_info db_create_row db_create_where db_query 
+     *
+     * require  2026.02.05 db_add_row db_add_table_info db_create_row db_create_where db_query
      * @version 2026.02.05
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [row=array()]`      입력할 값, 키는 컬럼명, 값은 컬럼값
@@ -1556,7 +1556,7 @@ class Ukp {
 
     /**
      * - 마지막으로 인서트된 primary key
-     * 
+     *
      * require  2025.11.18
      * @version 2025.11.18
      *
@@ -1568,7 +1568,7 @@ class Ukp {
 
     /**
      * - 마지막 쿼리문
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -1581,7 +1581,7 @@ class Ukp {
     /**
      * - 쿼리 보내기
      * - 쿼리 실패시 프로그램 종료
-     * 
+     *
      * require  2025.11.25 db_connect db_escape
      * @version 2025.11.25
      *
@@ -1736,7 +1736,7 @@ class Ukp {
 
     /**
      * - 쿼리결과 여러줄
-     * 
+     *
      * require  2025.03.06 db_query
      * @version 2025.03.06
      *
@@ -1752,7 +1752,7 @@ class Ukp {
 
     /**
      * - 쿼리결과 1줄
-     * 
+     *
      * require  2025.03.06 db_query
      * @version 2025.03.06
      *
@@ -1771,12 +1771,12 @@ class Ukp {
      * - db/list 폴더 내 {$database}/{$table}.sql 파일 가져와서 사용
      * - sql 파일 없는경우 `select count(*) as cnt from {테이블명}` 쿼리 사용
      * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
-     * 
+     *
      * require  2026.01.29 db_row_array db_select_sql
      * @version 2026.01.29
-     * 
+     *
      * @param  string $table    테이블명
-     * @param  array  $option   옵션  
+     * @param  array  $option   옵션
      * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
      * - `bool   [or_bool=false]`         true: where or문, false: where and문
      * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
@@ -1806,10 +1806,10 @@ class Ukp {
      * - sql 파일 없는경우 `select * from {테이블명}` 쿼리 사용
      * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
      * - 정렬배열은 빈배열인경우 쿼리문에 있는 기본 정렬 사용
-     * 
+     *
      * require  2026.03.31 db_result_array db_row_array db_select_sql
      * @version 2026.03.31
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [select=array()]`        select 컬럼 리스트, 빈배열인경우 sql파일 select 그대로 사용
@@ -1848,10 +1848,10 @@ class Ukp {
      * - sql 파일 없는경우 `select * from {테이블명}` 쿼리 사용
      * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
      * - 정렬배열은 빈배열인경우 쿼리문에 있는 기본 정렬 사용
-     * 
+     *
      * require  2026.07.24 db_add_prefix db_add_table_info db_create_where db_from_table_name
      * @version 2026.07.24
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [select=array()]`        select 컬럼 리스트(기본컬럼인경우 빈배열)
@@ -1975,10 +1975,10 @@ class Ukp {
      * - 백업이 저장될 곳 DB 접속정보만 설정
      * - 백업이 저장될 곳에 db, tb 테이블 이미 있는경우 접두어 설정
      * - 백업대상 DB 접속정보 설정, 테이블 정보는 prefix와 update_dt(인덱스 설정 필수) 정보만 설정
-     * 
+     *
      * require  2026.01.02 array_value db_add_table_info db_charset_info db_create_where db_insert db_query db_row_array db_table_create_sql db_table_ddl db_update decode_json encode_json
      * @version 2026.01.02
-     * 
+     *
      * @param array $target    백업대상 데이터베이스 배열
      * - `string [{데이터베이스명}][]` 테이블명
      * @param string $database 백업이 저장될 곳 데이터베이스
@@ -2139,6 +2139,7 @@ class Ukp {
                         break;
                     }
                     foreach ($ddl as $k => $v) {
+                        $field_name = $field_type = "";
                         foreach ($v as $field_name => $field_type) {
                         }
                         //ddl 달라진경우
@@ -2262,10 +2263,10 @@ class Ukp {
      * - db_table_ddl() 함수 반환값 이용하여 생성
      * - 접두어는 config.php 파일에 설정된 값으로 치환
      * - 실패시 빈배열 반환
-     * 
+     *
      * require  2026.01.02 array_value db_add_table_info db_charset_info db_row_array db_table_ddl str_pad
      * @version 2026.01.02
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `string [charset=null]`     캐릭터셋(utf8mb4, utf8, euckr), 세팅 안한경우 설정값
@@ -2445,10 +2446,10 @@ class Ukp {
      * - db/ddl 폴더 내 {$database}/{$table}.json 파일 설정필요
      * - 자료형 문자열이 타입사전 키값중에 있는경우 해당 자료형과 기본값으로 대체
      * - 전체 컬럼에서 primary 자료형은 한개만 설정가능
-     * 
+     *
      * require  2026.01.02 decode_json
      * @version 2026.01.02
-     * 
+     *
      * @param  string $table    테이블명
      * @param  string $database 사용할 db
      * @return array            DDL 배열, 실패시 빈배열
@@ -2535,10 +2536,10 @@ class Ukp {
     /**
      * - 백업이 저장된 곳 데이터베이스를 이용하여 복구
      * - 백업방법은 db_table_backup() 함수 참조
-     * 
-     * require  2026.01.02 db_add_table_info db_insert db_query db_row_array db_table_create_sql db_table_ddl
-     * @version 2026.01.02
-     * 
+     *
+     * require  2026.09.22 db_add_table_info db_insert db_query db_row_array db_table_create_sql db_table_ddl
+     * @version 2026.09.22
+     *
      * @param array  $target   복구대상 데이터베이스 배열
      * - `string [{데이터베이스명}][]` 테이블명
      * @param string $database 백업이 저장된 곳 데이터베이스
@@ -2555,6 +2556,7 @@ class Ukp {
                 }
                 //ddl, 쿼리정보 생성
                 $primary = "";
+                $select = array();
                 foreach ($result["columns"] as $temp) {
                     $select[] = "`{$temp[0]}`";
                     if ($temp[1] == "primary") {
@@ -2612,10 +2614,10 @@ class Ukp {
     /**
      * - 테이블 업데이트(1개)
      * - 중복체크 후 업데이트 하려는경우 primary, add_where 값 설정
-     * 
+     *
      * require  2026.02.06 db_add_row db_add_table_info db_create_row db_create_where db_query
      * @version 2026.02.06
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [row=array()]`       수정할 값, 키는 컬럼명, 값은 컬럼값
@@ -2699,10 +2701,10 @@ class Ukp {
      * - 에러 발생하는경우 종료됨
      * - list 없는경우 삭제만 됨
      * - where 없는경우 입력만 됨
-     * 
+     *
      * require  2026.03.31 db_add_row db_add_table_info db_create_row db_create_where db_delete db_query db_result_array db_row_array
      * @version 2026.03.31
-     * 
+     *
      * @param  string $table    테이블명
      * @param  array  $option   옵션
      * - `array  [list=array()]`     키는 컬럼명, 값은 컬럼값인 배열 리스트
@@ -2875,8 +2877,8 @@ class Ukp {
 // #endregion
 // #region @ukp decode
     /**
-     * 11st xml decode  
-     *   
+     * 11st xml decode
+     *
      * require  2025.01.17 decode_xml
      * @version 2025.01.17
      *
@@ -2890,11 +2892,11 @@ class Ukp {
     }
 
     /**
-     * base32 decode by Bryan Ruiz  
-     *   
+     * base32 decode by Bryan Ruiz
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param  string $input base32
      * @return string        문자열
      */
@@ -2936,11 +2938,11 @@ class Ukp {
     }
 
     /**
-     * base64 decode  
-     *   
+     * base64 decode
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param  string $text base64 텍스트
      * @return string       텍스트
      */
@@ -2949,11 +2951,11 @@ class Ukp {
     }
 
     /**
-     * html decode(&amp; &lt; &gt; &quot;)  
-     *   
+     * html decode(&amp; &lt; &gt; &quot;)
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param  string $text 인코딩 텍스트
      * @return string       html코드
      */
@@ -2963,7 +2965,7 @@ class Ukp {
 
     /**
      * - JSON 디코딩
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -2976,8 +2978,8 @@ class Ukp {
     }
 
     /**
-     * nhn xml decode  
-     *   
+     * nhn xml decode
+     *
      * require  2025.01.17 array_value, decode_xml
      * @version 2025.01.17
      *
@@ -2996,8 +2998,8 @@ class Ukp {
     }
 
     /**
-     * UCS2 변환  
-     *   
+     * UCS2 변환
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3009,8 +3011,8 @@ class Ukp {
     }
 
     /**
-     * xml 디코딩 (root 포함된 배열 반환, 네임스페이스 안됨)  
-     *   
+     * xml 디코딩 (root 포함된 배열 반환, 네임스페이스 안됨)
+     *
      * require  2025.01.17 decode_json encode_json
      * @version 2025.01.17
      *
@@ -3027,10 +3029,10 @@ class Ukp {
 // #endregion
 // #region @ukp decrypt
     /**
-     * AES-128/CBC,ECB 복호화  
-     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
-     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
-     *   
+     * AES-128/CBC,ECB 복호화
+     * pkcs5padding, pkcs7padding 두 방식은 서로 같음
+     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
+     *
      * require  2025.06.17 str_pkcs7_unpadding
      * @version 2025.06.17
      *
@@ -3050,17 +3052,16 @@ class Ukp {
         }
         if (version_compare(phpversion(), '5.3.0', '>=')) {
             $return_str = openssl_decrypt($text, $cbc_bool ? "AES-128-CBC" : "AES-128-ECB", $key, 0, $iv);
-        } else {
-            eval('$return_str = $this->str_pkcs7_unpadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, base64_decode($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         }
+        eval('$return_str = $this->str_pkcs7_unpadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, base64_decode($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         return $return_str;
     }
 
     /**
-     * - AES-256/CBC,ECB 복호화  
-     * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
-     * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
-     *   
+     * - AES-256/CBC,ECB 복호화
+     * - pkcs5padding, pkcs7padding 두 방식은 서로 같음
+     * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
+     *
      * require  2025.06.17 str_pkcs7_unpadding
      * @version 2025.06.17
      *
@@ -3080,15 +3081,14 @@ class Ukp {
         }
         if (version_compare(phpversion(), '5.3.0', '>=')) {
             $return_str = openssl_decrypt($text, $cbc_bool ? "AES-256-CBC" : "AES-256-ECB", $key, 0, $iv);
-        } else {
-            eval('$return_str = $this->str_pkcs7_unpadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, base64_decode($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         }
+        eval('$return_str = $this->str_pkcs7_unpadding(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, base64_decode($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         return $return_str;
     }
 
     /**
-     * nhn decrypt  
-     *   
+     * nhn decrypt
+     *
      * require  2025.01.17 decrypt_aes128
      * @version 2025.01.17
      *
@@ -3110,8 +3110,8 @@ class Ukp {
     }
 
     /**
-     * 티몬 복호화  
-     *   
+     * 티몬 복호화
+     *
      * require  2025.01.17 decrypt_aes128
      * @version 2025.01.17
      *
@@ -3125,11 +3125,11 @@ class Ukp {
 // #endregion
 // #region @ukp encode
     /**
-     * base32 encode by Bryan Ruiz  
-     *   
+     * base32 encode by Bryan Ruiz
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param  string $input        문자열
      * @param  bool   $padding_bool padding 여부
      * @return string               base32
@@ -3164,11 +3164,11 @@ class Ukp {
     }
 
     /**
-     * base64 encode  
-     *   
+     * base64 encode
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param  string $text          텍스트
      * @param  bool   $url_safe_bool url safe 여부
      * @return string                base64 텍스트
@@ -3182,11 +3182,11 @@ class Ukp {
     }
 
     /**
-     * html encode(&amp; &lt; &gt; &quot;)  
-     *   
+     * html encode(&amp; &lt; &gt; &quot;)
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param  string $html               html코드
      * @param  bool   $double_encode_bool 이중변환여부
      * @return string                     인코딩 텍스트
@@ -3197,7 +3197,7 @@ class Ukp {
 
     /**
      * - JSON 인코딩
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3209,24 +3209,23 @@ class Ukp {
         if (version_compare(phpversion(), '5.4.0', '>=')) {
             return json_encode($arr, JSON_UNESCAPED_UNICODE);
             //php 5.2, 5.3버전인경우
-        } else {
-            $param1 = '/(\\\u[a-f0-9]+)+/';
-            $param2 = '$s';
-            $param3 = '$json = json_decode(\'{"s":"\'.$s[0].\'"}\'); return reset($json);';
-            $return_str = "";
-            eval('$return_str = preg_replace_callback($param1, create_function($param2, $param3), json_encode($arr));');
-            return $return_str;
         }
+        $param1 = '/(\\\u[a-f0-9]+)+/';
+        $param2 = '$s';
+        $param3 = '$json = json_decode(\'{"s":"\'.$s[0].\'"}\'); return reset($json);';
+        $return_str = "";
+        eval('$return_str = preg_replace_callback($param1, create_function($param2, $param3), json_encode($arr));');
+        return $return_str;
     }
 
     /**
-     * jsonp 문자열 반환  
-     * callback은 request로 받아옴  
-     * 배열은 json문자열로 변환  
-     *   
+     * jsonp 문자열 반환
+     * callback은 request로 받아옴
+     * 배열은 json문자열로 변환
+     *
      * require  2025.01.17 encode_json input_request
      * @version 2025.01.17
-     * 
+     *
      * @param  string|array $data 데이터
      * @param  string       $name request name
      * @return array
@@ -3241,8 +3240,8 @@ class Ukp {
     }
 
     /**
-     * xml 인코딩 (root가 배열에 포함, 네임스페이스 안됨)  
-     *   
+     * xml 인코딩 (root가 배열에 포함, 네임스페이스 안됨)
+     *
      * require  2025.01.17 custom_add_xml_element
      * @version 2025.01.17
      *
@@ -3258,10 +3257,10 @@ class Ukp {
 // #endregion
 // #region @ukp encrypt
     /**
-     * AES-128/CBC,ECB 암호화  
-     * pkcs5padding, pkcs7padding 두 방식은 서로 같음  
-     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
-     *   
+     * AES-128/CBC,ECB 암호화
+     * pkcs5padding, pkcs7padding 두 방식은 서로 같음
+     * ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
+     *
      * require  2025.06.17 str_pkcs7_padding
      * @version 2025.06.17
      *
@@ -3281,17 +3280,16 @@ class Ukp {
         }
         if (version_compare(phpversion(), '5.3.0', '>=')) {
             return openssl_encrypt($text, $cbc_bool ? "AES-128-CBC" : "AES-128-ECB", $key, 0, $iv);
-        } else {
-            eval('$return_str = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $this->str_pkcs7_padding($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         }
+        eval('$return_str = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $this->str_pkcs7_padding($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         return $return_str;
     }
 
     /**
-     * - AES-256/CBC,ECB 암호화  
-     * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
-     * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
-     *   
+     * - AES-256/CBC,ECB 암호화
+     * - pkcs5padding, pkcs7padding 두 방식은 서로 같음
+     * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
+     *
      * require  2025.06.17 str_pkcs7_padding
      * @version 2025.06.17
      *
@@ -3311,22 +3309,21 @@ class Ukp {
         }
         if (version_compare(phpversion(), '5.3.0', '>=')) {
             return openssl_encrypt($text, $cbc_bool ? "AES-256-CBC" : "AES-256-ECB", $key, 0, $iv);
-        } else {
-            eval('$return_str = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $this->str_pkcs7_padding($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         }
+        eval('$return_str = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $this->str_pkcs7_padding($text), $cbc_bool ? MCRYPT_MODE_CBC : MCRYPT_MODE_ECB, $iv));');
         return $return_str;
     }
 
     /**
-     * nhn encrypt  
-     *   
+     * nhn encrypt
+     *
      * require  2025.01.17 encrypt_aes128
      * @version 2025.01.17
      *
      * @param  string $text       평문
      * @param  string $secret_key 비밀키
      * @param  string $iv         iv
-     * @return array  [text]      암호문  
+     * @return array  [text]      암호문
      *                [timestamp] 타임스템프
      */
     function encrypt_nhn($text, $secret_key, $iv) {
@@ -3348,8 +3345,8 @@ class Ukp {
     }
 
     /**
-     * 티몬 암호화  
-     *   
+     * 티몬 암호화
+     *
      * require  2025.01.17 encrypt_aes128
      * @version 2025.01.17
      *
@@ -3363,13 +3360,13 @@ class Ukp {
 // #endregion
 // #region @ukp input
     /**
-     * 현재 실행중인 php파일  
-     *   
+     * 현재 실행중인 php파일
+     *
      * require  2025.10.30 input_server str_simplify_path
      * @version 2025.10.30
-     * 
-     * @return array         배열  
-     *         string [dir]  절대경로  
+     *
+     * @return array         배열
+     *         string [dir]  절대경로
      *         string [base] 파일명
      */
     function input_current_php() {
@@ -3386,7 +3383,7 @@ class Ukp {
      * - `$_FILES` 정보
      * - `$array_bool` 값이 true 인경우 업로드한 파일 리스트정보로 반환, 파일 없는경우 빈배열
      * - `$array_bool` 값이 false 인경우 업로드한 파일정보 1차원배열로 반환, 파일 없는경우 값이 빈문자열, 0으로 채워진 배열
-     * 
+     *
      * require  2026.02.06
      * @version 2026.02.06
      *
@@ -3430,7 +3427,7 @@ class Ukp {
     /**
      * - 단일 파일업로드
      * - 함수 실행 후 input_file_upload_info 함수 호출하여 반환값으로 결과확인
-     * 
+     *
      * require  2026.02.06 unique_id
      * @version 2026.02.06
      *
@@ -3488,7 +3485,7 @@ class Ukp {
 
     /**
      * - 배열파일 일괄업로드
-     * 
+     *
      * require  2026.02.06 input_file unique_id
      * @version 2026.02.06
      *
@@ -3561,7 +3558,7 @@ class Ukp {
      * - base64 문자열로 되어있는 파일을 저장
      * - 함수 실행 후 input_file_upload_info 함수 호출하여 반환값으로 결과확인
      * - 업로드 파일명은 유니크한 파일명
-     * 
+     *
      * require  2026.03.31 array_value unique_id $input_upload_info
      * @version 2026.03.31
      *
@@ -3618,15 +3615,15 @@ class Ukp {
      * + 2: 업로드파일 없음
      * + 3: 업로드할 폴더 없음
      * + 4: 허용확장자 없음
-     * 
+     *
      * require  2026.02.06
      * @version 2026.02.06
      *
      * @return array 업로드한 파일정보
      * - `int    [code]`      업로드 결과코드
-     * - `string [name]`      업로드 파일명  
-     * - `string [ext]`       업로드 파일 확장자  
-     * - `string [full_name]` 확장자 포함 파일명  
+     * - `string [name]`      업로드 파일명
+     * - `string [ext]`       업로드 파일 확장자
+     * - `string [full_name]` 확장자 포함 파일명
      * - `string [src]`       업로드 경로
      */
     function input_file_upload_info() {
@@ -3636,7 +3633,7 @@ class Ukp {
     /**
      * - $_REQUEST 배열의 값 가져오기
      * - 키에 해당하는 값이 없는경우 $array_bool 값이 true이면 빈배열, false인경우 빈문자열
-     * 
+     *
      * require  2026.02.06 array_value
      * @version 2026.02.06
      *
@@ -3653,8 +3650,8 @@ class Ukp {
     }
 
     /**
-     * server  
-     *   
+     * server
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3674,8 +3671,8 @@ class Ukp {
 // #endregion
 // #region @ukp is
     /**
-     * 봇 여부  
-     *   
+     * 봇 여부
+     *
      * require  2025.07.15 input_server
      * @version 2025.07.15
      *
@@ -3697,7 +3694,7 @@ class Ukp {
 
     /**
      * magic_quotes_gpc 설정여부
-     *   
+     *
      * require  2025.08.13
      * @version 2025.08.13
      *
@@ -3713,8 +3710,8 @@ class Ukp {
     }
 
     /**
-     * 모바일 여부 (http://detectmobilebrowsers.com/)  
-     *   
+     * 모바일 여부 (http://detectmobilebrowsers.com/)
+     *
      * require  2025.07.15 input_server
      * @version 2025.07.15
      *
@@ -3734,7 +3731,7 @@ class Ukp {
     /**
      * - 로그저장
      * - require 없어야함
-     * 
+     *
      * require  2025.10.24
      * @version 2025.10.24
      *
@@ -3762,7 +3759,7 @@ class Ukp {
     /**
      * - 세션 값 불러오기
      * - `$key` 값이 null 인경우 세션 전체값 배열 반환
-     * 
+     *
      * require  2026.01.08
      * @version 2026.01.08
      *
@@ -3778,7 +3775,7 @@ class Ukp {
 
     /**
      * - 세션 값 저장
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3791,7 +3788,7 @@ class Ukp {
 
     /**
      * - 세션 시작
-     * 
+     *
      * require  2026.01.29 session_start_check
      * @version 2026.01.29
      *
@@ -3813,27 +3810,26 @@ class Ukp {
 
     /**
      * - 세션 시작여부 확인
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
      * @return bool
      */
     function session_start_check() {
-        if (php_sapi_name() !== 'cli') {
-            if (version_compare(phpversion(), '5.4.0', '>=')) {
-                return session_status() === PHP_SESSION_ACTIVE ? true : false;
-            } else {
-                return session_id() === '' ? false : true;
-            }
+        if (php_sapi_name() == 'cli') {
+            return false;
         }
-        return false;
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
+            return session_status() === PHP_SESSION_ACTIVE ? true : false;
+        }
+        return session_id() === '' ? false : true;
     }
 
     /**
      * - 세션 값 제거
      * - `$key` 값이 null 인경우 전체 제거
-     * 
+     *
      * require  2026.01.08
      * @version 2026.01.08
      *
@@ -3849,8 +3845,8 @@ class Ukp {
 // #endregion
 // #region @ukp str
     /**
-     * 문자열 공백추가후 반환  
-     *   
+     * 문자열 공백추가후 반환
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3877,8 +3873,8 @@ class Ukp {
     }
 
     /**
-     * pkcs7 padding  
-     *   
+     * pkcs7 padding
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3892,8 +3888,8 @@ class Ukp {
     }
 
     /**
-     * pkcs7 unpadding  
-     *   
+     * pkcs7 unpadding
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3907,11 +3903,11 @@ class Ukp {
     }
 
     /**
-     * 폴더경로 심플하게 바꾸기  
-     *   
+     * 폴더경로 심플하게 바꾸기
+     *
      * require  2025.10.30
      * @version 2025.10.30
-     * 
+     *
      * @param  string $path 폴더경로
      * @return string       심플한 폴더경로
      */
@@ -3947,7 +3943,7 @@ class Ukp {
     /**
      * - 시간, PID, 순차 번호를 조합하여 시스템 전체에서 고유한 식별자를 생성.
      * - 생성 포맷: [년월일시분(12)][마이크로초(6)][PID(7, 0-padding)][증가값(1~)]
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
      *
@@ -3961,7 +3957,7 @@ class Ukp {
     /**
      * - `$id` 값 기준으로 고유한 임시값 생성
      * - `$id`와 `$pw`를 조합하여 해싱(Hashing), 입력이 같으면 항상 결과가 같음.
-     * 
+     *
      * require  2025.01.17 encode_base64 unique_id
      * @version 2025.01.17
      *
@@ -3978,12 +3974,12 @@ class Ukp {
 // #endregion
 // #region @ukp user
     /**
-     * 사용자 정보 문자열 설정 및 반환  
-     * 로그에도 사용자 정보 문자열 출력됨  
-     *   
+     * 사용자 정보 문자열 설정 및 반환
+     * 로그에도 사용자 정보 문자열 출력됨
+     *
      * require  2025.10.24
      * @version 2025.10.24
-     * 
+     *
      * @param  string $str 사용자 정보 문자열, null인경우 반환만, 빈문자열인경우 초기화
      * @return string      사용자 정보 문자열
      */
