@@ -1,4 +1,4 @@
-# PHP $ukp 함수 리스트 (2026.03.31)
+# PHP $ukp 함수 리스트
 ## decrypt_aes256 (2025.06.17)
 ```php
 /**
@@ -16,9 +16,9 @@ $ukp->decrypt_aes256($text, $key, $iv = "", $cbc_bool = false);
 ## encrypt_aes256 (2025.06.17)
 ```php
 /**
- * - AES-256/CBC,ECB 암호화  
- * - pkcs5padding, pkcs7padding 두 방식은 서로 같음  
- * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)  
+ * - AES-256/CBC,ECB 암호화
+ * - pkcs5padding, pkcs7padding 두 방식은 서로 같음
+ * - ECB방식은 iv값 사용하지 않음(공백으로 두면 됨)
  * @param  string $text     평문자열
  * @param  string $key      암호화 키
  * @param  string $iv       암호화 iv(ecb인경우 공백으로 두면 됨)
@@ -189,7 +189,7 @@ $ukp->$db_update_multiple($table, $option = array(), $database = "default");
  * - sql 파일 없는경우 `select count(*) as cnt from {테이블명}` 쿼리 사용
  * - delete_flag_bool 값은 delete_flag 컬럼 설정 안한경우 false 로 강제변경
  * @param  string $table    테이블명
- * @param  array  $option   옵션  
+ * @param  array  $option   옵션
  * - `array  [where=array()]`         where문, 키는 컬럼명, 값은 컬럼값
  * - `bool   [or_bool=false]`          true: where or문, false: where and문
  * - `bool   [delete_flag_bool=true]` true - 삭제여부 사용, false - 삭제여부 사용안함, 삭제여부는 y, n 값으로 판단
@@ -323,9 +323,9 @@ $ukp->input_file_upload_base64($file, $src = ".");
  * + 4: 허용확장자 없음
  * @return array 업로드한 파일정보
  * - `int    [code]`      업로드 결과코드
- * - `string [name]`      업로드 파일명  
- * - `string [ext]`       업로드 파일 확장자  
- * - `string [full_name]` 확장자 포함 파일명  
+ * - `string [name]`      업로드 파일명
+ * - `string [ext]`       업로드 파일 확장자
+ * - `string [full_name]` 확장자 포함 파일명
  * - `string [src]`       업로드 경로
  */
 $ukp->input_file_upload_info();
@@ -412,7 +412,7 @@ $ukp->unique_session_id($id, $pw, $temp_bool = false);
 ## common_curl (2025.12.04)
 ```php
 /**
- * - curl 요청  
+ * - curl 요청
  * - 파일첨부인경우
  * + 기존 $header 값에 Content-Type: multipart/form-data 추가(띄어쓰기, 대소문자 구분)
  * + $method 값은 GET이 아닌 값, $query는 배열, 파일은 @ + 파일경로
@@ -426,10 +426,10 @@ $ukp->unique_session_id($id, $pw, $temp_bool = false);
  * @param  array        $header  요청 header
  * @param  string       $cookie  요청 cookie
  * @param  int          $timeout 요청 제한시간
- * @return array                 curl 결과배열  
- * - `string [http_code]`    http 상태코드  
- * - `string [header]`       응답헤더  
- * - `string [content]`      응답결과  
+ * @return array                 curl 결과배열
+ * - `string [http_code]`    http 상태코드
+ * - `string [header]`       응답헤더
+ * - `string [content]`      응답결과
  * - `string [redirect_url]` 리다이렉트url(해당하는경우만)
  */
 $ukp->common_curl($url, $query = "", $method = "GET", $header = array(), $cookie = "", $timeout = 10);

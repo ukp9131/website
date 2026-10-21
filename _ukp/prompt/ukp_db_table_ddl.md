@@ -1,36 +1,44 @@
-# JSON 문자열 생성. (2026.02.04)
+# 요청사항
+- `## 입력값` 에 맞춰서 JSON 문자열을 생성해줘.
 ## 입력값
 ```php
 $foreign_postfix = "";
 ```
 ```sql
 ```
-## 출력값 설명
-- comment: 테이블 주석
-- primary_type: 기본키 자료형, 기본값 int
-- columns: 순서대로 컬럼명, 자료형, 코멘트, 인덱스여부, 기본값
-## 규칙
+### 규칙
 - 결과물에는 주석을 달지 않는다.
-- 자료형이 ```primary```, ```foreign``` 인경우 인덱스여부를 true로 설정한다.
-- 테이블 생성 쿼리문에서 자료형과 기본값이 ```$type_dictionary``` 변수와 정확히 일치한다면 자료형 대신 ```$type_dictionary``` 변수 키값을 입력한다.
-  - ```varchar(1) default null``` -> ```varchar(1)```
-  - ```varchar(1) default 'n'``` -> ```flag```
-  - ```int(11) default null``` -> ```int(11)```
-  - ```int(4) default '0'``` -> ```int(4)```
-- ```date``` 자료형 기본값이 ```1970-01-01``` 보다 적은경우 기본값은 ```1970-01-01```이 된다.
-- ```datetime``` 자료형 기본값이 ```1970-01-01 00:00:00``` 보다 적은경우 기본값은 ```1970-01-01 00:00:00```이 된다.
-- 테이블 코멘트는 값이 없는경우 빈문자열로 처리한다.
-- 필드 코멘트는 값이 없는경우 정렬용 공백이 들어간 빈 코멘트로 입력한다.
-- 컬럼명, 자료형, 코멘트만 tab(공백4칸)을 이용하여 세로정렬한다. (영어 1byte, 한글 2byte 기준으로)
+- `primary key` 설정이 되어있는 컬럼은 자료형이 `primary` 가 된다.
+- `$foreign_postfix` 값을 접미어로 가지고 있는 컬럼은 자료형이 `foreign` 이 된다.
+- 테이블 기본값은 아래 규칙에 따라 입력하며, 함수나 명령어는 소문자로 치환한다.
+  + `default null` -> 입력안함.
+  + `default 'n'` -> "n"
+  + `default CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()` -> "current_timestamp() on update current_timestamp()"
+  + `default '1970-01-01' ON UPDATE current_timestamp()` -> "'1970-01-01' on update current_timestamp()"
+- 테이블 코멘트는 값이 없는경우 빈문자열로 입력한다.
+- 컬럼 코멘트는 값이 없는경우 정렬용 공백이 들어간 빈 코멘트로 입력한다.
+- 영문/숫자/기호는 1칸, 한글은 2칸으로 계산하여 컬럼명, 자료형, 코멘트를 공백으로 세로 정렬한다.
 - 인덱스여부, 기본값은 세로정렬하지 않는다.
-- ```primary_type``` 은 primary key 자료형이 ```int``` 인경우 생략해도 되며, ```int``` 가 아닌경우 해당 자료형에 맞게 변경한다.
-## 참고변수 설명
+- `$type_dictionary`에 기본값이 정의된 자료형은 SQL의 자료형과 기본값이 모두 동일한 경우에만 해당 키로 치환한다.
+- `$type_dictionary`에 기본값이 정의되지 않은 자료형은 SQL의 기본값이 `null`인 경우 해당 키로 치환한다.
+- `$type_dictionary`와 SQL 자료형 비교는 대소문자를 구분하지 않는다.
+- `$type_dictionary`의 기본값 비교 시 SQL 문자열 리터럴의 바깥쪽 따옴표는 제거하여 비교한다.
+- `$foreign_postfix`가 빈 문자열이면 외래키 자료형 판정을 하지 않는다.
+- `primary_type` 은 primary key 자료형이 `int` 인경우 생략해도 되며, `int` 가 아닌경우 해당 자료형에 맞게 변경한다.
+- `date` 자료형 기본값이 `1970-01-01` 보다 적은경우 기본값은 `1970-01-01`이 된다, null 인경우 기본값을 설정하지 않는다.
+- `datetime` 자료형 기본값이 `1970-01-01 00:00:00` 보다 적은경우 기본값은 `1970-01-01 00:00:00`이 된다, null 인경우 기본값을 설정하지 않는다.
+- `date`, `datetime` 최소값 보정은 날짜 또는 datetime 리터럴에만 적용하며 함수나 명령어에는 적용하지 않는다.
+- 기본값이 null이더라도 ON UPDATE 절이 존재하면 기본값을 생략하지 않고 `null on update ...` 형태로 입력한다.
+- 자료형 판정 우선순위는 `primary` → `foreign` → `$type_dictionary` → 원본 SQL 자료형 순서이다.
+- `primary key`, `index`, `key`, `unique index`, `unique key`에 포함된 컬럼은 인덱스여부를 `true`로 입력한다.
+- 복합 인덱스에 포함된 모든 컬럼은 인덱스여부를 true로 입력한다.
+### 참고변수
 ```php
 /**
  * - [{자료형}][0]:string 자료형
  * - [{자료형}][1]:string 기본값, 설정되어있지 않은경우 default null
- * 
- * @var array
+ *
+ * @var array<string,array{0:string,1?:string}>
 */
 $type_dictionary = array(
     "bigint" => array("bigint(20)", "0"),
@@ -49,13 +57,21 @@ $type_dictionary = array(
 /**
  * - 컬럼명 접미어에 $foreign_postfix 값이 포함되어 있다면 해당 컬럼은 외래키이다.
  * - 변수값이 빈문자열인경우 외래키는 존재하지 않는다.
- * 
+ *
  * @var string
  */
 $foreign_postfix = "";
 ```
-## 참고예제
-### 입력값
+### 출력값 설명
+- comment: 테이블 주석
+- primary_type: 기본키 자료형, 기본값 int
+- columns: 컬럼 정보
+  + `[][0]`: 컬럼명
+  + `[][1]`: 자료형
+  + `[][2]`: 컬럼 코멘트
+  + `[][3]`: 인덱스여부
+  + `[][4]`: 기본값, 설정 안한경우 기본값 null
+### 참고예제 입력값
 ```php
 $foreign_postfix = "_idx";
 ```
@@ -73,8 +89,8 @@ create table if not exists `ukp_sample_table` (
     `insert_date`      date         null     default '0000-00-00'   comment '입력일',
     `insert_time`      time         null     default null   comment '입력시',
     `insert_dt`        datetime     null     default current_timestamp()   comment '입력일시',
-    `update_date`      date       null     default current_timestamp() ON UPDATE current_timestamp()   comment '수정일',
-    `update_dt`        datetime     null     default null ON UPDATE current_timestamp()   comment '수정일시',
+    `update_date`      date       null     default CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()   comment '수정일',
+    `update_dt`        datetime     null     default null on update current_timestamp()   comment '수정일시',
     `delete_flag`      varchar(1)   null     default 'n'    comment '삭제여부',
     primary key (`sample_table_idx`),
     index (`foreign_idx`),
@@ -82,7 +98,7 @@ create table if not exists `ukp_sample_table` (
     index (`update_dt`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='샘플테이블(st)';
 ```
-### 출력값
+### 참고예제 출력값
 ```json
 {
     "comment": "샘플테이블(st)",
@@ -102,7 +118,9 @@ create table if not exists `ukp_sample_table` (
         ["insert_dt         ", "datetime          ", "입력일시          ", false, "current_timestamp()"],
         ["update_date       ", "date              ", "수정일            ", false, "current_timestamp() on update current_timestamp()"],
         ["update_dt         ", "datetime          ", "수정일시          ", true, "null on update current_timestamp()"],
-        ["delete_flag       ", "flag              ", "삭제여부          ", false],
+        ["delete_flag       ", "flag              ", "삭제여부          ", false]
     ]
 }
 ```
+#### 마지막 수정일
+- 2026.10.15

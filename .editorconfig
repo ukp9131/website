@@ -1,0 +1,12 @@
+# editorconfig 확장프로그램 설치 필수
+root = true
+
+[*]
+# 개행문자
+end_of_line = lf
+# 문자셋
+charset = utf-8
+# 파일 마지막줄에 개행문자 자동추가
+insert_final_newline = true
+# 각 줄 뒤에 의미없는 공백문자 삭제
+trim_trailing_whitespace = true

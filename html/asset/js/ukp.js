@@ -9,18 +9,18 @@
  * - 주석 자료형: *, array, boolean, function, number, object, string
  * - 객체설명: `{자료형} [{객체키}={기본값}]` {설명문}, 실제 값이 아닌 설명문인경우 중괄호로 감싸야함, 설명이 길어지는경우 메인주석에 작성 후 참조
  * - 사용자 정의 함수는 함수 접두어 언더바(_) 사용
- * 
- * @version 2026.04.30
+ *
+ * @version 2026.06.05
  * @author ukp
  */
 
 class Ukp {
     /**
      * - 생성자
-     * 
+     *
      * require  2026.04.30 each
-     * @version 2026.04.30
-     * 
+     * @version 2026.06.05
+     *
      * @param {object} obj       설정값
      * - `object [root=document]`      최상위요소(기본값 document)
      * - `string [storage_name="ukp"]` 스토리지 이름(기본값 ukp), 겹치는경우 설정
@@ -38,17 +38,21 @@ class Ukp {
             width: 0,
             height: 0
         };
-        console.log("ukp.js 2026.04.30");
+        if (typeof(window.ukp_version) != "undefined") {
+            return;
+        }
+        window.ukp_version = "2026.06.05";
+        console.log("ukp.js " + window.ukp_version);
     }
 
     /**
      * - 컨텐츠 리사이징, 오토스케일링
      * - 전체 컨텐츠 리사이징, 오토스케일링인경우 html, body 태그에 아래와 같이 설정
      * - margin:0, padding:0, height:100%, min-height:100%, overflow:hidden
-     * 
+     *
      * require  2025.06.17 css find intval obj_type
      * @version 2025.06.17
-     * 
+     *
      * @param   {object|string} wrap    감싸고 있는 대상 객체 또는 쿼리셀렉터
      * @param   {object|string} content 리사이징 대상 객체 또는 쿼리셀렉터
      * @param   {number}        width   리사이징 대상 원본너비
@@ -98,10 +102,10 @@ class Ukp {
     /**
      * - 배열 또는 객체 반복
      * - ukp 내에서 forEach 대신 이 함수 사용
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param {object}   arr 배열 또는 객체
      * @param {function} fun 반복할 함수, false 리턴시 break, 첫번째 매개변수: 값, 두번째 매개변수: 키
      */
@@ -118,10 +122,10 @@ class Ukp {
     /**
      * - querySelector
      * - ukp 내에서 document.querySelector 대신 이 함수 사용
-     * 
+     *
      * require  2024.11.07
      * @version 2024.11.07
-     * 
+     *
      * @param   {string} selector 셀렉터
      * @returns {object}          html 요소객체
      */
@@ -133,10 +137,10 @@ class Ukp {
     /**
      * - querySelectorAll
      * - ukp 내에서 document.querySelectorAll 대신 이 함수 사용
-     * 
+     *
      * require  2024.11.07
      * @version 2024.11.07
-     * 
+     *
      * @param   {string} selector 셀렉터
      * @returns {array}           html 요소객체리스트
      */
@@ -148,10 +152,10 @@ class Ukp {
     /**
      * - addEventListener
      * - ukp 내에서 addEventListener 대신 이 함수 사용
-     * 
+     *
      * require  2025.01.17 each find_all
      * @version 2025.01.17
-     * 
+     *
      * @param {string}        event_name 이벤트 유형
      * @param {object|string} target     대상객체 또는 쿼리셀렉터
      * @param {function}      fun        실행함수, 첫번째 매개변수에 이벤트객체
@@ -170,10 +174,10 @@ class Ukp {
     /**
      * - 이벤트 강제실행
      * - 이벤트가 안먹히는 경우 이 소스 참고해서 html 속성에 직접 작성
-     * 
+     *
      * require  2025.01.17 each find_all
      * @version 2025.01.17
-     * 
+     *
      * @param {string}        event_name 이벤트 유형
      * @param {object|string} target     대상객체 또는 쿼리셀렉터
      */
@@ -190,10 +194,10 @@ class Ukp {
 
     /**
      * - window onload
-     * 
+     *
      * require  2025.01.17 on
      * @version 2025.01.17
-     * 
+     *
      * @param {function} fun 실행함수, 첫번째 매개변수에 이벤트객체
      */
     load(fun) {
@@ -203,10 +207,10 @@ class Ukp {
 
     /**
      * - window onDOMContentLoaded
-     * 
+     *
      * require  2025.01.17 on
      * @version 2025.01.17
-     * 
+     *
      * @param {function} fun 실행함수, 첫번째 매개변수에 이벤트객체
      */
     ready(fun) {
@@ -216,10 +220,10 @@ class Ukp {
 
     /**
      * - 태그내 style 속성 변경
-     * 
+     *
      * require  2025.01.17 each find_all
      * @version 2025.01.17
-     * 
+     *
      * @param {object|string} target 대상객체 또는 쿼리셀렉터
      * @param {string}        key    css 속성
      * @param {string}        value  속성값, 없거나 공백인경우 해제
@@ -264,10 +268,10 @@ class Ukp {
      * - input file 요소에 첨부된 파일 콜백함수 매개변수로 전달(blob문자열)
      * - 단일파일만 처리
      * - 파일 없는경우 콜백함수에 공백문자 전달
-     * 
+     *
      * require  2025.01.17
      * @version 2025.01.17
-     * 
+     *
      * @param {object}   ele input file 요소
      * @param {function} fun 콜백함수, 매개변수에 파일 전달
      */
@@ -287,10 +291,10 @@ class Ukp {
 
     /**
      * - 그리기용 ctx 반환
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {object} canvas 캔버스
      * @returns {object}         ctx
      */
@@ -300,10 +304,10 @@ class Ukp {
 
     /**
      * - 그리기 전체 지우기
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param {object} ctx ctx
      */
     clear_draw(ctx) {
@@ -314,10 +318,10 @@ class Ukp {
 
     /**
      * - 그리기 저장
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {object} ctx ctx
      * @returns {string}     blob 문자열
      */
@@ -327,10 +331,10 @@ class Ukp {
 
     /**
      * - 그리기 불러오기
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param {object} ctx  ctx
      * @param {string} blob blob 문자열
      */
@@ -347,10 +351,10 @@ class Ukp {
 
     /**
      * - 그리기 펜설정
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param {object} ctx   ctx
      * @param {string} color 펜 색상, transparent인경우 지우개
      * @param {number} size  펜 사이즈
@@ -369,10 +373,10 @@ class Ukp {
 
     /**
      * - 캔버스에 그리기
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param {object} ctx    ctx
      * @param {number} from_x 시작 x좌표
      * @param {number} from_y 시작 x좌표
@@ -390,10 +394,10 @@ class Ukp {
      * - list 요소 내용 마지막에 row 요소 추가
      * - row 를 감싸고 있는 태그는 template 태그 사용 추천
      * - 이벤트유형은 on을 뺀 이름(ex onclick -> "click")
-     * 
+     *
      * require  2026.04.17 each find on
      * @version 2026.04.17
-     * 
+     *
      * @param {object|string} row_target  row 감싸고있는 태그의 요소 또는 쿼리셀렉터
      * @param {object|string} list_target list 요소 또는 쿼리셀렉터
      * @param {object}        replace     `string [{변경할 문자열}]` 변경될 문자열
@@ -435,10 +439,10 @@ class Ukp {
 
     /**
      * - 숫자콤마
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {number} num 숫자
      * @returns {string}     콤마 추가된 숫자
      */
@@ -448,10 +452,10 @@ class Ukp {
 
     /**
      * - 숫자앞에 0
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {number} n     숫자
      * @param   {number} width 길이
      * @returns {string}       0붙은숫자
@@ -463,10 +467,10 @@ class Ukp {
 
     /**
      * - 시간범위내 포함여부
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {string}  now_time   기준시간
      * @param   {string}  start_time 시작시간(공백가능)
      * @param   {string}  end_time   종료시간(공백가능)
@@ -499,10 +503,10 @@ class Ukp {
 
     /**
      * - 뒤로가기 또는 캐시 상태 페이지인경우 함수 실행
-     * 
+     *
      * require  2025.01.17 on
      * @version 2025.01.17
-     * 
+     *
      * @param {function} fun 실행함수, 첫번째 매개변수에 이벤트객체
      */
     back_cache(fun) {
@@ -516,10 +520,10 @@ class Ukp {
 
     /**
      * - 날짜차이
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {string} start_date 시작일
      * @param   {string} end_date   종료일
      * @returns {int}               차이일수
@@ -533,10 +537,10 @@ class Ukp {
     /**
      * - 날짜연산
      * - 현지시간 기준으로 생성
-     * 
+     *
      * require  2024.08.13 number_pad
      * @version 2024.08.13
-     * 
+     *
      * @param   {string} datetime YYYY-mm-dd 또는 YYYY-mm-dd HH:ii:ss, 공백인경우 현재일시
      * @param   {number} num      연산숫자, 음수도 가능
      * @param   {string} name     year, month, day, hour, minute, second (뒤에 s 붙여도 가능)
@@ -583,10 +587,10 @@ class Ukp {
     /**
      * - 현재 국제표준시 반환
      * - 기본 반환형태: YYYY-mm-dd HH:ii:ss
-     * 
+     *
      * require  2026.04.30 number_pad
      * @version 2026.04.30
-     * 
+     *
      * @param   {boolean} short_bool true 인경우 YYYYmmddHHiiss 형태로 반환
      * @returns {string}             년월일시분초
      */
@@ -610,10 +614,10 @@ class Ukp {
 
     /**
      * - 고유번호
-     * 
+     *
      * require  2024.08.13 number_pad
      * @version 2024.08.13
-     * 
+     *
      * @returns {string} 고유번호
      */
     unique_id() {
@@ -633,10 +637,10 @@ class Ukp {
 
     /**
      * - 아이폰 여부
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @returns {boolean}
      */
     is_iphone() {
@@ -645,10 +649,10 @@ class Ukp {
 
     /**
      * - 안드로이드 여부
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @returns {boolean}
      */
     is_android() {
@@ -658,10 +662,10 @@ class Ukp {
     /**
      * - 상위요소 기준 요소 또는 마우스 절대좌표
      * - 회전이 들어간 요소는 상위요소의 절대좌표 + 요소의 top, left 값으로 구함
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {object} e 요소 또는 마우스/터치 이벤트
      * @param   {object} p 상위요소
      * @returns {object}   좌표
@@ -715,10 +719,10 @@ class Ukp {
     /**
      * - 두 점의 기울기
      * - deg 이므로 각도값과 부호 반대
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {number} center_x 중심 x 좌표
      * @param   {number} center_y 중심 x 좌표
      * @param   {number} outer_x  외각 x 좌표
@@ -742,10 +746,10 @@ class Ukp {
 
     /**
      * - 한글키보드
-     * 
+     *
      * require  2024.08.13 word_merge
      * @version 2024.08.13
-     * 
+     *
      * @param   {string}  before_word   이미 입력되어있는 문자열
      * @param   {string}  input_word    키보드 입력값
      * @param   {boolean} keyboard_bool true: 108키보드, false: 축소키보드
@@ -905,10 +909,10 @@ class Ukp {
 
     /**
      * - 자음모음 합치기
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {object} word 문자열[i,m,t]
      * @returns {string}      합친결과
      */
@@ -938,7 +942,7 @@ class Ukp {
 
     /**
      * - 기본 contextmenu 이벤트 삭제
-     * 
+     *
      * require  2025.01.17 on
      * @version 2025.01.17
      */
@@ -953,10 +957,10 @@ class Ukp {
      * - 스토리지 저장
      * - 현지시간 기준으로 저장
      * - 값은 문자열로 강제변경
-     * 
+     *
      * require  2026.02.04
      * @version 2026.02.04
-     * 
+     *
      * @param {string} key           키
      * @param {string} value         값
      * @param {string} expiration_dt 만기일시, 공백인경우 영구, "session" 인경우 세션스토리지
@@ -991,11 +995,11 @@ class Ukp {
      * - 스토리지 불러오기
      * - 현지시간 기준으로 만료
      * - 값은 문자열로 강제변경
-     * 
+     *
      * require  2026.02.04 date_add each
      * @version 2026.02.04
-     * 
-     * @param   {string}        key 키, null인경우 전체 스토리지 
+     *
+     * @param   {string}        key 키, null인경우 전체 스토리지
      * @returns {string|object}     값, 없는 키인경우 공백문자열
      */
     get_storage(key = null) {
@@ -1052,10 +1056,10 @@ class Ukp {
 
     /**
      * - 스토리지 삭제
-     * 
+     *
      * require  2026.02.04
      * @version 2026.02.04
-     * 
+     *
      * @param {string} key 키, null인경우 전체 스토리지 삭제
      */
     unset_storage(key = null) {
@@ -1076,10 +1080,10 @@ class Ukp {
     /**
      * - 객체값 반환
      * - 값 없는경우 공백문자열
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @param   {object} obj 객체
      * @param   {string} key 키
      * @returns {*}          값
@@ -1091,10 +1095,10 @@ class Ukp {
     /**
      * - get 파라미터에서 값 가져오기
      * - 키에 해당하는 값 없는경우 공백문자열 반환
-     * 
+     *
      * require  2024.08.13 obj_value
      * @version 2024.08.13
-     * 
+     *
      * @param   {string}       key 키, null인경우 배열전체
      * @returns {string|array}
      */
@@ -1129,10 +1133,10 @@ class Ukp {
 
     /**
      * - 화면 수직 여부
-     * 
+     *
      * require  2024.08.13
      * @version 2024.08.13
-     * 
+     *
      * @returns {boolean} true: 수직화면, false: 수평화면
      */
     is_screen_vertical() {
@@ -1142,10 +1146,10 @@ class Ukp {
     /**
      * - html 정렬변경
      * - row는 그대로 둔 상태에서 내부만 바꿈
-     * 
+     *
      * require  2025.01.17 each
      * @version 2025.01.17
-     * 
+     *
      * @param {object}  row     row 요소
      * @param {boolean} up_bool true: 위요소와 변경, false: 아래요소와 변경
      */
@@ -1181,10 +1185,10 @@ class Ukp {
 
     /**
      * - base64 to file
-     * 
+     *
      * require  2024.11.07
      * @version 2024.11.07
-     * 
+     *
      * @param   {string} base64    base64
      * @param   {string} file_name 파일명
      * @returns {object}           파일객체
@@ -1203,10 +1207,10 @@ class Ukp {
 
     /**
      * - 객체타입 소문자로 반환
-     * 
+     *
      * require  2024.11.07
      * @version 2024.11.07
-     * 
+     *
      * @param   {*}      obj 객체
      * @returns {string}     소문자로 변환된 객체타입 문자열
      */
@@ -1217,10 +1221,10 @@ class Ukp {
     /**
      * - ajax 전송
      * - Content-Type: multipart/form-data
-     * 
+     *
      * require  2026.02.24 find obj_type on
      * @version 2026.02.24
-     * 
+     *
      * @param {string}        url      url
      * @param {object|string} data     json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
      * @param {function}      com_func 완료함수, 첫번째 매개변수에 결과(text) 전달
@@ -1260,10 +1264,10 @@ class Ukp {
     /**
      * - ajax json 전송
      * - Content-Type: application/json
-     * 
+     *
      * require  2024.11.07
      * @version 2024.11.07
-     * 
+     *
      * @param {string}   url  url
      * @param {object}   json json 객체
      * @param {function} func 완료함수, 첫번째 매개변수에 결과(text) 전달
@@ -1287,10 +1291,10 @@ class Ukp {
      * - json 객체는 키=값 형태로 생성
      * - 매개변수가 문자열인경우 해당 쿼리셀렉터를 가진 form 태그 객체 있는지 확인
      * - form 태그 객체는 객체 내에 value 값을 가질 수 있는 요소의 name=value 형태로 생성
-     * 
+     *
      * require  2026.03.09
      * @version 2026.03.09
-     * 
+     *
      * @param   {object|string} target json 객체, FormData 객체, form 태그 객체, form 태그 쿼리셀렉터
      * @returns {string}               쿼리스트링
      */
@@ -1320,10 +1324,10 @@ class Ukp {
     /**
      * - 클래스 값 가지고 있는지 확인
      * - 쿼리셀렉터인경우 첫번째 요소만 확인
-     *   
+     *
      * require  2025.01.17 each find
      * @version 2025.01.17
-     * 
+     *
      * @param   {object|string} target     요소 또는 셀렉터
      * @param   {string}        class_name 확인할 클래스명
      * @returns {boolean}                  true: 클래스가 있음, false: 클래스가 없음
@@ -1347,10 +1351,10 @@ class Ukp {
 
     /**
      * - 클래스 값 추가
-     * 
+     *
      * require  2025.01.17 each find_all has_class
      * @version 2025.01.17
-     * 
+     *
      * @param   {object|string} target     요소 또는 셀렉터
      * @param   {string}        class_name 추가할 클래스명
      */
@@ -1370,10 +1374,10 @@ class Ukp {
 
     /**
      * - 클래스 값 삭제
-     * 
+     *
      * require  2025.01.17 each find_all
      * @version 2025.01.17
-     * 
+     *
      * @param   {object|string} target     요소 또는 셀렉터
      * @param   {string}        class_name 삭제할 클래스명
      */
@@ -1398,10 +1402,10 @@ class Ukp {
 
     /**
      * - 클래스 값 없는경우 추가, 있는경우 삭제
-     * 
+     *
      * require  2025.01.17 add_class each find_all has_class remove_class
      * @version 2025.01.17
-     * 
+     *
      * @param   {object|string} target     요소 또는 셀렉터
      * @param   {string}        class_name 클래스명
      */
@@ -1422,10 +1426,10 @@ class Ukp {
 
     /**
      * - base64 디코딩
-     * 
+     *
      * require  2025.03.06
      * @version 2025.03.06
-     * 
+     *
      * @param   {string} text base64 문자열
      * @returns {string}      문자열
      */
@@ -1437,10 +1441,10 @@ class Ukp {
 
     /**
      * - base64 인코딩
-     * 
+     *
      * require  2025.03.06
      * @version 2025.03.06
-     * 
+     *
      * @param   {string}  text          문자열
      * @param   {boolean} url_safe_bool url safe 여부
      * @returns {string}                base64 문자열
@@ -1456,10 +1460,10 @@ class Ukp {
 
     /**
      * - 문자열 정수로 변경
-     * 
+     *
      * require  2025.03.06
      * @version 2025.03.06
-     * 
+     *
      * @param   {string} text 문자열
      * @returns {number}      정수
      */
@@ -1470,10 +1474,10 @@ class Ukp {
 
     /**
      * - 문자열 실수로 변경
-     * 
+     *
      * require  2025.03.06
      * @version 2025.03.06
-     * 
+     *
      * @param   {string} text 문자열
      * @returns {number}      실수
      */
@@ -1485,10 +1489,10 @@ class Ukp {
     /**
      * - 숫자값을 문자열로 변경
      * - 숫자, 문자열이 아닌경우 공백문자열 반환
-     * 
+     *
      * require  2026.02.04 obj_type
      * @version 2026.02.04
-     * 
+     *
      * @param   {number} num 숫자
      * @returns {string}     문자열
      */
@@ -1502,10 +1506,10 @@ class Ukp {
     /**
      * - sha256 해시생성
      * - 비동기 함수 사용하므로 생성완료시 콜백함수에 해시값 전달
-     * 
+     *
      * require  2026.04.30 obj_type
      * @version 2026.04.30
-     * 
+     *
      * @param {string}   text 변환할 값
      * @param {function} func 첫번째 매개변수에 sha256 값 전달
      */
@@ -1515,6 +1519,135 @@ class Ukp {
             const hash_array = Array.from(new Uint8Array(hash_buffer));
             const hash_hex = hash_array.map(b => b.toString(16).padStart(2, '0')).join('');
             func(hash_hex);
+        });
+    }
+
+    /**
+     * - ArrayBuffer to Hex
+     *
+     * require  2026.06.05
+     * @version 2026.06.05
+     *
+     * @param   {object} bin  ArrayBuffer
+     * @returns {string}      hex
+     */
+    bin2hex(bin) {
+        return Array.from(new Uint8Array(bin))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
+    /**
+     * - Hex to Uint8Array
+     *
+     * require  2026.06.05
+     * @version 2026.06.05
+     *
+     * @param   {string} hex  hex
+     * @returns {object}      Uint8Array
+     */
+    hex2bin(hex) {
+        const bytes = new Uint8Array(Math.ceil(hex.length / 2));
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+        }
+        return bytes;
+    }
+
+    /**
+     * - ed25519 키생성
+     * - 공개키는 raw, 비밀키는 pkcs#8 방식으로 추출 후 hex 처리
+     * - 비동기 함수 사용하므로 생성완료시 콜백함수에 키값 전달
+     *
+     * require  2026.06.05 bin2hex
+     * @version 2026.06.05
+     *
+     * @param {function} func 첫번째 매개변수: 공개키, 두번째 매개변수: 비밀키
+     */
+    ed25519_generate_key(func) {
+        const ukp = this;
+        crypto.subtle.generateKey(
+            { name: "Ed25519" },
+            true,
+            ["sign", "verify"]
+        ).then(async (key_pair) => {
+            //공개키
+            const public_key = await crypto.subtle.exportKey(
+                "raw",
+                key_pair.publicKey
+            );
+            const public_key_hex = ukp.bin2hex(public_key);
+            //비밀키
+            const private_key = await crypto.subtle.exportKey(
+                "pkcs8",
+                key_pair.privateKey
+            );
+            const private_key_hex = ukp.bin2hex(private_key);
+            func(public_key_hex, private_key_hex);
+        });
+    }
+
+    /**
+     * - ed25519 sign
+     * - 비밀키는 pkcs#8 방식이며 hex 처리됨
+     * - 비동기 함수 사용하므로 생성완료시 콜백함수에 사인을 hex 처리하여 전달
+     *
+     * require  2026.06.05 bin2hex hex2bin
+     * @version 2026.06.05
+     *
+     * @param {string}   text        사인할 문자열
+     * @param {string}   private_key 비밀키
+     * @param {function} func        첫번째 매개변수: sign
+     */
+    ed25519_sign(text, private_key, func) {
+        const ukp = this;
+        crypto.subtle.importKey(
+            "pkcs8",
+            ukp.hex2bin(private_key),
+            { name: "Ed25519" },
+            false,
+            ["sign"]
+        ).then(async (imported_private_key) => {
+            const encoded_text = new TextEncoder().encode(text);
+            const signature = await crypto.subtle.sign(
+                { name: "Ed25519" },
+                imported_private_key,
+                encoded_text
+            );
+            func(ukp.bin2hex(signature));
+        });
+    }
+
+    /**
+     * - ed25519 verify
+     * - 공개키는 raw 방식이며 hex 처리됨
+     * - 비동기 함수 사용하므로 콜백함수에 검증결과 전달
+     *
+     * require  2026.06.05
+     * @version 2026.06.05
+     *
+     * @param {string}   text       검증할 문자열
+     * @param {string}   sign       사인
+     * @param {string}   public_key 공개키
+     * @param {function} func       첫번째 매개변수값이 true 인경우 검증성공
+     */
+    ed25519_verify(text, sign, public_key, func) {
+        const ukp = this;
+        crypto.subtle.importKey(
+            "raw",
+            ukp.hex2bin(public_key),
+            { name: "Ed25519" },
+            false,
+            ["verify"]
+        ).then(async (imported_public_key) => {
+            const encoded_text = new TextEncoder().encode(text);
+            const result_bool = await crypto.subtle.verify(
+                { name: "Ed25519" },
+                imported_public_key,
+                ukp.hex2bin(sign),
+                encoded_text
+            );
+            func(result_bool);
         });
     }
 }

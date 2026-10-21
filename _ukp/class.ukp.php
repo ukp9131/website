@@ -8,7 +8,7 @@
  * - `bool [cors_bool=false]`   cors 허용여부
  *
  * require  2026.02.19 config.php
- * @version 2026.09.22
+ * @version 2026.10.15
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -341,6 +341,24 @@ class Ukp {
             $arr["return"] = base64_decode($arr["return"]);
         }
         return $arr;
+    }
+
+    /**
+     * - 환경변수 값 trim 처리하여 가져오기
+     * - 파일 없는경우 빈문자열
+     *
+     * require  2026.10.12
+     * @version 2026.10.12
+     *
+     * @param  string $key 환경변수 파일명
+     * @return string      환경변수 값
+     */
+    function custom_env($key) {
+        $file = dirname(__FILE__) . "/env/{$key}";
+        if (!file_exists($file)) {
+            return "";
+        }
+        return trim(file_get_contents($file));
     }
 
     /**
@@ -1093,14 +1111,18 @@ class Ukp {
      * - ddl 기준으로 전체 데이터베이스 생성
      * - src 는 빈문자열인경우 prompt/upload_db.md 파일에 저장됨
      *
-     * require  2026.09.22
-     * @version 2026.09.22
+     * require  2026.10.15
+     * @version 2026.10.15
      *
-     * @param  array  $db_arr 키는 데이터베이스명, 값은 테이블명 배열
-     * @param  string $src    파일명이 포함된 저장경로
-     * @return array          생성결과
-     * - `bool   [bool]` 생성성공여부
-     * - `string [msg]`  결과상세내용
+     * @param array<string,array<int,string>> $db_arr
+     * db 및 테이블 배열
+     * - `[{데이터베이스명}][]` 테이블명
+     * @param string $src
+     * 파일명이 포함된 저장경로
+     * @return array{bool:bool,msg:string}
+     * 생성결과
+     * - `[bool]` 생성성공여부
+     * - `[msg]`  결과상세내용
      */
     function db_create_md($db_arr, $src = "") {
         $return_arr = array(
@@ -1113,7 +1135,6 @@ class Ukp {
         $db_dir = dirname(__FILE__) . "/db";
         $content = "";
         foreach ($db_arr as $database => $temp) {
-            $content .= "# database: {$database}\n";
             foreach ($temp as $table) {
                 $ddl_file = "{$db_dir}/ddl/{$database}/{$table}.json";
                 $list_file = "{$db_dir}/list/{$database}/{$table}.sql";
@@ -1125,11 +1146,11 @@ class Ukp {
                     $return_arr["msg"] = "{$list_file} 파일이 존재하지 않습니다.";
                     return $return_arr;
                 }
-                $content .= "## table: {$table}\n";
-                $content .= "### ddl\n```json\n";
+                $content .= "# database: {$database}, table: {$table}\n";
+                $content .= "## ddl\n```json\n";
                 $content .= trim(file_get_contents($ddl_file));
                 $content .= "\n```\n";
-                $content .= "### list sql\n```sql\n";
+                $content .= "## list sql\n```sql\n";
                 $content .= trim(file_get_contents($list_file));
                 $content .= "\n```\n";
             }
@@ -3208,8 +3229,8 @@ class Ukp {
         //php 5.4버전 이상인경우
         if (version_compare(phpversion(), '5.4.0', '>=')) {
             return json_encode($arr, JSON_UNESCAPED_UNICODE);
-            //php 5.2, 5.3버전인경우
         }
+        //php 5.2, 5.3버전인경우
         $param1 = '/(\\\u[a-f0-9]+)+/';
         $param2 = '$s';
         $param3 = '$json = json_decode(\'{"s":"\'.$s[0].\'"}\'); return reset($json);';
@@ -3360,22 +3381,27 @@ class Ukp {
 // #endregion
 // #region @ukp input
     /**
-     * 현재 실행중인 php파일
+     * - 현재 요청으로 실행된 PHP 파일 정보
      *
-     * require  2025.10.30 input_server str_simplify_path
-     * @version 2025.10.30
+     * require  2026.10.15 input_server str_simplify_path
+     * @version 2026.10.15
      *
-     * @return array         배열
-     *         string [dir]  절대경로
-     *         string [base] 파일명
+     * @return array{dir:string,base:string,file:string}
+     * php 파일 정보
+     * - `[dir]`  파일이 위치한 디렉터리 절대경로
+     * - `[base]` 확장자를 포함한 파일명
+     * - `[file]` 확장자를 제외한 파일명
      */
     function input_current_php() {
         $file_name = $this->input_server("script_filename");
-        $pwd = substr($file_name, 0, 1) == "/" ? "" : ($this->input_server("pwd") . "/");
+        //윈도우, 리눅스 절대경로 판단 정규식 사용
+        $pwd = preg_match('~^(?:/|[a-zA-Z]:[\\\\/]|\\\\\\\\)~', $file_name) ? "" : ($this->input_server("pwd") . "/");
         $file = $this->str_simplify_path($pwd . $file_name);
+        $info = pathinfo($file);
         return array(
-            "dir" => dirname($file),
-            "base" => basename($file)
+            "dir" => $info["dirname"],
+            "base" => $info["basename"],
+            "file" => $info["filename"]
         );
     }
 
@@ -3989,5 +4015,5 @@ class Ukp {
         }
         return $this->user_info;
     }
-// #endregion
+    // #endregion
 }

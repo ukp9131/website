@@ -1,0 +1,18 @@
+{
+    "comment": "샘플테이블(st)",
+    "columns": [
+        ["sample_table_idx  ", "primary     ", "pk          ", true],
+        ["foreign_idx       ", "foreign     ", "외래키      ", true],
+        ["field             ", "varchar     ", "컬럼명      ", false],
+        ["num               ", "int         ", "숫자        ", false],
+        ["insert_date       ", "date        ", "입력일      ", false],
+        ["insert_time       ", "time        ", "입력시      ", false],
+        ["update_dt         ", "datetime    ", "수정일시    ", true],
+        ["delete_flag       ", "flag        ", "삭제여부    ", false]
+    ],
+    "data": [
+        [null, null, null, null, null, null, null, "y"],
+        ["1", null, "hi 나는 '사자'야", "12345"],
+        [null, null, null, null, null, null, null, "n"]
+    ]
+}

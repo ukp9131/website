@@ -3,6 +3,7 @@
 /**
  * @version 2026.02.19
  * @author ukp
+ * @var Ukp $this
  */
 
 $config["parking_start_dt"] = "";
@@ -28,12 +29,12 @@ $config["table"] = array(
 );
 $config["db"] = array(
     "default" => array(
-        "host" => "",
-        "username" => "",
-        "password" => "",
-        "database" => "",
-        "port" => "",
-        "charset" => "",
+        "host" => $this->custom_env("DB_DEFAULT_HOST"),
+        "username" => $this->custom_env("DB_DEFAULT_USERNAME"),
+        "password" => $this->custom_env("DB_DEFAULT_PASSWORD"),
+        "database" => $this->custom_env("DB_DEFAULT_DATABASE"),
+        "port" => $this->custom_env("DB_DEFAULT_PORT"),
+        "charset" => $this->custom_env("DB_DEFAULT_CHARSET"),
         "time_zone" => "+09:00",
         "base64_password_bool" => false,
         "prefix" => "",
@@ -48,5 +49,5 @@ $config["db"] = array(
     )
 );
 
-$config["api_url"] = "";
-$config["api_token"] = "";
+$config["api_url"] = $this->custom_env("API_URL");
+$config["api_token"] = $this->custom_env("API_TOKEN");
