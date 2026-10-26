@@ -1,12 +1,12 @@
 # 요청사항
-- `## 입력값` 에 맞춰서 JSON 문자열을 생성해줘.
+- `# 요청사항 > ## 입력값` 에 입력한 값을 가지고 JSON 문자열을 생성해줘.
 ## 입력값
 ```php
 $foreign_postfix = "";
 ```
 ```sql
 ```
-### 규칙
+# 규칙
 - 결과물에는 주석을 달지 않는다.
 - `primary key` 설정이 되어있는 컬럼은 자료형이 `primary` 가 된다.
 - `$foreign_postfix` 값을 접미어로 가지고 있는 컬럼은 자료형이 `foreign` 이 된다.
@@ -32,7 +32,7 @@ $foreign_postfix = "";
 - 자료형 판정 우선순위는 `primary` → `foreign` → `$type_dictionary` → 원본 SQL 자료형 순서이다.
 - `primary key`, `index`, `key`, `unique index`, `unique key`에 포함된 컬럼은 인덱스여부를 `true`로 입력한다.
 - 복합 인덱스에 포함된 모든 컬럼은 인덱스여부를 true로 입력한다.
-### 참고변수
+## 참고변수
 ```php
 /**
  * - [{자료형}][0]:string 자료형
@@ -62,7 +62,7 @@ $type_dictionary = array(
  */
 $foreign_postfix = "";
 ```
-### 출력값 설명
+## 출력값 설명
 - comment: 테이블 주석
 - primary_type: 기본키 자료형, 기본값 int
 - columns: 컬럼 정보
@@ -71,7 +71,7 @@ $foreign_postfix = "";
   + `[][2]`: 컬럼 코멘트
   + `[][3]`: 인덱스여부
   + `[][4]`: 기본값, 설정 안한경우 기본값 null
-### 참고예제 입력값
+## 참고예제 입력값
 ```php
 $foreign_postfix = "_idx";
 ```
@@ -98,7 +98,7 @@ create table if not exists `ukp_sample_table` (
     index (`update_dt`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='샘플테이블(st)';
 ```
-### 참고예제 출력값
+## 참고예제 출력값
 ```json
 {
     "comment": "샘플테이블(st)",
@@ -122,5 +122,7 @@ create table if not exists `ukp_sample_table` (
     ]
 }
 ```
-#### 마지막 수정일
-- 2026.10.15
+<!--
+# 마지막 수정일
+- 2026.10.26
+-->

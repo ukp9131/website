@@ -12,7 +12,7 @@ $ukp_g = array(
     "dir" => "",        //실행한 파일 폴더
     "base" => "",       //실행한 파일명
     "file" => "",       //확장자 제거한 실행한 파일명
-    "view_dir" => "",   //_view 폴더경로
+    "dir_view" => "",   //_view 폴더경로
     "lang" => "",       //언어
     "title" => ""       //title 태그 내용
 );
