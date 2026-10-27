@@ -71,4 +71,6 @@ require_once dirname(__FILE__) . '/_.php';
 - sample.php(선택사항)
 - upload_db.md
 - upload_ukp_php.md
+# 메모
+- $ukp_g 변수는 `## 이미 세팅되어있는 변수` 에 추가하지 않아도 된다.
 -->
