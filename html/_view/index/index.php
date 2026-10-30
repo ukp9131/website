@@ -7,8 +7,8 @@ if (!isset($data)) {
     exit;
 }
 ?>
-<link rel="stylesheet" href="_view/index/style.css">
+<link rel="stylesheet" href="_view/<?php echo $data["g_file"] ?>/style.css">
 <div class="ukpb__content">
-    <?php echo $data["foo"]; ?>
+    hello
 </div>
-<script src="_view/index/script.js" type="module"></script>
+<script src="_view/<?php echo $data["g_file"] ?>/script.js" type="module"></script>
