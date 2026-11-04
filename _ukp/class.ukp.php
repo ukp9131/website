@@ -8,7 +8,7 @@
  * - `bool [cors_bool=false]`   cors 허용여부
  *
  * require  2026.02.19 config.php
- * @version 2026.10.15
+ * @version 2026.11.04
  * @since   PHP 5 >= 5.2.0, PHP 7, PHP 8
  * @author  ukp
  */
@@ -345,20 +345,22 @@ class Ukp {
 
     /**
      * - 환경변수 값 trim 처리하여 가져오기
-     * - 파일 없는경우 빈문자열
+     * - env 폴더 내 파일만 접근 가능
+     * - 파일 읽을 수 없는경우 에러 출력후 프로그램 종료
      *
-     * require  2026.10.12
-     * @version 2026.10.12
+     * require  2026.11.04
+     * @version 2026.11.04
      *
      * @param  string $key 환경변수 파일명
      * @return string      환경변수 값
      */
     function custom_env($key) {
-        $file = dirname(__FILE__) . "/env/{$key}";
-        if (!file_exists($file)) {
-            return "";
+        $file = dirname(__FILE__) . "/env/" . str_replace(array('/', '\\'), '', $key);
+        $result = file_get_contents($file);
+        if ($result === false) {
+            trigger_error($file . " 파일 내용을 가져올 수 없습니다.");
         }
-        return trim(file_get_contents($file));
+        return trim($result);
     }
 
     /**
